@@ -19,10 +19,17 @@ Hoe de tweetraps-stop werkt:
     trade -- dan krijgt-ie veel meer ruimte om door te lopen.
 
 Hoe het scannen werkt:
-  - Bij elke run vraagt de bot Kraken zelf welke EUR-paren er zijn en pakt
-    de top WATCHLIST_SIZE op 24u-volume (stablecoins uitgesloten) -- geen
-    vaste lijst meer die met de hand moet worden bijgehouden, dus de bot
-    beweegt vanzelf mee met wat er op dat moment daadwerkelijk liquide is.
+  - Vóór elke scan checkt de bot eerst of er al een saldo van een watchlist-
+    coin op de rekening staat dat hij nog niet als eigen positie kent (bv.
+    handmatig gekocht). Zo ja: adopteert hij dat als positie, met een
+    instapprijs herleid uit de echte trade-historie op Kraken, en gaat 'm
+    vanaf dan gewoon beheren (incl. verkopen via de trailing stop). Dit is
+    een read-only herkenningsstap -- er wordt geen order voor geplaatst, dus
+    dit gebeurt ook gewoon in DRY_RUN.
+  - Is er niks te adopteren, dan vraagt de bot Kraken zelf welke EUR-paren
+    er zijn en pakt de top WATCHLIST_SIZE op 24u-volume (stablecoins
+    uitgesloten) -- geen vaste lijst meer die met de hand moet worden
+    bijgehouden.
   - Zolang er geen positie open is, checkt de bot elke cyclus ALLE paren in
     die watchlist op een Donchian-breakout.
   - Breken er meerdere tegelijk uit, dan kiest de bot de sterkste (grootste
@@ -63,8 +70,7 @@ import pandas as pd
 # ============================================================================
 #  VEILIGHEID -- eerst hier checken voordat je iets anders aanraakt
 # ============================================================================
-DRY_RUN = True   # True = alleen loggen wat er zou gebeuren, GEEN echte orders.
-                 # Pas op False zetten als je de logica een tijdje hebt gevolgd.
+DRY_RUN = False  # LIVE: de bot plaatst nu echte orders met echt geld.
 
 # ============================================================================
 #  API-KEYS -- komen uit GitHub Secrets, staan NERGENS in dit bestand
@@ -308,8 +314,81 @@ def discover_watchlist(exchange):
     return watchlist
 
 
+def find_adoptable_position(exchange):
+    """Checkt of er al een saldo van een watchlist-coin op de rekening staat dat de bot
+    nog niet als eigen positie kent -- bv. handmatig gekocht vóórdat de bot actief werd.
+    Retourneert (symbol, hoeveelheid) van de eerste match boven het orderminimum, of None."""
+    try:
+        balance = exchange.fetch_balance().get("free", {})
+    except ccxt.BaseError as e:
+        log.warning(f"Kon balans niet ophalen voor adoptie-check ({e}).")
+        return None
+
+    for symbol in WATCHLIST:
+        base = base_currency(symbol)
+        amount = balance.get(base, 0) or 0
+        if amount <= 0:
+            continue
+        try:
+            price = float(exchange.fetch_ticker(symbol)["last"])
+        except ccxt.BaseError:
+            continue
+        if amount * price >= MIN_ORDER_EUR:
+            return symbol, amount
+
+    return None
+
+
+def compute_average_entry_price(exchange, symbol):
+    """Herleidt een gewogen gemiddelde instapprijs uit de ECHTE trade-historie op Kraken
+    (fetch_my_trades), i.p.v. te gokken. Simplificatie: telt alleen BUY-trades mee, geen
+    FIFO-matching tegen eventuele sells -- voor het normale geval (een of enkele
+    handmatige aankopen, geen sells) is dit nauwkeurig genoeg. Retourneert None als er
+    geen trade-historie te vinden is (bv. via een andere app gekocht, of ouder dan wat
+    de API teruggeeft) -- dan valt de aanroeper terug op de huidige prijs als schatting."""
+    try:
+        trades = exchange.fetch_my_trades(symbol, limit=200)
+    except ccxt.BaseError as e:
+        log.warning(f"Kon trade-historie niet ophalen voor {symbol} ({e}).")
+        return None
+
+    buys = [t for t in trades if t.get("side") == "buy" and t.get("price") and t.get("amount")]
+    total_amount = sum(t["amount"] for t in buys)
+    if total_amount <= 0:
+        return None
+
+    total_cost = sum(t["price"] * t["amount"] for t in buys)
+    return total_cost / total_amount
+
+
 def scan_for_entry(exchange, state):
     """Doorzoekt de watchlist en stapt in op de sterkste breakout, indien die er is."""
+    adoptable = find_adoptable_position(exchange)
+    if adoptable:
+        symbol, amount = adoptable
+        avg_price = compute_average_entry_price(exchange, symbol)
+        try:
+            current_price = float(exchange.fetch_ticker(symbol)["last"])
+        except ccxt.BaseError:
+            current_price = avg_price
+
+        entry_price = avg_price if avg_price is not None else current_price
+        source = "herleid uit je trade-historie" if avg_price is not None else "GESCHAT op de huidige prijs (geen trade-historie gevonden -- controleer dit)"
+        log.info(
+            f"Bestaand saldo gevonden: {amount} {base_currency(symbol)} -- geadopteerd als positie. "
+            f"Instapprijs {source}: €{fmt_price(entry_price)}"
+        )
+        state.update({
+            "in_position": True,
+            "symbol": symbol,
+            "entry_price": entry_price,
+            "peak_price": max(entry_price, current_price),
+            "current_price": current_price,
+            "position_size": amount,
+            "is_runner": False,
+        })
+        return state
+
     candidates = []
     snapshot = {}  # elke run vers -- paren die uit de watchlist vielen verdwijnen zo ook uit het dashboard
     checked_at = datetime.now(timezone.utc).isoformat()
