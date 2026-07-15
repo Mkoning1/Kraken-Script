@@ -204,19 +204,19 @@
       "LINK/EUR",
       "AAVE/EUR",
       "PUMP/EUR",
-      "NEAR/EUR",
       "SUI/EUR",
+      "NEAR/EUR",
       "PEPE/EUR",
       "CC/EUR",
       "BNB/EUR",
       "DOT/EUR",
-      "BILL/EUR",
       "UNI/EUR",
+      "BILL/EUR",
       "AVAX/EUR",
       "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-15T18:26:23.587777+00:00",
+  "last_run_at": "2026-07-15T18:47:05.857556+00:00",
   "dry_run": false
 }
