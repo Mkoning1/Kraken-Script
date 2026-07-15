@@ -305,13 +305,31 @@
     const container = document.getElementById("status-pill-container");
     container.innerHTML = "";
     const pill = el("div", "status-pill");
-    const dot = el("span", "dot" + (state.in_position ? (state.is_runner ? " pos" : " live") : ""));
+
+    const staleMinutes = state.last_run_at
+      ? Math.round((Date.now() - new Date(state.last_run_at).getTime()) / 60000)
+      : null;
+    const isStale = staleMinutes !== null && staleMinutes > 30; // workflow draait elke ~15 min
+
+    const dot = el("span", "dot" + (isStale ? "" : state.in_position ? (state.is_runner ? " pos" : " live") : ""));
+    if (isStale) dot.style.background = "var(--negative)";
+
     const label = state.in_position
       ? (state.is_runner ? "IN POSITIE — RUNNER" : "IN POSITIE")
       : "SCANNEN";
     pill.appendChild(dot);
-    pill.appendChild(el("span", null, `${label} · bijgewerkt ${timeAgo(state._fetched_at)}`));
+    pill.appendChild(el("span", null, `${label} · bot draaide ${timeAgo(state.last_run_at)}`));
     container.appendChild(pill);
+
+    if (isStale) {
+      const warn = el("div", "error-box");
+      warn.style.marginBottom = "14px";
+      warn.appendChild(el("div", "title", "Bot lijkt stil te liggen"));
+      warn.appendChild(el("div", null,
+        `Laatste run was ${staleMinutes} minuten geleden — hoort elke ~15 min te zijn. ` +
+        `Check de Actions-tab in je repo op een rode (mislukte) run.`));
+      container.appendChild(warn);
+    }
   }
 
   function renderPositionCard(state) {
