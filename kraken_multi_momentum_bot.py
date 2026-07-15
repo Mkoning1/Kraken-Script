@@ -51,6 +51,7 @@ import sys
 import json
 import logging
 from pathlib import Path
+from datetime import datetime, timezone
 
 import ccxt
 import pandas as pd
@@ -98,7 +99,9 @@ RSI_MIN_FOR_ENTRY  = 50     # lichte momentum-confirmatie. Zet op 0 om uit te sc
 MIN_ORDER_EUR      = 5.0    # Kraken cost-minimum voor EUR-paren
 
 STATE_FILE    = Path(__file__).with_name("bot_state.json")
-STATUS_FILE   = Path(__file__).with_name("STATUS.md")
+STATUS_FILE   = Path(__file__).with_name("README.md")   # README rendert automatisch
+                                                          # op de repo-hoofdpagina, geen
+                                                          # extra klik nodig om 'm te zien
 
 logging.basicConfig(
     level=logging.INFO,
@@ -115,15 +118,24 @@ log = logging.getLogger("multi-momentum-bot")
 # ============================================================================
 def load_state():
     if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
+        state = json.loads(STATE_FILE.read_text())
+        state.setdefault("current_price", None)
+        state.setdefault("current_atr", None)
+        state.setdefault("watchlist_snapshot", {})
+        state.setdefault("trade_history", [])
+        return state
     return {
         "in_position": False,
         "symbol": None,
         "entry_price": None,
         "peak_price": None,
+        "current_price": None,
+        "current_atr": None,
         "position_size": None,
         "is_runner": False,
         "last_candle_ts": {},   # {symbol: ts van laatst-verwerkte candle}
+        "watchlist_snapshot": {},  # {symbol: {price, donchian_high, checked_at}} -- voor het dashboard
+        "trade_history": [],       # afgeronde trades, nieuwste laatst, voor het dashboard
     }
 
 
@@ -260,6 +272,8 @@ def place_sell(exchange, symbol, amount):
 def scan_for_entry(exchange, state):
     """Doorzoekt de watchlist en stapt in op de sterkste breakout, indien die er is."""
     candidates = []
+    snapshot = dict(state.get("watchlist_snapshot", {}))  # vorige snapshot als basis, per paar bijwerken
+    checked_at = datetime.now(timezone.utc).isoformat()
 
     for symbol in WATCHLIST:
         try:
@@ -271,25 +285,35 @@ def scan_for_entry(exchange, state):
         ts = int(last_closed["ts"])
         price = float(last_closed["close"])
 
-        if ts == state["last_candle_ts"].get(symbol):
-            continue  # geen nieuwe candle voor dit paar sinds vorige check
-
         if pd.isna(last_closed["donchian_high"]) or pd.isna(last_closed["atr"]) or pd.isna(last_closed["rsi"]):
             continue  # nog niet genoeg historie voor dit paar
 
+        donchian_high = float(last_closed["donchian_high"])
+        snapshot[symbol] = {
+            "price": price,
+            "donchian_high": donchian_high,
+            "pct_to_breakout": round((donchian_high / price - 1) * 100, 2) if price > 0 else None,
+            "checked_at": checked_at,
+        }
+
+        if ts == state["last_candle_ts"].get(symbol):
+            continue  # geen nieuwe candle voor dit paar sinds vorige check
+
         state["last_candle_ts"][symbol] = ts
 
-        breakout = price > last_closed["donchian_high"]
+        breakout = price > donchian_high
         momentum_ok = (RSI_MIN_FOR_ENTRY <= 0) or (last_closed["rsi"] > RSI_MIN_FOR_ENTRY)
 
         log.info(
-            f"Check {symbol:9s} | prijs €{fmt_price(price)} | Donchian-high €{fmt_price(last_closed['donchian_high'])} "
+            f"Check {symbol:9s} | prijs €{fmt_price(price)} | Donchian-high €{fmt_price(donchian_high)} "
             f"| RSI {last_closed['rsi']:.1f} | ATR €{fmt_price(last_closed['atr'])}"
         )
 
         if breakout and momentum_ok:
-            strength_in_atr = (price - last_closed["donchian_high"]) / last_closed["atr"]
+            strength_in_atr = (price - donchian_high) / last_closed["atr"]
             candidates.append((strength_in_atr, symbol, price))
+
+    state["watchlist_snapshot"] = snapshot
 
     if not candidates:
         return state
@@ -307,6 +331,7 @@ def scan_for_entry(exchange, state):
             "symbol": symbol,
             "entry_price": price,
             "peak_price": price,
+            "current_price": price,
             "position_size": bought,
             "is_runner": False,
         })
@@ -334,6 +359,8 @@ def monitor_position(exchange, state):
 
     price = float(last_closed["close"])
     atr_now = float(last_closed["atr"])
+    state["current_price"] = price
+    state["current_atr"] = atr_now
     state["peak_price"] = max(state["peak_price"], price)
 
     # Eenmaal een runner, blijft een positie een runner (geen heen-en-weer
@@ -357,11 +384,25 @@ def monitor_position(exchange, state):
         if sold:
             pnl_pct = (price / state["entry_price"] - 1) * 100
             log.info(f"EXIT {symbol} via trailing stop | resultaat: {pnl_pct:+.1f}%")
+
+            trade_history = state.get("trade_history", [])
+            trade_history.append({
+                "symbol": symbol,
+                "entry_price": state["entry_price"],
+                "exit_price": price,
+                "pnl_pct": round(pnl_pct, 2),
+                "was_runner": state["is_runner"],
+                "exit_time": datetime.now(timezone.utc).isoformat(),
+            })
+            state["trade_history"] = trade_history[-50:]  # laatste 50 volstaat, houdt het bestand klein
+
             state.update({
                 "in_position": False,
                 "symbol": None,
                 "entry_price": None,
                 "peak_price": None,
+                "current_price": None,
+                "current_atr": None,
                 "position_size": None,
                 "is_runner": False,
             })
@@ -374,14 +415,14 @@ def run_cycle(exchange, state):
         state = monitor_position(exchange, state)
     else:
         state = scan_for_entry(exchange, state)
+    state["config"] = {"watchlist": WATCHLIST, "runner_threshold_atr": RUNNER_THRESHOLD_ATR}
     save_state(state)
     return state
 
 
 def write_status_file(state):
-    """Schrijft een leesbare STATUS.md -- zichtbaar op de GitHub-repopagina zelf,
+    """Schrijft een leesbare README.md -- zichtbaar op de GitHub-repopagina zelf,
     dus ook prima te bekijken vanaf je telefoon zonder ergens in te loggen."""
-    from datetime import datetime, timezone
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     mode = "DRY RUN (geen echte orders)" if DRY_RUN else "LIVE (echte orders!)"
 
@@ -401,7 +442,10 @@ def write_status_file(state):
         )
 
     content = (
-        f"# Trading bot status\n\n"
+        f"# Kraken multi-coin momentum bot\n\n"
+        f"Automatische breakout-bot, scant {len(WATCHLIST)} paren, draait elke ~15 min via "
+        f"GitHub Actions. Dit bestand wordt door de bot zelf overschreven bij elke run.\n\n"
+        f"---\n\n"
         f"**Laatste check:** {now}\n\n"
         f"{body}\n"
         f"---\n"
