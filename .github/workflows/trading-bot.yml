@@ -28,8 +28,8 @@ jobs:
 
       - name: Run bot cycle
         env:
-          KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
-          KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
+          KRAKEN_API_KEY: ${{ secrets.DnOb3qAA8pOStu8mDv7PKVw2Crjl1FshkIcMxd9yyM78Ddh0P2kwYShh }}
+          KRAKEN_API_SECRET: ${{ secrets.jNIdBbt4pfujuXy+LU5YGwhqsOMTe9wWVEpLtdR+70EnpNlvb6gdwMjOCVKf5yGZy0Uh6e09PTnyYcniJJnXVw== }}
         run: python kraken_multi_momentum_bot.py
 
       - name: Commit updated state (alleen als er iets veranderd is)
