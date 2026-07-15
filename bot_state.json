@@ -1,0 +1,18 @@
+{
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
+  "is_runner": false,
+  "last_candle_ts": {
+    "ADA/EUR": 1784088000000,
+    "SOL/EUR": 1784088000000,
+    "DOT/EUR": 1784088000000,
+    "LINK/EUR": 1784088000000,
+    "AVAX/EUR": 1784088000000,
+    "DOGE/EUR": 1784088000000,
+    "SHIB/EUR": 1784088000000,
+    "PEPE/EUR": 1784088000000
+  }
+}
