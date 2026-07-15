@@ -328,10 +328,14 @@ def scan_for_entry(exchange, state):
             continue  # nog niet genoeg historie voor dit paar
 
         donchian_high = float(last_closed["donchian_high"])
+        # Positief = prijs staat AL boven het kanaal (bullish, dicht bij of over de trigger).
+        # Negatief = prijs moet nog stijgen. Dit is bewust andersom dan een letterlijke
+        # "afstand tot", zodat positief/negatief meteen bullish/bearish betekent voor de UI.
+        pct_vs_breakout = round((price / donchian_high - 1) * 100, 2) if donchian_high > 0 else None
         snapshot[symbol] = {
             "price": price,
             "donchian_high": donchian_high,
-            "pct_to_breakout": round((donchian_high / price - 1) * 100, 2) if price > 0 else None,
+            "pct_vs_breakout": pct_vs_breakout,
             "checked_at": checked_at,
         }
 
