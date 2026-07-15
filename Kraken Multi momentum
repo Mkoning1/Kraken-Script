@@ -64,8 +64,8 @@ DRY_RUN = True   # True = alleen loggen wat er zou gebeuren, GEEN echte orders.
 # ============================================================================
 #  API-KEYS -- komen uit GitHub Secrets, staan NERGENS in dit bestand
 # ============================================================================
-API_KEY    = os.environ.get("KRAKEN_API_KEY", "")
-API_SECRET = os.environ.get("KRAKEN_API_SECRET", "")
+API_KEY    = os.environ.get("DnOb3qAA8pOStu8mDv7PKVw2Crjl1FshkIcMxd9yyM78Ddh0P2kwYShh", "")
+API_SECRET = os.environ.get("jNIdBbt4pfujuXy+LU5YGwhqsOMTe9wWVEpLtdR+70EnpNlvb6gdwMjOCVKf5yGZy0Uh6e09PTnyYcniJJnXVw==", "")
 
 # Liquide, al lang op Kraken genoteerde paren, nu aangevuld met memecoins.
 # DOGE/SHIB/PEPE heb ik gecontroleerd: bestaan echt als EUR-paar op Kraken.
