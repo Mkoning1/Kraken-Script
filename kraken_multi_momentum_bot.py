@@ -416,6 +416,8 @@ def run_cycle(exchange, state):
     else:
         state = scan_for_entry(exchange, state)
     state["config"] = {"watchlist": WATCHLIST, "runner_threshold_atr": RUNNER_THRESHOLD_ATR}
+    state["last_run_at"] = datetime.now(timezone.utc).isoformat()  # de ECHTE laatste-draai-tijd,
+                                                                     # niet wanneer het dashboard 'm ophaalt
     save_state(state)
     return state
 
