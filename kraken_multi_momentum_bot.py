@@ -19,8 +19,12 @@ Hoe de tweetraps-stop werkt:
     trade -- dan krijgt-ie veel meer ruimte om door te lopen.
 
 Hoe het scannen werkt:
+  - Bij elke run vraagt de bot Kraken zelf welke EUR-paren er zijn en pakt
+    de top WATCHLIST_SIZE op 24u-volume (stablecoins uitgesloten) -- geen
+    vaste lijst meer die met de hand moet worden bijgehouden, dus de bot
+    beweegt vanzelf mee met wat er op dat moment daadwerkelijk liquide is.
   - Zolang er geen positie open is, checkt de bot elke cyclus ALLE paren in
-    WATCHLIST op een Donchian-breakout.
+    die watchlist op een Donchian-breakout.
   - Breken er meerdere tegelijk uit, dan kiest de bot de sterkste (grootste
     uitbraak, gemeten in ATR's boven het kanaal) -- niet zomaar de eerste
     in de lijst.
@@ -68,21 +72,15 @@ DRY_RUN = True   # True = alleen loggen wat er zou gebeuren, GEEN echte orders.
 API_KEY    = os.environ.get("KRAKEN_API_KEY", "")
 API_SECRET = os.environ.get("KRAKEN_API_SECRET", "")
 
-# Liquide, al lang op Kraken genoteerde paren, nu aangevuld met memecoins.
-# DOGE/SHIB/PEPE heb ik gecontroleerd: bestaan echt als EUR-paar op Kraken.
-# Wil je er meer bij (WIF, BONK, FLOKI...): check zelf even op kraken.com of
-# de EUR-variant bestaat. Bestaat een paar niet of wordt het gedelist, dan
-# logt de bot een waarschuwing en slaat 'm gewoon over -- geen crash.
-#
-# Let op bij memecoins t.o.v. de rest van de lijst: dunnere orderboeken dan
-# ADA/SOL/DOT, dus een market sell tijdens een scherpe crash kan slechter
-# vullen dan de laatste prijs die de bot zag. De ATR-logica schaalt vanzelf
-# mee met hun hogere volatiliteit, dat is geen probleem -- de fill zelf kan
-# wel rommeliger zijn dan bij de grotere paren.
-WATCHLIST  = [
-    "ADA/EUR", "SOL/EUR", "DOT/EUR", "LINK/EUR", "AVAX/EUR",
-    "DOGE/EUR", "SHIB/EUR", "PEPE/EUR",
-]
+# Watchlist wordt NIET meer hardgecodeerd -- elke run vraagt de bot Kraken zelf
+# welke EUR-paren er zijn en pakt de top WATCHLIST_SIZE op 24u-volume. Groeit
+# en beweegt dus vanzelf mee met de markt, in plaats van een vaste lijst die
+# ik ooit met de hand samenstelde. Zie discover_watchlist() verderop.
+WATCHLIST_SIZE   = 25
+STABLECOIN_BASES = {"USDT", "USDC", "DAI", "USD", "GBP", "PYUSD", "TUSD", "USDG", "EURT", "EURR"}
+FALLBACK_WATCHLIST = ["ADA/EUR", "SOL/EUR", "DOT/EUR", "LINK/EUR", "AVAX/EUR"]  # als volume-ophalen faalt
+
+WATCHLIST  = list(FALLBACK_WATCHLIST)  # wordt bij elke run overschreven door discover_watchlist()
 TIMEFRAME  = "4h"
 
 # --- Strategie-parameters --------------------------------------------------
@@ -269,10 +267,51 @@ def place_sell(exchange, symbol, amount):
 # ============================================================================
 #  HOOFDLUS
 # ============================================================================
+def discover_watchlist(exchange):
+    """Vraagt Kraken zelf welke EUR-paren er zijn en pakt de top WATCHLIST_SIZE
+    op 24u-volume. Stablecoins (USDT/EUR, USDC/EUR...) slaan we over -- die
+    bewegen per definitie amper, een breakout-strategie heeft daar niks te zoeken."""
+    try:
+        markets = exchange.load_markets()
+        tickers = exchange.fetch_tickers()
+    except Exception as e:
+        # Bewust breed gevangen: een hapering hier (network, rate limit, een
+        # veld dat ontbreekt) mag nooit de hele cyclus laten crashen -- we
+        # hebben een prima vaste lijst achter de hand.
+        log.warning(f"Kon marktlijst/tickers niet ophalen ({e}) -- val terug op vaste lijst.")
+        return list(FALLBACK_WATCHLIST)
+
+    ranked = []
+    for symbol, market in markets.items():
+        if not market.get("active", True):
+            continue
+        if market.get("quote") != "EUR":
+            continue
+        if market.get("base") in STABLECOIN_BASES:
+            continue
+        if market.get("type") and market.get("type") != "spot":
+            continue
+        ticker = tickers.get(symbol)
+        if not ticker:
+            continue
+        volume_eur = ticker.get("quoteVolume") or 0
+        if volume_eur > 0:
+            ranked.append((volume_eur, symbol))
+
+    if not ranked:
+        log.warning("Geen enkel EUR-paar met volume gevonden -- val terug op vaste lijst.")
+        return list(FALLBACK_WATCHLIST)
+
+    ranked.sort(reverse=True)
+    watchlist = [sym for _, sym in ranked[:WATCHLIST_SIZE]]
+    log.info(f"Marktscan: {len(ranked)} actieve EUR-paren gevonden, top {len(watchlist)} op volume gekozen.")
+    return watchlist
+
+
 def scan_for_entry(exchange, state):
     """Doorzoekt de watchlist en stapt in op de sterkste breakout, indien die er is."""
     candidates = []
-    snapshot = dict(state.get("watchlist_snapshot", {}))  # vorige snapshot als basis, per paar bijwerken
+    snapshot = {}  # elke run vers -- paren die uit de watchlist vielen verdwijnen zo ook uit het dashboard
     checked_at = datetime.now(timezone.utc).isoformat()
 
     for symbol in WATCHLIST:
@@ -440,13 +479,14 @@ def write_status_file(state):
     else:
         body = (
             f"**Status:** Scannen, geen open positie ({mode})\n\n"
-            f"Watchlist: {', '.join(f'`{s}`' for s in WATCHLIST)}\n"
+            f"Watchlist: top {len(WATCHLIST)} EUR-paren op 24u-volume (ververst elke run).\n"
         )
 
     content = (
         f"# Kraken multi-coin momentum bot\n\n"
-        f"Automatische breakout-bot, scant {len(WATCHLIST)} paren, draait elke ~15 min via "
-        f"GitHub Actions. Dit bestand wordt door de bot zelf overschreven bij elke run.\n\n"
+        f"Automatische breakout-bot, scant dynamisch de top {len(WATCHLIST)} EUR-paren op Kraken "
+        f"(op volume), draait elke ~15 min via GitHub Actions. Dit bestand wordt door de bot zelf "
+        f"overschreven bij elke run. Zie het dashboard voor het volledige overzicht.\n\n"
         f"---\n\n"
         f"**Laatste check:** {now}\n\n"
         f"{body}\n"
@@ -457,11 +497,18 @@ def write_status_file(state):
 
 
 def main():
+    global WATCHLIST
     exchange = build_exchange()
     state = load_state()
+
+    WATCHLIST = discover_watchlist(exchange)
+    # State opschonen voor paren die niet meer in de watchlist zitten, anders
+    # blijven ze onterecht in het dashboard staan met stokoude cijfers.
+    state["last_candle_ts"] = {s: t for s, t in state.get("last_candle_ts", {}).items() if s in WATCHLIST}
+
     mode = "DRY RUN (geen echte orders)" if DRY_RUN else "LIVE (echte orders!)"
     log.info(
-        f"Cyclus gestart | {mode} | watchlist: {', '.join(WATCHLIST)} | {TIMEFRAME} | "
+        f"Cyclus gestart | {mode} | {len(WATCHLIST)} paren | {TIMEFRAME} | "
         f"breakout={BREAKOUT_LOOKBACK} candles | trail={ATR_TRAIL_MULT_INITIAL}x->{ATR_TRAIL_MULT_RUNNER}xATR "
         f"(runner vanaf {RUNNER_THRESHOLD_ATR}x ATR winst) | RSI-min={RSI_MIN_FOR_ENTRY}"
     )
