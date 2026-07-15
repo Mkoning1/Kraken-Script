@@ -197,25 +197,25 @@
       "ADA/EUR",
       "HYPE/EUR",
       "TRX/EUR",
-      "DOGE/EUR",
       "XLM/EUR",
+      "DOGE/EUR",
       "TAO/EUR",
       "LINK/EUR",
-      "PUMP/EUR",
+      "PEPE/EUR",
       "ONDO/EUR",
+      "PUMP/EUR",
       "AAVE/EUR",
       "NEAR/EUR",
       "SUI/EUR",
       "BNB/EUR",
       "CC/EUR",
-      "PEPE/EUR",
-      "DOT/EUR",
       "AVAX/EUR",
-      "UNI/EUR",
-      "BILL/EUR"
+      "BILL/EUR",
+      "DOT/EUR",
+      "UNI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-15T21:18:49.764272+00:00",
+  "last_run_at": "2026-07-15T22:31:43.192015+00:00",
   "dry_run": false
 }
