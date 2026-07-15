@@ -1,0 +1,41 @@
+name: Trading bot cycle
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'   # elke 15 min -- GitHub kan dit een paar minuten
+                              # vertragen bij drukte, geen probleem voor een
+                              # strategie op 4h-candles.
+  workflow_dispatch: {}       # handmatig een cyclus draaien via de Actions-tab
+
+permissions:
+  contents: write   # nodig om bot_state.json / STATUS.md terug te committen
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot cycle
+        env:
+          KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
+          KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
+        run: python kraken_multi_momentum_bot.py
+
+      - name: Commit updated state (alleen als er iets veranderd is)
+        run: |
+          git config user.name "trading-bot"
+          git config user.email "[email protected]"
+          git add bot_state.json STATUS.md
+          git diff --staged --quiet || git commit -m "Bot update [skip ci]"
+          git push
