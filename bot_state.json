@@ -8,7 +8,6 @@
   "last_candle_ts": {
     "ADA/EUR": 1784131200000,
     "SOL/EUR": 1784116800000,
-    "DOT/EUR": 1784116800000,
     "LINK/EUR": 1784116800000,
     "AVAX/EUR": 1784116800000,
     "DOGE/EUR": 1784116800000,
@@ -200,22 +199,22 @@
       "XLM/EUR",
       "DOGE/EUR",
       "TAO/EUR",
+      "ONDO/EUR",
       "LINK/EUR",
       "PEPE/EUR",
-      "ONDO/EUR",
       "PUMP/EUR",
       "AAVE/EUR",
       "NEAR/EUR",
       "SUI/EUR",
       "BNB/EUR",
       "CC/EUR",
+      "UNI/EUR",
       "AVAX/EUR",
       "BILL/EUR",
-      "DOT/EUR",
-      "UNI/EUR"
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-15T22:31:43.192015+00:00",
+  "last_run_at": "2026-07-15T23:42:55.629119+00:00",
   "dry_run": false
 }
