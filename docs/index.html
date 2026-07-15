@@ -58,6 +58,605 @@
   }
   header h1 span { color: var(--text-muted); font-weight: 500; }
 
+  .mode-badge {
+    display: inline-block;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 2px 7px;
+    border-radius: 5px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .mode-badge.dry {
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .mode-badge.live {
+    color: var(--negative);
+    border: 1px solid var(--negative);
+    background: rgba(240,89,107,0.1);
+  }
+
+  .refresh-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: "IBM Plex Mono", monospace;
+    cursor: pointer;
+  }
+  .refresh-btn:active { background: var(--surface); }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 18px;
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); flex-shrink: 0; }
+  .dot.live { background: var(--accent); box-shadow: 0 0 0 3px rgba(232,163,61,0.18); }
+  .dot.pos { background: var(--positive); box-shadow: 0 0 0 3px rgba(79,214,138,0.18); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+
+  .card-title {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 12px;
+  }
+
+  .position-symbol {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 14px;
+  }
+
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .kv-row:last-of-type { border-bottom: none; }
+  .kv-row .k { color: var(--text-muted); }
+  .kv-row .v { font-family: "IBM Plex Mono", monospace; }
+
+  .pnl-big {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 2px 0 14px;
+  }
+  .pnl-big.pos { color: var(--positive); }
+  .pnl-big.neg { color: var(--negative); }
+
+  .runner-block { margin-top: 14px; }
+  .runner-label {
+    display: flex;
+    justify-content: space-between;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    letter-spacing: 0.03em;
+  }
+  .runner-label .active { color: var(--accent); font-weight: 600; }
+  .runner-track {
+    height: 6px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .runner-fill {
+    height: 100%;
+    background: var(--text-muted);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .runner-fill.runner { background: var(--accent); }
+
+  .watch-row {
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .watch-row:last-child { border-bottom: none; }
+  .watch-row-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13.5px;
+    margin-bottom: 6px;
+  }
+  .watch-row .sym { font-family: "Space Grotesk", sans-serif; font-weight: 600; }
+  .watch-row .price { font-family: "IBM Plex Mono", monospace; color: var(--text-muted); }
+  .watch-row .dist { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--text-muted); }
+  .watch-row .dist.close { color: var(--accent); font-weight: 600; }
+  .watch-bar-track {
+    height: 4px;
+    background: var(--surface-2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .watch-bar-fill {
+    height: 100%;
+    background: var(--text-muted);
+    border-radius: 3px;
+  }
+  .watch-bar-fill.close { background: var(--accent); }
+  .watch-more {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: "IBM Plex Mono", monospace;
+    padding-top: 10px;
+    text-align: center;
+  }
+
+  .equity-chart { display: block; margin-bottom: 16px; }
+
+  .summary-row {
+    display: flex;
+    gap: 18px;
+    margin-bottom: 4px;
+  }
+  .summary-item .num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 20px;
+    font-weight: 600;
+    display: block;
+  }
+  .summary-item .num.pos { color: var(--positive); }
+  .summary-item .num.neg { color: var(--negative); }
+  .summary-item .lbl {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.03em;
+  }
+
+  .trade-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .trade-row:last-child { border-bottom: none; }
+  .trade-left { display: flex; flex-direction: column; gap: 2px; }
+  .trade-sym { font-family: "Space Grotesk", sans-serif; font-weight: 600; }
+  .trade-meta { font-size: 11px; color: var(--text-muted); font-family: "IBM Plex Mono", monospace; }
+  .trade-pnl { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 14.5px; }
+  .trade-pnl.pos { color: var(--positive); }
+  .trade-pnl.neg { color: var(--negative); }
+  .runner-badge {
+    display: inline-block;
+    font-size: 9.5px;
+    font-family: "IBM Plex Mono", monospace;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    padding: 1px 4px;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  .empty {
+    color: var(--text-muted);
+    font-size: 13.5px;
+    padding: 8px 0;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    margin-top: 24px;
+  }
+
+  .error-box {
+    background: var(--surface);
+    border: 1px solid var(--negative);
+    border-radius: var(--radius);
+    padding: 16px;
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .error-box .title { color: var(--negative); font-weight: 600; margin-bottom: 6px; font-family: "Space Grotesk", sans-serif; }
+  .error-box code { font-family: "IBM Plex Mono", monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .runner-fill { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Kraken bot <span id="dry-run-badge"></span></h1>
+  <button class="refresh-btn" id="refresh-btn" aria-label="Ververs">↻</button>
+</header>
+
+<div id="status-pill-container"></div>
+<div id="app"><p class="empty">Laden…</p></div>
+
+<footer id="footer"></footer>
+
+<script>
+  // ---- Pas dit aan als je repo anders heet -------------------------------
+  const GITHUB_USER = "Mkoning1";
+  const GITHUB_REPO = "Kraken-Script";
+  const BRANCH = "main";
+  // -------------------------------------------------------------------------
+
+  const DATA_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/bot_state.json?_=${Date.now()}`;
+  const REFRESH_MS = 60000;
+
+  function fmtPrice(x) {
+    if (x === null || x === undefined) return "—";
+    const ax = Math.abs(x);
+    if (ax === 0) return "0";
+    if (ax >= 1) return x.toFixed(4);
+    if (ax >= 0.0001) return x.toFixed(6);
+    return x.toFixed(10);
+  }
+
+  function fmtPct(x, digits = 2) {
+    if (x === null || x === undefined) return "—";
+    const sign = x > 0 ? "+" : "";
+    return `${sign}${x.toFixed(digits)}%`;
+  }
+
+  function timeAgo(isoString) {
+    if (!isoString) return "onbekend";
+    const diffMs = Date.now() - new Date(isoString).getTime();
+    const min = Math.round(diffMs / 60000);
+    if (min < 1) return "zojuist";
+    if (min < 60) return `${min} min geleden`;
+    const hrs = Math.round(min / 60);
+    if (hrs < 24) return `${hrs} uur geleden`;
+    return `${Math.round(hrs / 24)} dagen geleden`;
+  }
+
+  function el(tag, className, html) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (html !== undefined) e.innerHTML = html;
+    return e;
+  }
+
+  function renderStatusPill(state) {
+    const container = document.getElementById("status-pill-container");
+    container.innerHTML = "";
+    const pill = el("div", "status-pill");
+
+    const staleMinutes = state.last_run_at
+      ? Math.round((Date.now() - new Date(state.last_run_at).getTime()) / 60000)
+      : null;
+    const isStale = staleMinutes !== null && staleMinutes > 30; // workflow draait elke ~15 min
+
+    const dot = el("span", "dot" + (isStale ? "" : state.in_position ? (state.is_runner ? " pos" : " live") : ""));
+    if (isStale) dot.style.background = "var(--negative)";
+
+    const label = state.in_position
+      ? (state.is_runner ? "IN POSITIE — RUNNER" : "IN POSITIE")
+      : "SCANNEN";
+    pill.appendChild(dot);
+    pill.appendChild(el("span", null, `${label} · bot draaide ${timeAgo(state.last_run_at)}`));
+    container.appendChild(pill);
+
+    if (isStale) {
+      const warn = el("div", "error-box");
+      warn.style.marginBottom = "14px";
+      warn.appendChild(el("div", "title", "Bot lijkt stil te liggen"));
+      warn.appendChild(el("div", null,
+        `Laatste run was ${staleMinutes} minuten geleden — hoort elke ~15 min te zijn. ` +
+        `Check de Actions-tab in je repo op een rode (mislukte) run.`));
+      container.appendChild(warn);
+    }
+  }
+
+  function renderPositionCard(state) {
+    const card = el("div", "card");
+    card.appendChild(el("p", "card-title", "Open positie"));
+    card.appendChild(el("div", "position-symbol", state.symbol));
+
+    const pnlPct = state.entry_price && state.current_price
+      ? (state.current_price / state.entry_price - 1) * 100
+      : null;
+    if (pnlPct !== null) {
+      const pnlEl = el("div", "pnl-big " + (pnlPct >= 0 ? "pos" : "neg"), fmtPct(pnlPct));
+      card.appendChild(pnlEl);
+    }
+
+    const rows = [
+      ["Instapprijs", `€${fmtPrice(state.entry_price)}`],
+      ["Huidige prijs", `€${fmtPrice(state.current_price)}`],
+      ["Piek sinds instap", `€${fmtPrice(state.peak_price)}`],
+    ];
+    rows.forEach(([k, v]) => {
+      const row = el("div", "kv-row");
+      row.appendChild(el("span", "k", k));
+      row.appendChild(el("span", "v", v));
+      card.appendChild(row);
+    });
+
+    // Signature element: voortgang richting "runner" status, in ATR-eenheden.
+    const threshold = (state.config && state.config.runner_threshold_atr) || 3.0;
+    if (state.current_atr && state.entry_price && state.current_price) {
+      const profitInAtr = (state.current_price - state.entry_price) / state.current_atr;
+      const ratio = state.is_runner ? 1 : Math.max(0, Math.min(profitInAtr / threshold, 1));
+      const block = el("div", "runner-block");
+      const labelRow = el("div", "runner-label");
+      labelRow.appendChild(el("span", null, "Trailing stop: " + (state.is_runner ? "BREED" : "smal")));
+      labelRow.appendChild(el("span", state.is_runner ? "active" : null,
+        state.is_runner ? "RUNNER ✓" : `${profitInAtr.toFixed(1)} / ${threshold} × ATR`));
+      const track = el("div", "runner-track");
+      const fill = el("div", "runner-fill" + (state.is_runner ? " runner" : ""));
+      fill.style.width = `${Math.round(ratio * 100)}%`;
+      track.appendChild(fill);
+      block.appendChild(labelRow);
+      block.appendChild(track);
+      card.appendChild(block);
+    }
+
+    return card;
+  }
+
+  function renderWatchlistCard(state) {
+    const card = el("div", "card");
+    const total = (state.config && state.config.watchlist) ? state.config.watchlist.length : Object.keys(state.watchlist_snapshot || {}).length;
+    card.appendChild(el("p", "card-title", `Watchlist${total ? ` · top ${Math.min(10, total)} van ${total}` : ""}`));
+    const snap = state.watchlist_snapshot || {};
+    const symbols = Object.keys(snap);
+    if (symbols.length === 0) {
+      card.appendChild(el("p", "empty", "Nog geen data — verschijnt na de eerste cyclus."));
+      return card;
+    }
+    const sorted = symbols
+      .map(sym => ({ sym, ...snap[sym] }))
+      .sort((a, b) => (a.pct_to_breakout ?? 999) - (b.pct_to_breakout ?? 999));
+
+    // Balkvulling: 0% te gaan = volle balk, 20%+ te gaan = zo goed als leeg.
+    // Geeft in één oogopslag aan wie dichtbij zit, zonder de cijfers te lezen.
+    const BAR_SCALE = 20;
+
+    sorted.slice(0, 10).forEach(({ sym, price, pct_to_breakout }) => {
+      const row = el("div", "watch-row");
+      const top = el("div", "watch-row-top");
+      top.appendChild(el("span", "sym", sym));
+      top.appendChild(el("span", "price", `€${fmtPrice(price)}`));
+      const close = pct_to_breakout !== null && pct_to_breakout < 2;
+      top.appendChild(el("span", "dist" + (close ? " close" : ""),
+        pct_to_breakout !== null ? `${pct_to_breakout}%` : "—"));
+      row.appendChild(top);
+
+      const track = el("div", "watch-bar-track");
+      const fill = el("div", "watch-bar-fill" + (close ? " close" : ""));
+      const ratio = pct_to_breakout !== null ? Math.max(0, 1 - pct_to_breakout / BAR_SCALE) : 0;
+      fill.style.width = `${Math.round(ratio * 100)}%`;
+      track.appendChild(fill);
+      row.appendChild(track);
+
+      card.appendChild(row);
+    });
+
+    if (sorted.length > 10) {
+      card.appendChild(el("div", "watch-more", `+ ${sorted.length - 10} andere paren in de gaten gehouden`));
+    }
+    return card;
+  }
+
+  function buildEquitySparkline(trades) {
+    // trades: oud -> nieuw. Bouwt een cumulatief (samengesteld) rendement-lijntje.
+    const points = [0];
+    let acc = 1;
+    trades.forEach(t => {
+      acc *= (1 + t.pnl_pct / 100);
+      points.push((acc - 1) * 100);
+    });
+    const w = 100, h = 32, pad = 2;
+    const min = Math.min(0, ...points);
+    const max = Math.max(0, ...points);
+    const range = (max - min) || 1;
+    const coords = points.map((p, i) => {
+      const x = pad + (i / (points.length - 1 || 1)) * (w - 2 * pad);
+      const y = h - pad - ((p - min) / range) * (h - 2 * pad);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    });
+    const last = points[points.length - 1];
+    const color = last >= 0 ? "var(--positive)" : "var(--negative)";
+    const zeroY = h - pad - ((0 - min) / range) * (h - 2 * pad);
+    return `
+      <svg class="equity-chart" viewBox="0 0 ${w} ${h}" width="100%" height="44" preserveAspectRatio="none">
+        <line x1="0" y1="${zeroY.toFixed(1)}" x2="${w}" y2="${zeroY.toFixed(1)}" stroke="var(--border)" stroke-width="1" />
+        <polyline points="${coords.join(" ")}" fill="none" stroke="${color}" stroke-width="2"
+          stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+      </svg>`;
+  }
+
+  function renderHistoryCard(state) {
+    const card = el("div", "card");
+    card.appendChild(el("p", "card-title", "Trade-geschiedenis"));
+    const tradesChrono = state.trade_history || [];
+    const trades = tradesChrono.slice().reverse();
+
+    if (trades.length === 0) {
+      card.appendChild(el("p", "empty", "Nog geen afgeronde trades."));
+      return card;
+    }
+
+    const wins = trades.filter(t => t.pnl_pct > 0).length;
+    const winRate = Math.round((wins / trades.length) * 100);
+    const compounded = trades.reduce((acc, t) => acc * (1 + t.pnl_pct / 100), 1);
+    const totalReturn = (compounded - 1) * 100;
+
+    if (tradesChrono.length >= 2) {
+      card.insertAdjacentHTML("beforeend", buildEquitySparkline(tradesChrono));
+    }
+
+    const summary = el("div", "summary-row");
+    const items = [
+      [trades.length, "trades", null],
+      [`${winRate}%`, "win rate", null],
+      [fmtPct(totalReturn), "samengesteld resultaat", totalReturn >= 0 ? "pos" : "neg"],
+    ];
+    items.forEach(([num, lbl, cls]) => {
+      const item = el("div", "summary-item");
+      item.appendChild(el("span", "num" + (cls ? " " + cls : ""), String(num)));
+      item.appendChild(el("span", "lbl", lbl));
+      summary.appendChild(item);
+    });
+    card.appendChild(summary);
+    card.appendChild(el("div", null, "").cloneNode()); // spacing
+
+    trades.slice(0, 20).forEach(t => {
+      const row = el("div", "trade-row");
+      const left = el("div", "trade-left");
+      const symLine = el("div");
+      symLine.appendChild(el("span", "trade-sym", t.symbol));
+      if (t.was_runner) symLine.appendChild(el("span", "runner-badge", "RUNNER"));
+      left.appendChild(symLine);
+      left.appendChild(el("div", "trade-meta", `€${fmtPrice(t.entry_price)} → €${fmtPrice(t.exit_price)} · ${timeAgo(t.exit_time)}`));
+      row.appendChild(left);
+      row.appendChild(el("div", "trade-pnl " + (t.pnl_pct >= 0 ? "pos" : "neg"), fmtPct(t.pnl_pct)));
+      card.appendChild(row);
+    });
+
+    return card;
+  }
+
+  function render(state) {
+    const badge = document.getElementById("dry-run-badge");
+    if (state.dry_run === undefined) {
+      badge.innerHTML = "";
+    } else if (state.dry_run) {
+      badge.innerHTML = `<span class="mode-badge dry">DRY RUN</span>`;
+    } else {
+      badge.innerHTML = `<span class="mode-badge live">● LIVE — ECHT GELD</span>`;
+    }
+    renderStatusPill(state);
+    const app = document.getElementById("app");
+    app.innerHTML = "";
+    if (state.in_position) app.appendChild(renderPositionCard(state));
+    else app.appendChild(renderWatchlistCard(state));
+    app.appendChild(renderHistoryCard(state));
+    document.getElementById("footer").textContent = `ververst automatisch elke ${REFRESH_MS / 1000}s`;
+  }
+
+  function renderError(message) {
+    const app = document.getElementById("app");
+    app.innerHTML = "";
+    const box = el("div", "error-box");
+    box.appendChild(el("div", "title", "Kan de botstatus niet ophalen"));
+    box.appendChild(el("div", null, message));
+    app.appendChild(box);
+  }
+
+  async function load() {
+    try {
+      const res = await fetch(DATA_URL, { cache: "no-store" });
+      if (!res.ok) {
+        renderError(`GitHub gaf status ${res.status} terug voor <code>bot_state.json</code>. ` +
+          `Heeft de workflow al minstens 1 keer succesvol gedraaid?`);
+        return;
+      }
+      const state = await res.json();
+      state._fetched_at = new Date().toISOString();
+      render(state);
+    } catch (err) {
+      renderError(`Netwerkfout: ${err.message}. Check <code>GITHUB_USER</code>/<code>GITHUB_REPO</code> ` +
+        `bovenin dit bestand, of probeer het over een minuut opnieuw.`);
+    }
+  }
+
+  document.getElementById("refresh-btn").addEventListener("click", load);
+  load();
+  setInterval(load, REFRESH_MS);
+</script>
+
+</body>
+</html><!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bot — status</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d12;
+    --surface: #12161f;
+    --surface-2: #171c27;
+    --border: #1f2530;
+    --text: #e7e9ec;
+    --text-muted: #7a8394;
+    --accent: #e8a33d;
+    --positive: #4fd68a;
+    --negative: #f0596b;
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 20px 16px 48px;
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .display { font-family: "Space Grotesk", sans-serif; }
+
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  header h1 {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header h1 span { color: var(--text-muted); font-weight: 500; }
+
   .refresh-btn {
     background: none;
     border: 1px solid var(--border);
