@@ -127,11 +127,13 @@ def load_state():
         state.setdefault("current_atr", None)
         state.setdefault("watchlist_snapshot", {})
         state.setdefault("trade_history", [])
+        state.setdefault("entry_time", None)
         return state
     return {
         "in_position": False,
         "symbol": None,
         "entry_price": None,
+        "entry_time": None,
         "peak_price": None,
         "current_price": None,
         "current_atr": None,
@@ -315,24 +317,25 @@ def discover_watchlist(exchange):
 
 
 def find_adoptable_position(exchange):
-    """Checkt of er al een saldo van een watchlist-coin op de rekening staat dat de bot
-    nog niet als eigen positie kent -- bv. handmatig gekocht vóórdat de bot actief werd.
-    Retourneert (symbol, hoeveelheid) van de eerste match boven het orderminimum, of None."""
+    """Checkt of er al een saldo van een coin op de rekening staat dat de bot nog niet
+    als eigen positie kent -- bv. handmatig gekocht vóórdat de bot actief werd. Kijkt naar
+    ALLE saldi op de rekening, niet alleen naar coins die toevallig in de huidige
+    (dynamische) watchlist zitten -- anders blijft een bestaande positie onzichtbaar op
+    een dag dat die coin net buiten de top-WATCHLIST_SIZE op volume valt."""
     try:
         balance = exchange.fetch_balance().get("free", {})
     except ccxt.BaseError as e:
         log.warning(f"Kon balans niet ophalen voor adoptie-check ({e}).")
         return None
 
-    for symbol in WATCHLIST:
-        base = base_currency(symbol)
-        amount = balance.get(base, 0) or 0
-        if amount <= 0:
+    for base, amount in balance.items():
+        if base == "EUR" or base in STABLECOIN_BASES or not amount or amount <= 0:
             continue
+        symbol = f"{base}/EUR"
         try:
             price = float(exchange.fetch_ticker(symbol)["last"])
         except ccxt.BaseError:
-            continue
+            continue  # geen EUR-paar voor deze coin, of niet (meer) verhandelbaar -- sla over
         if amount * price >= MIN_ORDER_EUR:
             return symbol, amount
 
@@ -382,6 +385,7 @@ def scan_for_entry(exchange, state):
             "in_position": True,
             "symbol": symbol,
             "entry_price": entry_price,
+            "entry_time": datetime.now(timezone.utc).isoformat(),
             "peak_price": max(entry_price, current_price),
             "current_price": current_price,
             "position_size": amount,
@@ -452,6 +456,7 @@ def scan_for_entry(exchange, state):
             "in_position": True,
             "symbol": symbol,
             "entry_price": price,
+            "entry_time": datetime.now(timezone.utc).isoformat(),
             "peak_price": price,
             "current_price": price,
             "position_size": bought,
@@ -522,6 +527,7 @@ def monitor_position(exchange, state):
                 "in_position": False,
                 "symbol": None,
                 "entry_price": None,
+                "entry_time": None,
                 "peak_price": None,
                 "current_price": None,
                 "current_atr": None,
