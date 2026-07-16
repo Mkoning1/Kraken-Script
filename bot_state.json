@@ -203,18 +203,18 @@
       "BCH/EUR",
       "TAO/EUR",
       "SUI/EUR",
-      "BNB/EUR",
       "NEAR/EUR",
-      "AAVE/EUR",
-      "PUMP/EUR",
+      "BNB/EUR",
       "CC/EUR",
       "UNI/EUR",
+      "AAVE/EUR",
+      "PUMP/EUR",
       "AVAX/EUR",
       "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-16T06:51:30.398635+00:00",
+  "last_run_at": "2026-07-16T07:04:44.600256+00:00",
   "dry_run": false,
   "entry_time": null
 }
