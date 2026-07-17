@@ -206,15 +206,15 @@
       "TRX/EUR",
       "SUI/EUR",
       "VVV/EUR",
-      "NEAR/EUR",
       "EURC/EUR",
       "ONDO/EUR",
-      "XLM/EUR",
-      "TAO/EUR",
       "LINK/EUR",
+      "TAO/EUR",
+      "XLM/EUR",
+      "NEAR/EUR",
       "DOGE/EUR",
-      "BNB/EUR",
       "AAVE/EUR",
+      "BNB/EUR",
       "DOT/EUR",
       "BCH/EUR",
       "OXT/EUR",
@@ -223,7 +223,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-17T17:19:52.648030+00:00",
+  "last_run_at": "2026-07-17T18:35:32.682810+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
