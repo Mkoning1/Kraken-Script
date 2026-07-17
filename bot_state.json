@@ -27,9 +27,7 @@
     "BCH/EUR": 1784275200000,
     "EURC/EUR": 1784275200000,
     "AAVE/EUR": 1784275200000,
-    "PAXG/EUR": 1784275200000,
     "XDC/EUR": 1784275200000,
-    "NIGHT/EUR": 1784275200000,
     "VVV/EUR": 1784275200000
   },
   "current_price": 0.02472,
@@ -207,26 +205,26 @@
       "ADA/EUR",
       "ZEC/EUR",
       "TRX/EUR",
-      "ONDO/EUR",
       "SUI/EUR",
       "EURC/EUR",
       "NEAR/EUR",
+      "VVV/EUR",
+      "ONDO/EUR",
       "XLM/EUR",
       "TAO/EUR",
       "LINK/EUR",
-      "BNB/EUR",
       "AAVE/EUR",
+      "BNB/EUR",
       "DOGE/EUR",
       "BCH/EUR",
-      "XDC/EUR",
       "UNI/EUR",
-      "PAXG/EUR",
-      "VVV/EUR",
-      "NIGHT/EUR"
+      "DOT/EUR",
+      "XDC/EUR",
+      "PUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-17T12:38:06.549130+00:00",
+  "last_run_at": "2026-07-17T14:17:23.947600+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
