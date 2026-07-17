@@ -211,19 +211,19 @@
       "EURC/EUR",
       "TAO/EUR",
       "XLM/EUR",
-      "NEAR/EUR",
       "DOGE/EUR",
+      "NEAR/EUR",
       "AAVE/EUR",
       "BNB/EUR",
-      "DOT/EUR",
       "OXT/EUR",
+      "DOT/EUR",
       "BCH/EUR",
       "UNI/EUR",
-      "JUP/EUR"
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-17T22:07:32.995154+00:00",
+  "last_run_at": "2026-07-17T23:10:17.533609+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
