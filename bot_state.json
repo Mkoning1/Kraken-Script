@@ -199,8 +199,8 @@
       "HYPE/EUR",
       "ADA/EUR",
       "LTC/EUR",
-      "ZEC/EUR",
       "ONDO/EUR",
+      "ZEC/EUR",
       "VVV/EUR",
       "TRX/EUR",
       "SUI/EUR",
@@ -211,16 +211,16 @@
       "OXT/EUR",
       "UNI/EUR",
       "DOGE/EUR",
-      "BCH/EUR",
-      "JUP/EUR",
-      "BNB/EUR",
       "XLM/EUR",
+      "JUP/EUR",
+      "BCH/EUR",
+      "BNB/EUR",
       "BILL/EUR",
       "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-18T09:42:51.809776+00:00",
+  "last_run_at": "2026-07-18T10:51:16.133716+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
