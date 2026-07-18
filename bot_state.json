@@ -23,13 +23,12 @@
     "SUI/EUR": 1784275200000,
     "BNB/EUR": 1784275200000,
     "ONDO/EUR": 1784275200000,
-    "BCH/EUR": 1784275200000,
     "AAVE/EUR": 1784275200000,
     "VVV/EUR": 1784275200000,
-    "XDC/EUR": 1784332800000
+    "XDC/EUR": 1784347200000
   },
-  "current_price": 0.02432,
-  "current_atr": 0.0003007142857142856,
+  "current_price": 0.02449,
+  "current_atr": 0.0002978571428571426,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 55343.8,
@@ -204,25 +203,25 @@
       "ZEC/EUR",
       "VVV/EUR",
       "TRX/EUR",
-      "SUI/EUR",
       "ONDO/EUR",
+      "SUI/EUR",
       "SYN/EUR",
       "TAO/EUR",
-      "LINK/EUR",
       "AAVE/EUR",
+      "LINK/EUR",
       "OXT/EUR",
-      "NEAR/EUR",
       "UNI/EUR",
-      "DOGE/EUR",
       "BNB/EUR",
+      "NEAR/EUR",
+      "DOGE/EUR",
       "DOT/EUR",
-      "XLM/EUR",
       "BILL/EUR",
-      "BCH/EUR"
+      "XLM/EUR",
+      "JUP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-18T05:52:47.633442+00:00",
+  "last_run_at": "2026-07-18T08:00:05.356246+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
