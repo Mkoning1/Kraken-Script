@@ -197,8 +197,8 @@
       "LTC/EUR",
       "ADA/EUR",
       "HYPE/EUR",
-      "ZEC/EUR",
       "ONDO/EUR",
+      "ZEC/EUR",
       "TRX/EUR",
       "SYN/EUR",
       "TAO/EUR",
@@ -214,11 +214,11 @@
       "JUP/EUR",
       "BILL/EUR",
       "BCH/EUR",
-      "POL/EUR"
+      "SUI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-18T21:56:24.616682+00:00",
+  "last_run_at": "2026-07-18T22:57:37.602259+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
