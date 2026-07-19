@@ -203,21 +203,21 @@
       "DOGE/EUR",
       "TRX/EUR",
       "TAO/EUR",
-      "LINK/EUR",
-      "BILL/EUR",
-      "SUI/EUR",
       "PUMP/EUR",
-      "NEAR/EUR",
+      "LINK/EUR",
+      "SUI/EUR",
+      "BILL/EUR",
       "BNB/EUR",
+      "NEAR/EUR",
       "WLD/EUR",
       "BCH/EUR",
       "TRAC/EUR",
       "PEPE/EUR",
-      "DOT/EUR"
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-19T22:01:59.162892+00:00",
+  "last_run_at": "2026-07-19T23:13:18.039473+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
