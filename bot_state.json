@@ -199,25 +199,25 @@
       "VVV/EUR",
       "ONDO/EUR",
       "ZEC/EUR",
-      "DOGE/EUR",
       "XLM/EUR",
+      "DOGE/EUR",
       "TRX/EUR",
       "TAO/EUR",
+      "LINK/EUR",
       "BILL/EUR",
       "SUI/EUR",
-      "LINK/EUR",
+      "PUMP/EUR",
       "NEAR/EUR",
       "BNB/EUR",
       "WLD/EUR",
-      "DOT/EUR",
-      "PEPE/EUR",
+      "BCH/EUR",
       "TRAC/EUR",
-      "PUMP/EUR",
-      "BCH/EUR"
+      "PEPE/EUR",
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-19T20:58:46.584331+00:00",
+  "last_run_at": "2026-07-19T22:01:59.162892+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
