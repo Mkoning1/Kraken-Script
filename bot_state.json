@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "XDC/EUR",
   "entry_price": 0.02472,
-  "peak_price": 0.02472,
+  "peak_price": 0.02473,
   "position_size": 702.6173,
   "is_runner": false,
   "last_candle_ts": {
@@ -22,10 +22,10 @@
     "ONDO/EUR": 1784275200000,
     "AAVE/EUR": 1784275200000,
     "VVV/EUR": 1784275200000,
-    "XDC/EUR": 1784433600000
+    "XDC/EUR": 1784448000000
   },
-  "current_price": 0.02462,
-  "current_atr": 0.00025499999999999953,
+  "current_price": 0.02473,
+  "current_atr": 0.0002278571428571425,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 55343.8,
@@ -198,9 +198,9 @@
       "ADA/EUR",
       "LTC/EUR",
       "ZEC/EUR",
+      "VVV/EUR",
       "TRX/EUR",
       "DOGE/EUR",
-      "VVV/EUR",
       "ONDO/EUR",
       "TAO/EUR",
       "LINK/EUR",
@@ -209,16 +209,16 @@
       "NEAR/EUR",
       "SYN/EUR",
       "BILL/EUR",
-      "AAVE/EUR",
       "BNB/EUR",
+      "AAVE/EUR",
+      "JUP/EUR",
       "BCH/EUR",
-      "UNI/EUR",
       "TRAC/EUR",
-      "M/EUR"
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-19T11:43:48.242258+00:00",
+  "last_run_at": "2026-07-19T12:40:03.853598+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
