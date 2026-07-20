@@ -21,10 +21,10 @@
     "TAO/EUR": 1784275200000,
     "ONDO/EUR": 1784275200000,
     "VVV/EUR": 1784275200000,
-    "XDC/EUR": 1784520000000
+    "XDC/EUR": 1784534400000
   },
-  "current_price": 0.02509,
-  "current_atr": 0.00018071428571428579,
+  "current_price": 0.02505,
+  "current_atr": 0.0001778571428571428,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 55343.8,
@@ -200,24 +200,24 @@
       "ONDO/EUR",
       "ZEC/EUR",
       "XLM/EUR",
-      "DOGE/EUR",
-      "VVV/EUR",
       "PUMP/EUR",
       "EURC/EUR",
-      "TAO/EUR",
-      "LINK/EUR",
       "SUI/EUR",
-      "JUP/EUR",
-      "BNB/EUR",
+      "LINK/EUR",
       "AVAX/EUR",
+      "TAO/EUR",
+      "DOGE/EUR",
+      "BNB/EUR",
       "NEAR/EUR",
-      "BCH/EUR",
+      "VVV/EUR",
+      "JUP/EUR",
       "DOT/EUR",
+      "WLD/EUR",
       "UNI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-20T10:31:06.891254+00:00",
+  "last_run_at": "2026-07-20T12:56:23.152745+00:00",
   "dry_run": false,
   "entry_time": "2026-07-17T12:38:06.549093+00:00"
 }
