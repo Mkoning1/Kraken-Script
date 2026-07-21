@@ -22,7 +22,7 @@
     "ONDO/EUR": 1784563200000,
     "NIGHT/EUR": 1784563200000,
     "SUI/EUR": 1784563200000,
-    "PUMP/EUR": 1784563200000,
+    "PUMP/EUR": 1784577600000,
     "EURC/EUR": 1784563200000,
     "NEAR/EUR": 1784563200000,
     "BNB/EUR": 1784563200000,
@@ -32,8 +32,8 @@
     "JUP/EUR": 1784563200000,
     "UNI/EUR": 1784563200000
   },
-  "current_price": 0.001815,
-  "current_atr": null,
+  "current_price": 0.001772,
+  "current_atr": 7.221428571428566e-05,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57020.9,
@@ -222,19 +222,19 @@
       "XLM/EUR",
       "EURC/EUR",
       "ONDO/EUR",
-      "PUMP/EUR",
       "NEAR/EUR",
+      "PUMP/EUR",
       "BNB/EUR",
       "BCH/EUR",
       "AVAX/EUR",
       "DOT/EUR",
-      "JUP/EUR",
       "TAO/EUR",
+      "JUP/EUR",
       "UNI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-20T23:04:15.003864+00:00",
+  "last_run_at": "2026-07-21T00:11:15.608187+00:00",
   "dry_run": false,
   "entry_time": "2026-07-20T21:51:52.088690+00:00"
 }
