@@ -213,24 +213,24 @@
       "ONDO/EUR",
       "ZEC/EUR",
       "XLM/EUR",
-      "NIGHT/EUR",
       "TRX/EUR",
+      "NIGHT/EUR",
       "NEAR/EUR",
       "HYPE/EUR",
       "EURC/EUR",
+      "LINK/EUR",
       "TAO/EUR",
+      "BNB/EUR",
       "TRU/EUR",
       "AAVE/EUR",
-      "BNB/EUR",
-      "LINK/EUR",
       "BCH/EUR",
+      "WLD/EUR",
       "AVAX/EUR",
-      "DOGE/EUR",
-      "SHX/EUR"
+      "DOGE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-21T21:15:38.234922+00:00",
+  "last_run_at": "2026-07-21T22:28:18.337720+00:00",
   "dry_run": false,
   "entry_time": "2026-07-20T21:51:52.088690+00:00"
 }
