@@ -28,10 +28,10 @@
     "AVAX/EUR": 1784563200000,
     "BCH/EUR": 1784563200000,
     "DOT/EUR": 1784563200000,
-    "PUMP/EUR": 1784606400000
+    "PUMP/EUR": 1784620800000
   },
-  "current_price": 0.0018,
-  "current_atr": 7.471428571428568e-05,
+  "current_price": 0.001752,
+  "current_atr": 7.642857142857139e-05,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57020.9,
@@ -212,27 +212,27 @@
       "LTC/EUR",
       "SUI/EUR",
       "NIGHT/EUR",
+      "VVV/EUR",
       "ZEC/EUR",
       "TRX/EUR",
       "HYPE/EUR",
       "ONDO/EUR",
-      "VVV/EUR",
+      "EURC/EUR",
       "LINK/EUR",
       "NEAR/EUR",
       "DOGE/EUR",
       "XLM/EUR",
       "TRU/EUR",
-      "EURC/EUR",
-      "BNB/EUR",
       "TAO/EUR",
       "BCH/EUR",
+      "BNB/EUR",
       "AVAX/EUR",
       "DOT/EUR",
-      "WLD/EUR"
+      "AAVE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-21T11:24:19.195100+00:00",
+  "last_run_at": "2026-07-21T12:56:19.902655+00:00",
   "dry_run": false,
   "entry_time": "2026-07-20T21:51:52.088690+00:00"
 }
