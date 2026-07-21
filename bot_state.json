@@ -26,11 +26,10 @@
     "NEAR/EUR": 1784563200000,
     "BNB/EUR": 1784563200000,
     "BCH/EUR": 1784563200000,
-    "DOT/EUR": 1784563200000,
-    "PUMP/EUR": 1784620800000
+    "PUMP/EUR": 1784635200000
   },
-  "current_price": 0.001752,
-  "current_atr": 7.642857142857139e-05,
+  "current_price": 0.001731,
+  "current_atr": 7.942857142857141e-05,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57020.9,
@@ -205,8 +204,8 @@
     "watchlist": [
       "BTC/EUR",
       "ETH/EUR",
-      "SOL/EUR",
       "XRP/EUR",
+      "SOL/EUR",
       "ADA/EUR",
       "LTC/EUR",
       "NIGHT/EUR",
@@ -215,23 +214,23 @@
       "ZEC/EUR",
       "TRX/EUR",
       "ONDO/EUR",
-      "HYPE/EUR",
       "EURC/EUR",
-      "NEAR/EUR",
+      "HYPE/EUR",
       "XLM/EUR",
-      "LINK/EUR",
-      "BCH/EUR",
-      "TRU/EUR",
-      "DOGE/EUR",
+      "NEAR/EUR",
       "TAO/EUR",
+      "TRU/EUR",
+      "LINK/EUR",
       "BNB/EUR",
+      "BCH/EUR",
       "AAVE/EUR",
+      "DOGE/EUR",
       "SHX/EUR",
-      "DOT/EUR"
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-21T15:09:30.128214+00:00",
+  "last_run_at": "2026-07-21T16:43:55.296228+00:00",
   "dry_run": false,
   "entry_time": "2026-07-20T21:51:52.088690+00:00"
 }
