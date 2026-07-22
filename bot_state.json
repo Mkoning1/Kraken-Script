@@ -208,16 +208,16 @@
       "XRP/EUR",
       "ADA/EUR",
       "HYPE/EUR",
+      "ZEC/EUR",
       "LTC/EUR",
       "EURC/EUR",
-      "ZEC/EUR",
-      "ONDO/EUR",
       "TRX/EUR",
+      "ONDO/EUR",
       "XLM/EUR",
-      "AAVE/EUR",
       "NEAR/EUR",
-      "LINK/EUR",
+      "AAVE/EUR",
       "NIGHT/EUR",
+      "LINK/EUR",
       "BNB/EUR",
       "SUI/EUR",
       "DOGE/EUR",
@@ -225,12 +225,12 @@
       "XDC/EUR",
       "TAO/EUR",
       "BCH/EUR",
-      "AVAX/EUR",
-      "DOT/EUR"
+      "DOT/EUR",
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-22T17:42:39.125338+00:00",
+  "last_run_at": "2026-07-22T18:49:02.988874+00:00",
   "dry_run": false,
   "entry_time": "2026-07-20T21:51:52.088690+00:00"
 }
