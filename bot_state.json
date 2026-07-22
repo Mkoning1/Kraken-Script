@@ -1,9 +1,9 @@
 {
-  "in_position": true,
-  "symbol": "PUMP/EUR",
-  "entry_price": 0.001815,
-  "peak_price": 0.001815,
-  "position_size": 9461.983,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1784563200000,
@@ -26,10 +26,10 @@
     "NEAR/EUR": 1784563200000,
     "BNB/EUR": 1784563200000,
     "BCH/EUR": 1784563200000,
-    "PUMP/EUR": 1784721600000
+    "PUMP/EUR": 1784736000000
   },
-  "current_price": 0.001713,
-  "current_atr": 6.350000000000004e-05,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57020.9,
@@ -198,6 +198,14 @@
       "pnl_pct": -0.2,
       "was_runner": false,
       "exit_time": "2026-07-20T20:42:08.483297+00:00"
+    },
+    {
+      "symbol": "PUMP/EUR",
+      "entry_price": 0.001815,
+      "exit_price": 0.00164,
+      "pnl_pct": -9.64,
+      "was_runner": false,
+      "exit_time": "2026-07-22T20:14:13.470831+00:00"
     }
   ],
   "config": {
@@ -214,23 +222,23 @@
       "TRX/EUR",
       "ONDO/EUR",
       "XLM/EUR",
-      "NEAR/EUR",
       "AAVE/EUR",
       "NIGHT/EUR",
-      "LINK/EUR",
-      "BNB/EUR",
       "SUI/EUR",
+      "BNB/EUR",
+      "LINK/EUR",
+      "NEAR/EUR",
       "DOGE/EUR",
-      "HBAR/EUR",
-      "XDC/EUR",
       "TAO/EUR",
+      "XDC/EUR",
       "BCH/EUR",
       "DOT/EUR",
-      "AVAX/EUR"
+      "AVAX/EUR",
+      "HBAR/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-22T18:49:02.988874+00:00",
+  "last_run_at": "2026-07-22T20:14:13.470888+00:00",
   "dry_run": false,
-  "entry_time": "2026-07-20T21:51:52.088690+00:00"
+  "entry_time": null
 }
