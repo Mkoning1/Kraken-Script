@@ -29,7 +29,6 @@
     "BILL/EUR": 1784865600000,
     "SKY/EUR": 1784865600000,
     "POL/EUR": 1784865600000,
-    "ZAMA/EUR": 1784865600000,
     "UNI/EUR": 1784865600000
   },
   "current_price": 0.290851,
@@ -224,25 +223,25 @@
       "ADA/EUR",
       "DOGE/EUR",
       "ZEC/EUR",
-      "XLM/EUR",
       "BNB/EUR",
+      "XLM/EUR",
       "EURC/EUR",
       "AVAX/EUR",
+      "BILL/EUR",
       "SUI/EUR",
       "LINK/EUR",
-      "BILL/EUR",
       "PEPE/EUR",
       "TAO/EUR",
       "ONDO/EUR",
       "NEAR/EUR",
       "POL/EUR",
-      "SKY/EUR",
       "UNI/EUR",
-      "ZAMA/EUR"
+      "SKY/EUR",
+      "SYN/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-24T09:58:28.856343+00:00",
+  "last_run_at": "2026-07-24T11:49:29.613676+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
