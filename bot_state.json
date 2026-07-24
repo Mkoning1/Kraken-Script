@@ -233,13 +233,13 @@
       "BILL/EUR",
       "WLD/EUR",
       "SKY/EUR",
-      "DOT/EUR",
-      "EURC/EUR",
-      "SYN/EUR"
+      "STX/EUR",
+      "SYN/EUR",
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-24T21:39:09.604001+00:00",
+  "last_run_at": "2026-07-24T22:44:09.426017+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
