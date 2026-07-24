@@ -24,7 +24,6 @@
     "NEAR/EUR": 1784865600000,
     "BNB/EUR": 1784865600000,
     "AVAX/EUR": 1784865600000,
-    "EURC/EUR": 1784865600000,
     "BILL/EUR": 1784865600000,
     "SKY/EUR": 1784865600000,
     "UNI/EUR": 1784865600000
@@ -221,25 +220,25 @@
       "XLM/EUR",
       "ADA/EUR",
       "DOGE/EUR",
-      "BNB/EUR",
       "SUI/EUR",
+      "BNB/EUR",
       "ZEC/EUR",
       "NEAR/EUR",
       "AVAX/EUR",
       "ONDO/EUR",
       "TAO/EUR",
       "LINK/EUR",
+      "WLD/EUR",
       "UNI/EUR",
       "BILL/EUR",
-      "WLD/EUR",
       "SKY/EUR",
       "STX/EUR",
       "SYN/EUR",
-      "EURC/EUR"
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-24T22:44:09.426017+00:00",
+  "last_run_at": "2026-07-24T23:47:44.858650+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
