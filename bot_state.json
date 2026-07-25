@@ -24,8 +24,7 @@
     "NEAR/EUR": 1784865600000,
     "BNB/EUR": 1784865600000,
     "AVAX/EUR": 1784865600000,
-    "BILL/EUR": 1784865600000,
-    "UNI/EUR": 1784865600000
+    "BILL/EUR": 1784865600000
   },
   "current_price": 0.289633,
   "current_atr": 0.001309928571428575,
@@ -216,28 +215,28 @@
       "LTC/EUR",
       "HYPE/EUR",
       "XLM/EUR",
-      "TRX/EUR",
       "ADA/EUR",
+      "TRX/EUR",
       "SUI/EUR",
       "DOGE/EUR",
       "NEAR/EUR",
       "ZEC/EUR",
-      "BNB/EUR",
       "ONDO/EUR",
+      "DOT/EUR",
+      "BNB/EUR",
       "AVAX/EUR",
       "WLD/EUR",
-      "TAO/EUR",
       "SYN/EUR",
-      "DOT/EUR",
+      "TAO/EUR",
       "ALGO/EUR",
-      "BILL/EUR",
       "LINK/EUR",
       "M/EUR",
-      "UNI/EUR"
+      "BILL/EUR",
+      "AAVE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-25T10:09:28.433839+00:00",
+  "last_run_at": "2026-07-25T11:36:50.769331+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
