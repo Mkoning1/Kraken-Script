@@ -223,17 +223,17 @@
       "SYN/EUR",
       "EUL/EUR",
       "ONDO/EUR",
+      "VVV/EUR",
+      "AAVE/EUR",
+      "LINK/EUR",
       "NEAR/EUR",
       "ALGO/EUR",
-      "VVV/EUR",
-      "LINK/EUR",
-      "AAVE/EUR",
-      "BILL/EUR",
-      "BNB/EUR"
+      "M/EUR",
+      "BILL/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-25T22:38:58.315704+00:00",
+  "last_run_at": "2026-07-25T23:44:52.067859+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
