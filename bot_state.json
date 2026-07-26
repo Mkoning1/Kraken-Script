@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "TRX/EUR",
   "entry_price": 0.290851,
-  "peak_price": 0.292083,
+  "peak_price": 0.292138,
   "position_size": 55.38127769,
   "is_runner": false,
   "last_candle_ts": {
@@ -17,13 +17,13 @@
     "LTC/EUR": 1784865600000,
     "HYPE/EUR": 1784865600000,
     "XLM/EUR": 1784865600000,
-    "TRX/EUR": 1785038400000,
+    "TRX/EUR": 1785052800000,
     "SUI/EUR": 1784865600000,
     "NEAR/EUR": 1784865600000,
     "AVAX/EUR": 1784865600000
   },
-  "current_price": 0.29097,
-  "current_atr": 0.001277642857142868,
+  "current_price": 0.292138,
+  "current_atr": 0.0013332142857142967,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57481.3,
@@ -211,8 +211,8 @@
       "SHIB/EUR",
       "DOGE/EUR",
       "TRX/EUR",
-      "LTC/EUR",
       "AVAX/EUR",
+      "LTC/EUR",
       "ZEC/EUR",
       "HYPE/EUR",
       "ADA/EUR",
@@ -223,16 +223,16 @@
       "SUI/EUR",
       "VVV/EUR",
       "M/EUR",
+      "FLOKI/EUR",
       "TAO/EUR",
       "DOT/EUR",
-      "FLOKI/EUR",
       "AAVE/EUR",
       "LINK/EUR",
       "NEAR/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-26T11:37:38.485279+00:00",
+  "last_run_at": "2026-07-26T12:45:23.599959+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
