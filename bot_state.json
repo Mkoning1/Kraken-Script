@@ -209,11 +209,11 @@
       "SHIB/EUR",
       "XLM/EUR",
       "LTC/EUR",
+      "HYPE/EUR",
       "DOGE/EUR",
       "AVAX/EUR",
-      "HYPE/EUR",
-      "ZEC/EUR",
       "TRX/EUR",
+      "ZEC/EUR",
       "PEPE/EUR",
       "ADA/EUR",
       "EUL/EUR",
@@ -222,15 +222,15 @@
       "M/EUR",
       "PUMP/EUR",
       "FLOKI/EUR",
-      "TAO/EUR",
       "VVV/EUR",
-      "NEAR/EUR",
+      "TAO/EUR",
+      "ONDO/EUR",
       "ESP/EUR",
-      "BNB/EUR"
+      "NEAR/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-26T16:38:40.205504+00:00",
+  "last_run_at": "2026-07-26T17:46:18.851479+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
