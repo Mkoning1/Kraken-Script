@@ -8,7 +8,6 @@
   "last_candle_ts": {
     "ADA/EUR": 1784865600000,
     "SOL/EUR": 1784865600000,
-    "LINK/EUR": 1784865600000,
     "DOGE/EUR": 1784865600000,
     "BTC/EUR": 1784865600000,
     "ETH/EUR": 1784865600000,
@@ -19,7 +18,6 @@
     "XLM/EUR": 1784865600000,
     "TRX/EUR": 1785052800000,
     "SUI/EUR": 1784865600000,
-    "NEAR/EUR": 1784865600000,
     "AVAX/EUR": 1784865600000
   },
   "current_price": 0.292138,
@@ -210,29 +208,29 @@
       "SOL/EUR",
       "SHIB/EUR",
       "DOGE/EUR",
-      "TRX/EUR",
-      "XLM/EUR",
       "LTC/EUR",
+      "XLM/EUR",
+      "TRX/EUR",
       "AVAX/EUR",
-      "ZEC/EUR",
       "HYPE/EUR",
       "ADA/EUR",
+      "ZEC/EUR",
       "PEPE/EUR",
-      "SYN/EUR",
       "EUL/EUR",
       "SUI/EUR",
+      "SYN/EUR",
       "FLOKI/EUR",
       "M/EUR",
+      "PUMP/EUR",
       "VVV/EUR",
       "TAO/EUR",
+      "ESP/EUR",
       "AAVE/EUR",
-      "BNB/EUR",
-      "LINK/EUR",
-      "NEAR/EUR"
+      "BNB/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-26T14:19:25.904990+00:00",
+  "last_run_at": "2026-07-26T15:41:38.461327+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
