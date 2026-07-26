@@ -16,12 +16,12 @@
     "LTC/EUR": 1784865600000,
     "HYPE/EUR": 1784865600000,
     "XLM/EUR": 1784865600000,
-    "TRX/EUR": 1785067200000,
+    "TRX/EUR": 1785081600000,
     "SUI/EUR": 1784865600000,
     "AVAX/EUR": 1784865600000
   },
-  "current_price": 0.29262,
-  "current_atr": 0.0012279285714285801,
+  "current_price": 0.291672,
+  "current_atr": 0.0012486428571428668,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57481.3,
@@ -209,10 +209,10 @@
       "SHIB/EUR",
       "LTC/EUR",
       "XLM/EUR",
-      "HYPE/EUR",
       "DOGE/EUR",
       "AVAX/EUR",
       "ZEC/EUR",
+      "HYPE/EUR",
       "PEPE/EUR",
       "TRX/EUR",
       "ADA/EUR",
@@ -221,16 +221,16 @@
       "SYN/EUR",
       "ONDO/EUR",
       "PUMP/EUR",
-      "M/EUR",
-      "FLOKI/EUR",
       "TAO/EUR",
       "ESP/EUR",
-      "VVV/EUR",
-      "LINK/EUR"
+      "LINK/EUR",
+      "FLOKI/EUR",
+      "M/EUR",
+      "VVV/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-26T19:18:23.960136+00:00",
+  "last_run_at": "2026-07-26T20:32:09.811391+00:00",
   "dry_run": false,
   "entry_time": "2026-07-24T09:58:28.856298+00:00"
 }
