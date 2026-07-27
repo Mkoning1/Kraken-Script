@@ -1,9 +1,9 @@
 {
-  "in_position": true,
-  "symbol": "TRX/EUR",
-  "entry_price": 0.290851,
-  "peak_price": 0.29262,
-  "position_size": 55.38127769,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1784865600000,
@@ -16,11 +16,11 @@
     "LTC/EUR": 1784865600000,
     "HYPE/EUR": 1784865600000,
     "XLM/EUR": 1784865600000,
-    "TRX/EUR": 1785124800000,
+    "TRX/EUR": 1785139200000,
     "SUI/EUR": 1784865600000
   },
-  "current_price": 0.290579,
-  "current_atr": 0.001027785714285721,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 57481.3,
@@ -197,6 +197,14 @@
       "pnl_pct": -9.64,
       "was_runner": false,
       "exit_time": "2026-07-22T20:14:13.470831+00:00"
+    },
+    {
+      "symbol": "TRX/EUR",
+      "entry_price": 0.290851,
+      "exit_price": 0.290201,
+      "pnl_pct": -0.22,
+      "was_runner": false,
+      "exit_time": "2026-07-27T12:32:45.520848+00:00"
     }
   ],
   "config": {
@@ -205,31 +213,31 @@
       "ETH/EUR",
       "SOL/EUR",
       "XRP/EUR",
-      "XLM/EUR",
       "LTC/EUR",
+      "XLM/EUR",
+      "STORJ/EUR",
       "ZEC/EUR",
       "HYPE/EUR",
-      "SHIB/EUR",
-      "STORJ/EUR",
       "TRX/EUR",
-      "SUI/EUR",
+      "SHIB/EUR",
       "ONDO/EUR",
+      "SUI/EUR",
       "LINK/EUR",
       "ADA/EUR",
-      "DOGE/EUR",
       "PUMP/EUR",
-      "PEPE/EUR",
-      "NEAR/EUR",
-      "AAVE/EUR",
-      "ESP/EUR",
-      "SYN/EUR",
       "TAO/EUR",
-      "UNI/EUR",
-      "EUL/EUR"
+      "EURC/EUR",
+      "NEAR/EUR",
+      "PEPE/EUR",
+      "DOGE/EUR",
+      "BNB/EUR",
+      "ESP/EUR",
+      "AAVE/EUR",
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-27T08:56:16.179818+00:00",
+  "last_run_at": "2026-07-27T12:32:45.520901+00:00",
   "dry_run": false,
-  "entry_time": "2026-07-24T09:58:28.856298+00:00"
+  "entry_time": null
 }
