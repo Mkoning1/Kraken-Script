@@ -28,8 +28,7 @@
     "SHIB/EUR": 1785139200000,
     "BNB/EUR": 1785139200000,
     "AAVE/EUR": 1785139200000,
-    "PEPE/EUR": 1785139200000,
-    "BCH/EUR": 1785139200000
+    "PEPE/EUR": 1785139200000
   },
   "current_price": 0.001876,
   "current_atr": 6.128571428571427e-05,
@@ -226,30 +225,30 @@
       "SOL/EUR",
       "XRP/EUR",
       "LTC/EUR",
-      "XLM/EUR",
       "HYPE/EUR",
       "STORJ/EUR",
       "ZEC/EUR",
+      "XLM/EUR",
       "ADA/EUR",
       "TRX/EUR",
       "EURC/EUR",
       "SUI/EUR",
-      "TAO/EUR",
       "ONDO/EUR",
+      "AAVE/EUR",
+      "TAO/EUR",
+      "LCAP/EUR",
       "NEAR/EUR",
       "PUMP/EUR",
       "LINK/EUR",
       "BNB/EUR",
-      "SHIB/EUR",
-      "LCAP/EUR",
       "DOGE/EUR",
-      "AAVE/EUR",
+      "SHIB/EUR",
       "PEPE/EUR",
-      "BCH/EUR"
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-27T20:38:17.767537+00:00",
+  "last_run_at": "2026-07-27T21:48:59.600705+00:00",
   "dry_run": false,
   "entry_time": "2026-07-27T15:32:12.165820+00:00"
 }
