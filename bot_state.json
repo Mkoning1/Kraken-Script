@@ -23,17 +23,16 @@
     "ONDO/EUR": 1785139200000,
     "LINK/EUR": 1785139200000,
     "TAO/EUR": 1785139200000,
-    "PUMP/EUR": 1785153600000,
+    "PUMP/EUR": 1785168000000,
     "NEAR/EUR": 1785139200000,
     "SHIB/EUR": 1785139200000,
     "BNB/EUR": 1785139200000,
     "AAVE/EUR": 1785139200000,
     "PEPE/EUR": 1785139200000,
-    "BCH/EUR": 1785139200000,
-    "DOT/EUR": 1785139200000
+    "BCH/EUR": 1785139200000
   },
-  "current_price": 0.001837,
-  "current_atr": 5.792857142857142e-05,
+  "current_price": 0.001876,
+  "current_atr": 6.128571428571427e-05,
   "watchlist_snapshot": {
     "ETH/EUR": {
       "price": 1719.87,
@@ -229,28 +228,28 @@
       "LTC/EUR",
       "XLM/EUR",
       "HYPE/EUR",
-      "ZEC/EUR",
       "STORJ/EUR",
+      "ZEC/EUR",
       "ADA/EUR",
       "TRX/EUR",
+      "EURC/EUR",
       "SUI/EUR",
       "TAO/EUR",
-      "EURC/EUR",
       "ONDO/EUR",
       "NEAR/EUR",
       "PUMP/EUR",
       "LINK/EUR",
-      "SHIB/EUR",
-      "DOGE/EUR",
       "BNB/EUR",
+      "SHIB/EUR",
+      "LCAP/EUR",
+      "DOGE/EUR",
       "AAVE/EUR",
       "PEPE/EUR",
-      "BCH/EUR",
-      "DOT/EUR"
+      "BCH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-27T18:57:16.523697+00:00",
+  "last_run_at": "2026-07-27T20:38:17.767537+00:00",
   "dry_run": false,
   "entry_time": "2026-07-27T15:32:12.165820+00:00"
 }
