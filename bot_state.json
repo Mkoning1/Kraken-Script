@@ -8,7 +8,6 @@
   "last_candle_ts": {
     "ADA/EUR": 1785312000000,
     "SOL/EUR": 1785312000000,
-    "DOGE/EUR": 1785312000000,
     "BTC/EUR": 1785312000000,
     "ETH/EUR": 1785312000000,
     "XRP/EUR": 1785312000000,
@@ -244,19 +243,19 @@
       "TAO/EUR",
       "NEAR/EUR",
       "ZEC/EUR",
-      "BNB/EUR",
       "AVAX/EUR",
+      "BNB/EUR",
       "EUL/EUR",
-      "PUMP/EUR",
       "COTI/EUR",
-      "AAVE/EUR",
+      "PUMP/EUR",
       "SUI/EUR",
-      "DOGE/EUR",
-      "LINK/EUR"
+      "AAVE/EUR",
+      "LINK/EUR",
+      "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-29T16:36:17.890338+00:00",
+  "last_run_at": "2026-07-29T17:57:26.712038+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
