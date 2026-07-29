@@ -232,9 +232,9 @@
       "SOL/EUR",
       "XRP/EUR",
       "EURC/EUR",
-      "TRX/EUR",
       "VVV/EUR",
       "LTC/EUR",
+      "TRX/EUR",
       "ADA/EUR",
       "UNI/EUR",
       "FIL/EUR",
@@ -244,18 +244,18 @@
       "TAO/EUR",
       "SUI/EUR",
       "NEAR/EUR",
-      "ZEC/EUR",
-      "AVAX/EUR",
       "DOT/EUR",
-      "BNB/EUR",
+      "AVAX/EUR",
+      "ZEC/EUR",
       "DOGE/EUR",
+      "BNB/EUR",
       "COTI/EUR",
       "EUL/EUR",
       "PUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-29T22:41:21.300069+00:00",
+  "last_run_at": "2026-07-29T23:44:50.795177+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
