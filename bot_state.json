@@ -19,7 +19,6 @@
     "TRX/EUR": 1785312000000,
     "SUI/EUR": 1785312000000,
     "EURC/EUR": 1785312000000,
-    "ONDO/EUR": 1785312000000,
     "TAO/EUR": 1785312000000,
     "PUMP/EUR": 1785312000000,
     "NEAR/EUR": 1785312000000,
@@ -27,12 +26,12 @@
     "AAVE/EUR": 1785312000000,
     "FIL/EUR": 1785312000000,
     "EUL/EUR": 1785312000000,
-    "UNI/EUR": 1785312000000,
+    "UNI/EUR": 1785326400000,
     "AVAX/EUR": 1785312000000,
     "VVV/EUR": 1785312000000
   },
-  "current_price": 3.5659,
-  "current_atr": null,
+  "current_price": 3.4691,
+  "current_atr": 0.09382142857142865,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 56625.0,
@@ -242,22 +241,22 @@
       "XLM/EUR",
       "FIL/EUR",
       "HYPE/EUR",
+      "TAO/EUR",
       "NEAR/EUR",
       "ZEC/EUR",
-      "TAO/EUR",
       "BNB/EUR",
       "AVAX/EUR",
-      "DOGE/EUR",
       "EUL/EUR",
-      "AAVE/EUR",
       "PUMP/EUR",
+      "COTI/EUR",
+      "AAVE/EUR",
       "SUI/EUR",
-      "ONDO/EUR",
-      "COTI/EUR"
+      "DOGE/EUR",
+      "LINK/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-29T14:58:32.021688+00:00",
+  "last_run_at": "2026-07-29T16:36:17.890338+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
