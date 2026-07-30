@@ -23,7 +23,6 @@
     "BNB/EUR": 1785312000000,
     "AAVE/EUR": 1785312000000,
     "FIL/EUR": 1785312000000,
-    "EUL/EUR": 1785312000000,
     "UNI/EUR": 1785369600000,
     "AVAX/EUR": 1785312000000,
     "VVV/EUR": 1785312000000
@@ -238,23 +237,23 @@
       "ADA/EUR",
       "XLM/EUR",
       "HYPE/EUR",
-      "AAVE/EUR",
-      "SUI/EUR",
-      "DOT/EUR",
-      "TAO/EUR",
       "ZEC/EUR",
+      "AAVE/EUR",
+      "DOT/EUR",
+      "SUI/EUR",
+      "TAO/EUR",
       "COTI/EUR",
       "FIL/EUR",
       "NEAR/EUR",
       "DOGE/EUR",
       "BNB/EUR",
       "AVAX/EUR",
-      "EUL/EUR",
-      "ONDO/EUR"
+      "ONDO/EUR",
+      "LINK/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-30T04:23:00.135802+00:00",
+  "last_run_at": "2026-07-30T07:15:26.095434+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
