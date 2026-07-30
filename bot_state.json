@@ -25,12 +25,12 @@
     "AAVE/EUR": 1785312000000,
     "FIL/EUR": 1785312000000,
     "EUL/EUR": 1785312000000,
-    "UNI/EUR": 1785340800000,
+    "UNI/EUR": 1785355200000,
     "AVAX/EUR": 1785312000000,
     "VVV/EUR": 1785312000000
   },
-  "current_price": 3.4169,
-  "current_atr": 0.09775000000000007,
+  "current_price": 3.4791,
+  "current_atr": 0.10000000000000009,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 56625.0,
@@ -236,8 +236,8 @@
       "LTC/EUR",
       "TRX/EUR",
       "ADA/EUR",
-      "UNI/EUR",
       "FIL/EUR",
+      "UNI/EUR",
       "XLM/EUR",
       "HYPE/EUR",
       "AAVE/EUR",
@@ -245,17 +245,17 @@
       "SUI/EUR",
       "NEAR/EUR",
       "DOT/EUR",
-      "AVAX/EUR",
       "ZEC/EUR",
+      "AVAX/EUR",
       "DOGE/EUR",
-      "BNB/EUR",
       "COTI/EUR",
+      "BNB/EUR",
       "EUL/EUR",
       "PUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-29T23:44:50.795177+00:00",
+  "last_run_at": "2026-07-30T01:05:41.955886+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
