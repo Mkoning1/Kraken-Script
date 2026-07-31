@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "UNI/EUR",
   "entry_price": 3.5659,
-  "peak_price": 3.8207,
+  "peak_price": 3.8523,
   "position_size": 3.75857427,
   "is_runner": false,
   "last_candle_ts": {
@@ -22,10 +22,10 @@
     "NEAR/EUR": 1785312000000,
     "BNB/EUR": 1785312000000,
     "AAVE/EUR": 1785312000000,
-    "UNI/EUR": 1785427200000
+    "UNI/EUR": 1785441600000
   },
-  "current_price": 3.8207,
-  "current_atr": 0.10730714285714292,
+  "current_price": 3.8523,
+  "current_atr": 0.1047571428571429,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 56625.0,
@@ -238,19 +238,19 @@
       "DOGE/EUR",
       "M/EUR",
       "DOT/EUR",
-      "SUI/EUR",
-      "COTI/EUR",
-      "ONDO/EUR",
       "PEPE/EUR",
+      "SUI/EUR",
+      "ONDO/EUR",
       "NEAR/EUR",
+      "COTI/EUR",
       "TAO/EUR",
       "LINK/EUR",
       "AAVE/EUR",
-      "PUMP/EUR"
+      "INJ/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-30T23:18:44.756628+00:00",
+  "last_run_at": "2026-07-31T01:06:18.054945+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
