@@ -232,10 +232,10 @@
       "UNI/EUR",
       "LTC/EUR",
       "ADA/EUR",
-      "ZEC/EUR",
       "RENDER/EUR",
-      "XLM/EUR",
+      "ZEC/EUR",
       "AAVE/EUR",
+      "XLM/EUR",
       "NEAR/EUR",
       "M/EUR",
       "PEPE/EUR",
@@ -245,11 +245,11 @@
       "SUI/EUR",
       "LINK/EUR",
       "TAO/EUR",
-      "INJ/EUR"
+      "COTI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-31T21:29:37.842040+00:00",
+  "last_run_at": "2026-07-31T22:37:44.937481+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
