@@ -229,8 +229,8 @@
       "BNB/EUR",
       "TRX/EUR",
       "EURC/EUR",
-      "UNI/EUR",
       "LTC/EUR",
+      "UNI/EUR",
       "ADA/EUR",
       "RENDER/EUR",
       "ZEC/EUR",
@@ -238,8 +238,8 @@
       "XLM/EUR",
       "NEAR/EUR",
       "M/EUR",
-      "PEPE/EUR",
       "PUMP/EUR",
+      "PEPE/EUR",
       "ONDO/EUR",
       "DOGE/EUR",
       "SUI/EUR",
@@ -249,7 +249,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-07-31T22:37:44.937481+00:00",
+  "last_run_at": "2026-07-31T23:44:24.015432+00:00",
   "dry_run": false,
   "entry_time": "2026-07-29T12:31:45.866698+00:00"
 }
