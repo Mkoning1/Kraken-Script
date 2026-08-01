@@ -1,9 +1,9 @@
 {
-  "in_position": true,
-  "symbol": "UNI/EUR",
-  "entry_price": 3.5659,
-  "peak_price": 3.8523,
-  "position_size": 3.75857427,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1785312000000,
@@ -21,10 +21,10 @@
     "NEAR/EUR": 1785312000000,
     "BNB/EUR": 1785312000000,
     "AAVE/EUR": 1785312000000,
-    "UNI/EUR": 1785542400000
+    "UNI/EUR": 1785556800000
   },
-  "current_price": 3.7092,
-  "current_atr": 0.11385714285714278,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 56625.0,
@@ -217,6 +217,14 @@
       "pnl_pct": -10.32,
       "was_runner": false,
       "exit_time": "2026-07-29T04:34:22.551363+00:00"
+    },
+    {
+      "symbol": "UNI/EUR",
+      "entry_price": 3.5659,
+      "exit_price": 3.5521,
+      "pnl_pct": -0.39,
+      "was_runner": false,
+      "exit_time": "2026-08-01T09:34:42.459057+00:00"
     }
   ],
   "config": {
@@ -225,31 +233,31 @@
       "ETH/EUR",
       "SOL/EUR",
       "HYPE/EUR",
-      "BNB/EUR",
       "XRP/EUR",
+      "BNB/EUR",
       "LTC/EUR",
-      "UNI/EUR",
       "ADA/EUR",
-      "TRX/EUR",
+      "UNI/EUR",
       "RENDER/EUR",
-      "ZEC/EUR",
+      "TRX/EUR",
       "EURC/EUR",
-      "AAVE/EUR",
+      "ZEC/EUR",
       "XLM/EUR",
+      "AAVE/EUR",
       "PUMP/EUR",
       "M/EUR",
       "ONDO/EUR",
+      "LINK/EUR",
       "DOGE/EUR",
       "NEAR/EUR",
-      "LINK/EUR",
       "PEPE/EUR",
-      "BCH/EUR",
       "SUI/EUR",
-      "TAO/EUR"
+      "TAO/EUR",
+      "XDC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-01T07:30:32.595712+00:00",
+  "last_run_at": "2026-08-01T09:34:42.459112+00:00",
   "dry_run": false,
-  "entry_time": "2026-07-29T12:31:45.866698+00:00"
+  "entry_time": null
 }
