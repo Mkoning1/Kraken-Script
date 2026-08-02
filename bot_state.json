@@ -2,11 +2,11 @@
   "in_position": true,
   "symbol": "ADA/EUR",
   "entry_price": 0.156176,
-  "peak_price": 0.161408,
+  "peak_price": 0.163624,
   "position_size": 84.76526482,
   "is_runner": false,
   "last_candle_ts": {
-    "ADA/EUR": 1785643200000,
+    "ADA/EUR": 1785657600000,
     "SOL/EUR": 1785628800000,
     "BTC/EUR": 1785628800000,
     "ETH/EUR": 1785628800000,
@@ -30,8 +30,8 @@
     "EUL/EUR": 1785628800000,
     "NEAR/EUR": 1785628800000
   },
-  "current_price": 0.161408,
-  "current_atr": 0.0033749285714285682,
+  "current_price": 0.163624,
+  "current_atr": 0.003541499999999995,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 55040.9,
@@ -245,26 +245,26 @@
       "ZEC/EUR",
       "LTC/EUR",
       "SUI/EUR",
+      "AAVE/EUR",
       "ONDO/EUR",
       "HYPE/EUR",
-      "XLM/EUR",
       "TAO/EUR",
+      "XLM/EUR",
       "TRX/EUR",
       "AVAX/EUR",
       "PUMP/EUR",
-      "AAVE/EUR",
-      "BNB/EUR",
-      "UNI/EUR",
       "ESP/EUR",
-      "LINK/EUR",
+      "UNI/EUR",
       "NEAR/EUR",
+      "LINK/EUR",
+      "BNB/EUR",
       "SHIB/EUR",
       "EUL/EUR",
-      "PEPE/EUR"
+      "ENA/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-02T10:52:11.627341+00:00",
+  "last_run_at": "2026-08-02T12:06:30.264302+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
