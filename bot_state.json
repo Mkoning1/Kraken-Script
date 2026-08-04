@@ -21,8 +21,7 @@
     "DOGE/EUR": 1785628800000,
     "TAO/EUR": 1785628800000,
     "SUI/EUR": 1785628800000,
-    "AVAX/EUR": 1785628800000,
-    "NEAR/EUR": 1785628800000
+    "AVAX/EUR": 1785628800000
   },
   "current_price": 0.166772,
   "current_atr": 0.004174714285714283,
@@ -234,31 +233,31 @@
       "ETH/EUR",
       "SOL/EUR",
       "EURC/EUR",
-      "ADA/EUR",
       "LTC/EUR",
+      "ADA/EUR",
       "XRP/EUR",
       "ZEC/EUR",
       "DOGE/EUR",
       "TRX/EUR",
       "HYPE/EUR",
-      "UNI/EUR",
-      "SUI/EUR",
-      "XLM/EUR",
       "BNB/EUR",
+      "XLM/EUR",
+      "SUI/EUR",
+      "UNI/EUR",
       "PUMP/EUR",
       "AVAX/EUR",
-      "TAO/EUR",
       "DOT/EUR",
+      "TAO/EUR",
       "ONDO/EUR",
       "SYN/EUR",
       "LDO/EUR",
       "AAVE/EUR",
       "LINK/EUR",
-      "NEAR/EUR"
+      "CC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-04T22:37:06.948141+00:00",
+  "last_run_at": "2026-08-04T23:44:06.144367+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
