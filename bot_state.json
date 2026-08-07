@@ -234,8 +234,8 @@
       "ZEC/EUR",
       "PUMP/EUR",
       "BNB/EUR",
-      "TRX/EUR",
       "NEAR/EUR",
+      "TRX/EUR",
       "SUI/EUR",
       "PAXG/EUR",
       "ONDO/EUR",
@@ -244,15 +244,15 @@
       "DOGE/EUR",
       "HFT/EUR",
       "SYN/EUR",
-      "EURC/EUR",
       "TAO/EUR",
+      "EURC/EUR",
       "FET/EUR",
       "ZBT/EUR",
       "LINK/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-07T22:41:33.683505+00:00",
+  "last_run_at": "2026-08-07T23:19:12.675875+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
