@@ -16,8 +16,6 @@
     "HYPE/EUR": 1785628800000,
     "XLM/EUR": 1785628800000,
     "TRX/EUR": 1785628800000,
-    "UNI/EUR": 1785628800000,
-    "TAO/EUR": 1785628800000,
     "SUI/EUR": 1785628800000
   },
   "current_price": 0.172907,
@@ -234,8 +232,8 @@
       "ZEC/EUR",
       "LTC/EUR",
       "TRX/EUR",
-      "AVAX/EUR",
       "SUI/EUR",
+      "AVAX/EUR",
       "XLM/EUR",
       "BNB/EUR",
       "ZBT/EUR",
@@ -244,17 +242,17 @@
       "SYN/EUR",
       "HYPE/EUR",
       "LINK/EUR",
+      "NEAR/EUR",
       "EURC/EUR",
       "PAXG/EUR",
-      "NEAR/EUR",
-      "HFT/EUR",
-      "TAO/EUR",
       "ONDO/EUR",
-      "UNI/EUR"
+      "HFT/EUR",
+      "DOGE/EUR",
+      "PUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-07T05:24:35.448399+00:00",
+  "last_run_at": "2026-08-07T06:49:02.020941+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
