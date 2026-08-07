@@ -233,26 +233,26 @@
       "LTC/EUR",
       "ZEC/EUR",
       "BNB/EUR",
-      "SUI/EUR",
       "CC/EUR",
+      "SUI/EUR",
+      "NEAR/EUR",
       "TRX/EUR",
       "PAXG/EUR",
-      "NEAR/EUR",
       "ONDO/EUR",
       "AVAX/EUR",
       "HFT/EUR",
-      "ZBT/EUR",
       "XLM/EUR",
-      "SYN/EUR",
       "EURC/EUR",
+      "SYN/EUR",
+      "ZBT/EUR",
       "TAO/EUR",
       "LINK/EUR",
-      "FET/EUR",
-      "DOGE/EUR"
+      "DOGE/EUR",
+      "FET/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-07T16:02:17.855818+00:00",
+  "last_run_at": "2026-08-07T17:09:38.142223+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
