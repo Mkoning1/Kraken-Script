@@ -237,22 +237,22 @@
       "PAXG/EUR",
       "XLM/EUR",
       "TRX/EUR",
-      "AVAX/EUR",
       "SUI/EUR",
+      "AVAX/EUR",
       "NEAR/EUR",
       "XMR/EUR",
       "DOGE/EUR",
       "SYN/EUR",
-      "ONDO/EUR",
       "EURC/EUR",
+      "ONDO/EUR",
       "TAO/EUR",
       "FET/EUR",
-      "DOT/EUR",
-      "LINK/EUR"
+      "LINK/EUR",
+      "BICO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-08T09:55:18.366199+00:00",
+  "last_run_at": "2026-08-08T10:38:25.090086+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
