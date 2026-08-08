@@ -235,24 +235,24 @@
       "BNB/EUR",
       "ZEC/EUR",
       "XLM/EUR",
-      "TRX/EUR",
       "SUI/EUR",
+      "TRX/EUR",
       "XMR/EUR",
       "AVAX/EUR",
       "NEAR/EUR",
-      "SYN/EUR",
       "PAXG/EUR",
+      "SYN/EUR",
       "DOGE/EUR",
       "TAO/EUR",
       "ONDO/EUR",
       "EURC/EUR",
       "CRO/EUR",
-      "LINK/EUR",
-      "CC/EUR"
+      "VVV/EUR",
+      "CRV/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-08T13:51:04.641614+00:00",
+  "last_run_at": "2026-08-08T14:36:02.867236+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
