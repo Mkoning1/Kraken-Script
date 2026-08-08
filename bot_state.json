@@ -235,24 +235,24 @@
       "ADA/EUR",
       "ZEC/EUR",
       "XLM/EUR",
-      "SUI/EUR",
       "TRX/EUR",
       "XMR/EUR",
-      "AVAX/EUR",
+      "SUI/EUR",
       "NEAR/EUR",
-      "DOGE/EUR",
+      "AVAX/EUR",
       "PAXG/EUR",
+      "DOGE/EUR",
       "SYN/EUR",
       "TAO/EUR",
       "ONDO/EUR",
-      "VVV/EUR",
       "EURC/EUR",
-      "CRO/EUR",
-      "LINK/EUR"
+      "VVV/EUR",
+      "AAVE/EUR",
+      "CRO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-08T15:06:43.832048+00:00",
+  "last_run_at": "2026-08-08T15:47:49.832045+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
