@@ -239,20 +239,20 @@
       "HYPE/EUR",
       "XLM/EUR",
       "PUMP/EUR",
+      "CRV/EUR",
       "SYN/EUR",
       "BICO/EUR",
-      "VVV/EUR",
-      "CRV/EUR",
       "CC/EUR",
-      "DOGE/EUR",
       "BILL/EUR",
+      "VVV/EUR",
+      "DOGE/EUR",
       "NEAR/EUR",
-      "ONDO/EUR",
-      "AAVE/EUR"
+      "AAVE/EUR",
+      "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T11:15:35.734645+00:00",
+  "last_run_at": "2026-08-09T11:56:46.693138+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
