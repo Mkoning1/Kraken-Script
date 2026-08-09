@@ -233,8 +233,8 @@
       "XMR/EUR",
       "BNB/EUR",
       "XLM/EUR",
-      "LTC/EUR",
       "TAO/EUR",
+      "LTC/EUR",
       "TRX/EUR",
       "CRV/EUR",
       "ONDO/EUR",
@@ -244,14 +244,14 @@
       "BILL/EUR",
       "XAN/EUR",
       "BMT/EUR",
-      "PAXG/EUR",
       "NEAR/EUR",
-      "DOGE/EUR",
-      "VVV/EUR"
+      "PAXG/EUR",
+      "HYPE/EUR",
+      "DOGE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T22:36:01.786739+00:00",
+  "last_run_at": "2026-08-09T23:12:13.048599+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
