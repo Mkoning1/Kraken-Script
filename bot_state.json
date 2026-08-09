@@ -235,24 +235,24 @@
       "TAO/EUR",
       "ICP/EUR",
       "SUI/EUR",
-      "HYPE/EUR",
       "TRX/EUR",
+      "HYPE/EUR",
       "XLM/EUR",
       "PUMP/EUR",
       "SYN/EUR",
-      "VVV/EUR",
       "BICO/EUR",
+      "VVV/EUR",
+      "CC/EUR",
       "CRV/EUR",
       "DOGE/EUR",
-      "CC/EUR",
-      "BLUAI/EUR",
+      "BILL/EUR",
       "NEAR/EUR",
-      "ONDO/EUR",
-      "AAVE/EUR"
+      "BLUAI/EUR",
+      "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T09:04:10.729666+00:00",
+  "last_run_at": "2026-08-09T09:58:09.883424+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
