@@ -234,8 +234,8 @@
       "ADA/EUR",
       "TAO/EUR",
       "TRX/EUR",
-      "ICP/EUR",
       "PUMP/EUR",
+      "ICP/EUR",
       "SUI/EUR",
       "HYPE/EUR",
       "XLM/EUR",
@@ -247,12 +247,12 @@
       "CC/EUR",
       "ONDO/EUR",
       "VVV/EUR",
-      "NEAR/EUR",
-      "XAN/EUR"
+      "XAN/EUR",
+      "NEAR/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T13:07:27.623067+00:00",
+  "last_run_at": "2026-08-09T13:59:56.408105+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
