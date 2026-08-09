@@ -6,7 +6,7 @@
   "position_size": 84.76526482,
   "is_runner": true,
   "last_candle_ts": {
-    "ADA/EUR": 1786248000000,
+    "ADA/EUR": 1786262400000,
     "SOL/EUR": 1785628800000,
     "BTC/EUR": 1785628800000,
     "ETH/EUR": 1785628800000,
@@ -18,8 +18,8 @@
     "TRX/EUR": 1785628800000,
     "SUI/EUR": 1785628800000
   },
-  "current_price": 0.171775,
-  "current_atr": 0.0026804999999999984,
+  "current_price": 0.170128,
+  "current_atr": 0.0026135714285714273,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 55040.9,
@@ -235,24 +235,24 @@
       "TAO/EUR",
       "TRX/EUR",
       "ICP/EUR",
+      "PUMP/EUR",
       "SUI/EUR",
       "HYPE/EUR",
       "XLM/EUR",
-      "PUMP/EUR",
       "CRV/EUR",
-      "SYN/EUR",
       "BICO/EUR",
-      "CC/EUR",
+      "SYN/EUR",
       "BILL/EUR",
-      "VVV/EUR",
       "DOGE/EUR",
+      "CC/EUR",
+      "ONDO/EUR",
+      "VVV/EUR",
       "NEAR/EUR",
-      "AAVE/EUR",
-      "ONDO/EUR"
+      "XAN/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T11:56:46.693138+00:00",
+  "last_run_at": "2026-08-09T13:07:27.623067+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
