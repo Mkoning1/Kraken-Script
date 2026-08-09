@@ -231,9 +231,9 @@
       "PUMP/EUR",
       "ZEC/EUR",
       "ADA/EUR",
+      "XMR/EUR",
       "BNB/EUR",
       "LTC/EUR",
-      "XMR/EUR",
       "TAO/EUR",
       "TRX/EUR",
       "XLM/EUR",
@@ -241,10 +241,10 @@
       "ONDO/EUR",
       "ICP/EUR",
       "BICO/EUR",
-      "SUI/EUR",
-      "HYPE/EUR",
       "BILL/EUR",
+      "SUI/EUR",
       "XAN/EUR",
+      "HYPE/EUR",
       "NEAR/EUR",
       "DOGE/EUR",
       "VVV/EUR",
@@ -252,7 +252,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T19:06:25.782634+00:00",
+  "last_run_at": "2026-08-09T19:49:38.666246+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
