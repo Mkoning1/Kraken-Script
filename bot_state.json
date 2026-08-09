@@ -238,21 +238,21 @@
       "TRX/EUR",
       "XLM/EUR",
       "CRV/EUR",
-      "ICP/EUR",
       "ONDO/EUR",
+      "ICP/EUR",
       "BICO/EUR",
-      "HYPE/EUR",
       "SUI/EUR",
+      "HYPE/EUR",
       "BILL/EUR",
-      "DOGE/EUR",
       "XAN/EUR",
+      "DOGE/EUR",
       "NEAR/EUR",
       "SYN/EUR",
       "CC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T17:39:02.685670+00:00",
+  "last_run_at": "2026-08-09T18:14:48.425406+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
