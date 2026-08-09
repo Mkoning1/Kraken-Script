@@ -229,8 +229,8 @@
       "ETH/EUR",
       "XRP/EUR",
       "ZEC/EUR",
-      "BNB/EUR",
       "LTC/EUR",
+      "BNB/EUR",
       "ADA/EUR",
       "TAO/EUR",
       "TRX/EUR",
@@ -252,7 +252,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T10:44:42.957239+00:00",
+  "last_run_at": "2026-08-09T11:15:35.734645+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
