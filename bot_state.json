@@ -243,16 +243,16 @@
       "BILL/EUR",
       "SUI/EUR",
       "XAN/EUR",
-      "NEAR/EUR",
       "BMT/EUR",
-      "ICP/EUR",
+      "NEAR/EUR",
       "DOGE/EUR",
       "HYPE/EUR",
+      "ICP/EUR",
       "VVV/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-09T21:14:26.525301+00:00",
+  "last_run_at": "2026-08-09T21:52:13.092210+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
