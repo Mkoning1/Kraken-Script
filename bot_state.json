@@ -240,18 +240,18 @@
       "SUI/EUR",
       "ATOM/EUR",
       "EURC/EUR",
+      "NEAR/EUR",
       "HYPE/EUR",
       "UNI/EUR",
       "WLD/EUR",
-      "BMT/EUR",
       "TAO/EUR",
+      "BMT/EUR",
       "ICP/EUR",
-      "NEAR/EUR",
-      "XAN/EUR"
+      "AAVE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-10T17:27:33.596103+00:00",
+  "last_run_at": "2026-08-10T18:26:10.809757+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
