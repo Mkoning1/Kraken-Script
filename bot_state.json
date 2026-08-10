@@ -237,21 +237,21 @@
       "SUI/EUR",
       "TRX/EUR",
       "TAO/EUR",
+      "AVAX/EUR",
       "XAN/EUR",
       "ONDO/EUR",
-      "AVAX/EUR",
       "BMT/EUR",
       "CRV/EUR",
       "BICO/EUR",
       "BCH/EUR",
+      "NEAR/EUR",
       "BILL/EUR",
       "PAXG/EUR",
-      "NEAR/EUR",
-      "JUP/EUR"
+      "DOGE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-10T05:44:51.287249+00:00",
+  "last_run_at": "2026-08-10T06:59:17.033727+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
