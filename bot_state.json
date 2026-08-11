@@ -233,24 +233,24 @@
       "TRX/EUR",
       "PAXG/EUR",
       "BNB/EUR",
-      "HYPE/EUR",
-      "NEAR/EUR",
       "TAO/EUR",
+      "NEAR/EUR",
+      "DOGE/EUR",
       "PUMP/EUR",
       "CRV/EUR",
       "SUI/EUR",
       "BLUAI/EUR",
+      "HYPE/EUR",
       "UNI/EUR",
       "ICP/EUR",
       "EURC/EUR",
       "ONDO/EUR",
-      "XLM/EUR",
-      "DOGE/EUR",
-      "AVAX/EUR"
+      "AVAX/EUR",
+      "XLM/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-11T18:39:39.886487+00:00",
+  "last_run_at": "2026-08-11T19:47:53.999942+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
