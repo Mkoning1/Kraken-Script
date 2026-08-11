@@ -236,21 +236,21 @@
       "DOGE/EUR",
       "PUMP/EUR",
       "NEAR/EUR",
-      "TAO/EUR",
       "SUI/EUR",
-      "CRV/EUR",
+      "TAO/EUR",
       "HYPE/EUR",
       "BLUAI/EUR",
       "UNI/EUR",
-      "ONDO/EUR",
-      "EURC/EUR",
+      "CRV/EUR",
       "XLM/EUR",
+      "EURC/EUR",
+      "ONDO/EUR",
       "ICP/EUR",
       "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-11T21:54:01.211940+00:00",
+  "last_run_at": "2026-08-11T22:49:42.359448+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
