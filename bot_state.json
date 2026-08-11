@@ -235,22 +235,22 @@
       "BNB/EUR",
       "HYPE/EUR",
       "NEAR/EUR",
-      "CRV/EUR",
       "TAO/EUR",
       "PUMP/EUR",
-      "BLUAI/EUR",
+      "CRV/EUR",
       "SUI/EUR",
-      "EURC/EUR",
+      "BLUAI/EUR",
       "UNI/EUR",
       "ICP/EUR",
+      "EURC/EUR",
       "ONDO/EUR",
       "XLM/EUR",
-      "AVAX/EUR",
-      "DOGE/EUR"
+      "DOGE/EUR",
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-11T17:43:13.530510+00:00",
+  "last_run_at": "2026-08-11T18:39:39.886487+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
