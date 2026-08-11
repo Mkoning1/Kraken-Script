@@ -14,8 +14,7 @@
     "ZEC/EUR": 1785628800000,
     "LTC/EUR": 1785628800000,
     "XLM/EUR": 1785628800000,
-    "TRX/EUR": 1785628800000,
-    "SUI/EUR": 1785628800000
+    "TRX/EUR": 1785628800000
   },
   "current_price": 0.164708,
   "current_atr": 0.002723428571428569,
@@ -235,23 +234,23 @@
       "HYPE/EUR",
       "ATOM/EUR",
       "EURC/EUR",
-      "PAXG/EUR",
       "PUMP/EUR",
       "NEAR/EUR",
+      "PAXG/EUR",
       "UNI/EUR",
       "CRV/EUR",
       "BNB/EUR",
       "AVAX/EUR",
-      "WLD/EUR",
       "ICP/EUR",
+      "WLD/EUR",
+      "TAO/EUR",
       "AAVE/EUR",
       "XLM/EUR",
-      "LINK/EUR",
-      "SUI/EUR"
+      "LINK/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-11T06:38:03.511129+00:00",
+  "last_run_at": "2026-08-11T07:57:31.054933+00:00",
   "dry_run": false,
   "entry_time": "2026-08-02T04:05:30.489832+00:00"
 }
