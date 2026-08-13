@@ -257,15 +257,15 @@
       "PAXG/EUR",
       "TRX/EUR",
       "DOGE/EUR",
-      "XLM/EUR",
-      "LINK/EUR",
       "EURC/EUR",
+      "LINK/EUR",
       "ZEC/EUR",
       "BNB/EUR",
+      "XLM/EUR",
       "TAO/EUR",
       "PUMP/EUR",
-      "UNI/EUR",
       "AVAX/EUR",
+      "UNI/EUR",
       "SUI/EUR",
       "ACU/EUR",
       "PEPE/EUR",
@@ -274,7 +274,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-13T17:31:55.643063+00:00",
+  "last_run_at": "2026-08-13T18:38:38.777678+00:00",
   "dry_run": false,
   "entry_time": "2026-08-13T17:31:55.643027+00:00"
 }
