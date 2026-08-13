@@ -6,184 +6,184 @@
   "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
-    "ADA/EUR": 1786593600000,
-    "SOL/EUR": 1786593600000,
-    "BTC/EUR": 1786593600000,
-    "ETH/EUR": 1786593600000,
-    "XRP/EUR": 1786593600000,
-    "ZEC/EUR": 1786593600000,
-    "LTC/EUR": 1786593600000,
-    "XLM/EUR": 1786593600000,
-    "TRX/EUR": 1786593600000,
-    "HYPE/EUR": 1786593600000,
-    "AAVE/EUR": 1786593600000,
-    "DOGE/EUR": 1786593600000,
-    "LINK/EUR": 1786593600000,
-    "UNI/EUR": 1786593600000,
-    "PAXG/EUR": 1786593600000,
-    "NEAR/EUR": 1786593600000,
-    "TAO/EUR": 1786593600000,
-    "BNB/EUR": 1786593600000,
-    "SUI/EUR": 1786593600000,
-    "PUMP/EUR": 1786593600000,
-    "EURC/EUR": 1786593600000,
-    "CRV/EUR": 1786593600000,
-    "AVAX/EUR": 1786593600000,
-    "PEPE/EUR": 1786593600000,
-    "FIL/EUR": 1786593600000
+    "ADA/EUR": 1786608000000,
+    "SOL/EUR": 1786608000000,
+    "BTC/EUR": 1786608000000,
+    "ETH/EUR": 1786608000000,
+    "XRP/EUR": 1786608000000,
+    "ZEC/EUR": 1786608000000,
+    "LTC/EUR": 1786608000000,
+    "XLM/EUR": 1786608000000,
+    "TRX/EUR": 1786608000000,
+    "HYPE/EUR": 1786608000000,
+    "AAVE/EUR": 1786608000000,
+    "DOGE/EUR": 1786608000000,
+    "LINK/EUR": 1786608000000,
+    "UNI/EUR": 1786608000000,
+    "PAXG/EUR": 1786608000000,
+    "NEAR/EUR": 1786608000000,
+    "TAO/EUR": 1786608000000,
+    "BNB/EUR": 1786608000000,
+    "SUI/EUR": 1786608000000,
+    "PUMP/EUR": 1786608000000,
+    "EURC/EUR": 1786608000000,
+    "CRV/EUR": 1786608000000,
+    "AVAX/EUR": 1786608000000,
+    "PEPE/EUR": 1786608000000,
+    "FIL/EUR": 1786608000000
   },
   "current_price": null,
   "current_atr": null,
   "watchlist_snapshot": {
     "BTC/EUR": {
-      "price": 55360.7,
+      "price": 54986.9,
       "donchian_high": 56599.1,
-      "pct_vs_breakout": -2.19,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -2.85,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "ETH/EUR": {
-      "price": 1643.29,
+      "price": 1628.91,
       "donchian_high": 1680.36,
-      "pct_vs_breakout": -2.21,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -3.06,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "SOL/EUR": {
-      "price": 66.26,
+      "price": 65.53,
       "donchian_high": 67.29,
-      "pct_vs_breakout": -1.53,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -2.62,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "XRP/EUR": {
-      "price": 0.87842,
+      "price": 0.87013,
       "donchian_high": 0.93911,
-      "pct_vs_breakout": -6.46,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -7.35,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "HYPE/EUR": {
-      "price": 49.73,
+      "price": 49.45,
       "donchian_high": 50.15,
-      "pct_vs_breakout": -0.84,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -1.4,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "AAVE/EUR": {
-      "price": 77.37,
+      "price": 76.47,
       "donchian_high": 80.89,
-      "pct_vs_breakout": -4.35,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -5.46,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "DOGE/EUR": {
-      "price": 0.06118,
+      "price": 0.0606851,
       "donchian_high": 0.0632469,
-      "pct_vs_breakout": -3.27,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -4.05,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "ADA/EUR": {
-      "price": 0.161031,
+      "price": 0.158776,
       "donchian_high": 0.184078,
-      "pct_vs_breakout": -12.52,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -13.75,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "LTC/EUR": {
-      "price": 38.92,
+      "price": 38.72,
       "donchian_high": 40.22,
-      "pct_vs_breakout": -3.23,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
-    },
-    "LINK/EUR": {
-      "price": 7.59664,
-      "donchian_high": 7.6925,
-      "pct_vs_breakout": -1.25,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -3.73,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "XLM/EUR": {
-      "price": 0.139911,
+      "price": 0.138381,
       "donchian_high": 0.149338,
-      "pct_vs_breakout": -6.31,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -7.34,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
+    },
+    "LINK/EUR": {
+      "price": 7.52606,
+      "donchian_high": 7.6925,
+      "pct_vs_breakout": -2.16,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "TRX/EUR": {
-      "price": 0.292205,
-      "donchian_high": 0.29243,
-      "pct_vs_breakout": -0.08,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "price": 0.28929,
+      "donchian_high": 0.293481,
+      "pct_vs_breakout": -1.43,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "ZEC/EUR": {
-      "price": 429.502,
+      "price": 423.809,
       "donchian_high": 455.896,
-      "pct_vs_breakout": -5.79,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
-    },
-    "EURC/EUR": {
-      "price": 1.0,
-      "donchian_high": 1.002,
-      "pct_vs_breakout": -0.2,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
-    },
-    "PAXG/EUR": {
-      "price": 3787.61,
-      "donchian_high": 3848.43,
-      "pct_vs_breakout": -1.58,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -7.04,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "BNB/EUR": {
-      "price": 531.85,
+      "price": 527.61,
       "donchian_high": 536.98,
-      "pct_vs_breakout": -0.96,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -1.74,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
+    },
+    "EURC/EUR": {
+      "price": 0.9997,
+      "donchian_high": 1.002,
+      "pct_vs_breakout": -0.23,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
+    },
+    "PAXG/EUR": {
+      "price": 3796.57,
+      "donchian_high": 3848.43,
+      "pct_vs_breakout": -1.35,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "UNI/EUR": {
-      "price": 3.1152,
+      "price": 3.0596,
       "donchian_high": 3.6298,
-      "pct_vs_breakout": -14.18,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -15.71,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "TAO/EUR": {
-      "price": 173.33,
+      "price": 172.6832,
       "donchian_high": 182.0,
-      "pct_vs_breakout": -4.76,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -5.12,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "SUI/EUR": {
-      "price": 0.5981,
+      "price": 0.5943,
       "donchian_high": 0.6115,
-      "pct_vs_breakout": -2.19,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -2.81,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "AVAX/EUR": {
-      "price": 5.657,
-      "donchian_high": 6.047,
-      "pct_vs_breakout": -6.45,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "price": 5.633,
+      "donchian_high": 5.986,
+      "pct_vs_breakout": -5.9,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
+    },
+    "FIL/EUR": {
+      "price": 0.581,
+      "donchian_high": 0.64,
+      "pct_vs_breakout": -9.22,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "PUMP/EUR": {
       "price": 0.002421,
       "donchian_high": 0.00255,
       "pct_vs_breakout": -5.06,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "NEAR/EUR": {
-      "price": 1.4533,
+      "price": 1.4285,
       "donchian_high": 1.5357,
-      "pct_vs_breakout": -5.37,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
-    },
-    "FIL/EUR": {
-      "price": 0.588,
-      "donchian_high": 0.64,
-      "pct_vs_breakout": -8.13,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -6.98,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "CRV/EUR": {
-      "price": 0.22129,
+      "price": 0.21763,
       "donchian_high": 0.24743,
-      "pct_vs_breakout": -10.56,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -12.04,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     },
     "PEPE/EUR": {
-      "price": 2.346e-06,
+      "price": 2.331e-06,
       "donchian_high": 2.595e-06,
-      "pct_vs_breakout": -9.6,
-      "checked_at": "2026-08-13T11:31:31.092267+00:00"
+      "pct_vs_breakout": -10.17,
+      "checked_at": "2026-08-13T12:34:19.068119+00:00"
     }
   },
   "trade_history": [
@@ -255,26 +255,26 @@
       "DOGE/EUR",
       "ADA/EUR",
       "LTC/EUR",
-      "LINK/EUR",
       "XLM/EUR",
+      "LINK/EUR",
       "TRX/EUR",
       "ZEC/EUR",
+      "BNB/EUR",
       "EURC/EUR",
       "PAXG/EUR",
-      "BNB/EUR",
       "UNI/EUR",
       "TAO/EUR",
       "SUI/EUR",
       "AVAX/EUR",
+      "FIL/EUR",
       "PUMP/EUR",
       "NEAR/EUR",
-      "FIL/EUR",
       "CRV/EUR",
       "PEPE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-13T11:32:01.126000+00:00",
+  "last_run_at": "2026-08-13T12:34:49.101438+00:00",
   "dry_run": false,
   "entry_time": null
 }
