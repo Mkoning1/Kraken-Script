@@ -1,9 +1,9 @@
 {
-  "in_position": true,
-  "symbol": "HYPE/EUR",
-  "entry_price": 50.16,
-  "peak_price": 50.16,
-  "position_size": 0.2624381,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1786622400000,
@@ -15,7 +15,7 @@
     "LTC/EUR": 1786622400000,
     "XLM/EUR": 1786622400000,
     "TRX/EUR": 1786622400000,
-    "HYPE/EUR": 1786680000000,
+    "HYPE/EUR": 1786694400000,
     "AAVE/EUR": 1786622400000,
     "DOGE/EUR": 1786622400000,
     "LINK/EUR": 1786622400000,
@@ -29,8 +29,8 @@
     "AVAX/EUR": 1786622400000,
     "ACU/EUR": 1786622400000
   },
-  "current_price": 48.87,
-  "current_atr": 0.716428571428571,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 54980.0,
@@ -239,6 +239,14 @@
       "pnl_pct": 0.95,
       "was_runner": true,
       "exit_time": "2026-08-12T16:10:46.206036+00:00"
+    },
+    {
+      "symbol": "HYPE/EUR",
+      "entry_price": 50.16,
+      "exit_price": 48.59,
+      "pnl_pct": -3.13,
+      "was_runner": false,
+      "exit_time": "2026-08-14T13:25:24.181988+00:00"
     }
   ],
   "config": {
@@ -248,30 +256,30 @@
       "SOL/EUR",
       "XRP/EUR",
       "ADA/EUR",
-      "LTC/EUR",
       "PAXG/EUR",
+      "LTC/EUR",
       "LINK/EUR",
       "HYPE/EUR",
-      "AAVE/EUR",
       "PUMP/EUR",
       "TRX/EUR",
       "UNI/EUR",
+      "TAO/EUR",
+      "AAVE/EUR",
       "ZEC/EUR",
       "BNB/EUR",
       "EURC/EUR",
-      "TAO/EUR",
       "NEAR/EUR",
       "XLM/EUR",
-      "ATOM/EUR",
       "BCH/EUR",
-      "AVAX/EUR",
+      "ATOM/EUR",
       "2Z/EUR",
-      "ACU/EUR",
-      "DOGE/EUR"
+      "DOGE/EUR",
+      "AVAX/EUR",
+      "ACU/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-14T11:58:44.937262+00:00",
+  "last_run_at": "2026-08-14T13:25:24.182042+00:00",
   "dry_run": false,
-  "entry_time": "2026-08-13T17:31:55.643027+00:00"
+  "entry_time": null
 }
