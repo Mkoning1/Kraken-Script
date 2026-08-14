@@ -29,8 +29,7 @@
     "2Z/EUR": 1786723200000,
     "ATOM/EUR": 1786723200000,
     "INJ/EUR": 1786723200000,
-    "PEPE/EUR": 1786723200000,
-    "ICP/EUR": 1786723200000
+    "PEPE/EUR": 1786723200000
   },
   "current_price": 7.76271,
   "current_atr": null,
@@ -265,12 +264,12 @@
       "UNI/EUR",
       "TAO/EUR",
       "PUMP/EUR",
-      "ZEC/EUR",
       "HYPE/EUR",
+      "ZEC/EUR",
       "PAXG/EUR",
       "BNB/EUR",
-      "INJ/EUR",
       "NEAR/EUR",
+      "INJ/EUR",
       "EURC/EUR",
       "2Z/EUR",
       "XLM/EUR",
@@ -278,11 +277,11 @@
       "BCH/EUR",
       "ATOM/EUR",
       "PEPE/EUR",
-      "ICP/EUR"
+      "SUI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-14T20:17:01.035908+00:00",
+  "last_run_at": "2026-08-14T20:57:31.956609+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
