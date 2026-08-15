@@ -252,27 +252,27 @@
       "LTC/EUR",
       "AVAX/EUR",
       "ZEC/EUR",
-      "TRX/EUR",
       "COW/EUR",
-      "WLD/EUR",
+      "TRX/EUR",
       "APR/EUR",
       "XLM/EUR",
       "UNI/EUR",
-      "ADA/EUR",
+      "WLD/EUR",
       "FET/EUR",
+      "ADA/EUR",
       "DOGE/EUR",
       "PUMP/EUR",
       "HYPE/EUR",
       "PAXG/EUR",
+      "FUN/EUR",
       "EURC/EUR",
       "BNB/EUR",
       "SUI/EUR",
-      "WAL/EUR",
-      "BCH/EUR"
+      "WAL/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T21:35:56.621217+00:00",
+  "last_run_at": "2026-08-15T21:58:01.628950+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
