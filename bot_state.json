@@ -24,7 +24,6 @@
     "TAO/EUR": 1786723200000,
     "BNB/EUR": 1786723200000,
     "PUMP/EUR": 1786723200000,
-    "EURC/EUR": 1786723200000,
     "BCH/EUR": 1786723200000,
     "INJ/EUR": 1786723200000
   },
@@ -258,27 +257,27 @@
       "LTC/EUR",
       "UNI/EUR",
       "TRX/EUR",
-      "ADA/EUR",
       "ZEC/EUR",
+      "ADA/EUR",
       "TAO/EUR",
       "AVAX/EUR",
       "HYPE/EUR",
-      "BNB/EUR",
       "INJ/EUR",
       "PUMP/EUR",
-      "EURC/EUR",
+      "BNB/EUR",
+      "APR/EUR",
       "XLM/EUR",
+      "DOGE/EUR",
       "NEAR/EUR",
       "WLD/EUR",
-      "DOGE/EUR",
       "PAXG/EUR",
       "ICP/EUR",
-      "SUI/EUR",
-      "BCH/EUR"
+      "BCH/EUR",
+      "SUI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T08:00:56.250831+00:00",
+  "last_run_at": "2026-08-15T08:46:21.424593+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
