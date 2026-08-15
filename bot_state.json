@@ -269,8 +269,8 @@
       "BNB/EUR",
       "INJ/EUR",
       "XLM/EUR",
-      "NEAR/EUR",
       "EURC/EUR",
+      "NEAR/EUR",
       "WLD/EUR",
       "2Z/EUR",
       "DOGE/EUR",
@@ -279,7 +279,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T04:58:01.808130+00:00",
+  "last_run_at": "2026-08-15T05:33:24.853084+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
