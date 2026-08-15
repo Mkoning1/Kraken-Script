@@ -262,20 +262,20 @@
       "APR/EUR",
       "HYPE/EUR",
       "COW/EUR",
-      "XLM/EUR",
       "WLD/EUR",
+      "XLM/EUR",
       "PUMP/EUR",
       "EURC/EUR",
-      "NEAR/EUR",
       "DOGE/EUR",
+      "NEAR/EUR",
       "SUI/EUR",
-      "BNB/EUR",
       "PAXG/EUR",
+      "BNB/EUR",
       "ICP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T14:33:36.772512+00:00",
+  "last_run_at": "2026-08-15T15:00:02.248713+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
