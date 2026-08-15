@@ -268,18 +268,18 @@
       "PAXG/EUR",
       "BNB/EUR",
       "INJ/EUR",
+      "NEAR/EUR",
       "XLM/EUR",
       "EURC/EUR",
-      "NEAR/EUR",
       "WLD/EUR",
-      "2Z/EUR",
       "DOGE/EUR",
+      "2Z/EUR",
       "BCH/EUR",
       "ICP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T05:33:24.853084+00:00",
+  "last_run_at": "2026-08-15T06:01:30.420423+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
