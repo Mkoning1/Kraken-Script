@@ -265,6 +265,7 @@
       "HYPE/EUR",
       "PUMP/EUR",
       "PAXG/EUR",
+      "AVAX/EUR",
       "BNB/EUR",
       "INJ/EUR",
       "XLM/EUR",
@@ -274,12 +275,11 @@
       "WLD/EUR",
       "DOGE/EUR",
       "BCH/EUR",
-      "ICP/EUR",
-      "HBAR/EUR"
+      "ICP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T01:51:17.459079+00:00",
+  "last_run_at": "2026-08-15T02:56:02.694729+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
