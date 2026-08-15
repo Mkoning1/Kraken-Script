@@ -19,7 +19,6 @@
     "DOGE/EUR": 1786723200000,
     "LINK/EUR": 1786809600000,
     "UNI/EUR": 1786723200000,
-    "PAXG/EUR": 1786723200000,
     "PUMP/EUR": 1786723200000
   },
   "current_price": 8.28675,
@@ -257,22 +256,22 @@
       "APR/EUR",
       "UNI/EUR",
       "ADA/EUR",
+      "DOGE/EUR",
       "FET/EUR",
       "FUN/EUR",
       "XLM/EUR",
-      "DOGE/EUR",
       "XNY/EUR",
       "WLD/EUR",
       "PUMP/EUR",
       "EURC/EUR",
+      "NEAR/EUR",
       "BNB/EUR",
-      "PAXG/EUR",
       "HYPE/EUR",
       "WAL/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T22:59:47.302833+00:00",
+  "last_run_at": "2026-08-15T23:29:13.216132+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
