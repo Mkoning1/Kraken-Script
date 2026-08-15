@@ -26,7 +26,6 @@
     "PUMP/EUR": 1786723200000,
     "EURC/EUR": 1786723200000,
     "BCH/EUR": 1786723200000,
-    "2Z/EUR": 1786723200000,
     "INJ/EUR": 1786723200000
   },
   "current_price": 8.25614,
@@ -264,22 +263,22 @@
       "TAO/EUR",
       "AVAX/EUR",
       "HYPE/EUR",
-      "PUMP/EUR",
       "BNB/EUR",
+      "PUMP/EUR",
       "INJ/EUR",
       "EURC/EUR",
-      "XLM/EUR",
       "NEAR/EUR",
-      "PAXG/EUR",
+      "XLM/EUR",
       "WLD/EUR",
       "DOGE/EUR",
-      "2Z/EUR",
+      "PAXG/EUR",
       "ICP/EUR",
+      "SUI/EUR",
       "BCH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T06:58:31.588133+00:00",
+  "last_run_at": "2026-08-15T07:37:23.031214+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
