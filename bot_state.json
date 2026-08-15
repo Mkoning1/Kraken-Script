@@ -258,23 +258,23 @@
       "UNI/EUR",
       "ADA/EUR",
       "APR/EUR",
-      "HYPE/EUR",
       "COW/EUR",
+      "HYPE/EUR",
       "WLD/EUR",
       "XLM/EUR",
-      "INJ/EUR",
       "FET/EUR",
       "EURC/EUR",
       "DOGE/EUR",
-      "PUMP/EUR",
       "ICP/EUR",
       "NEAR/EUR",
       "PAXG/EUR",
-      "SHIB/EUR"
+      "PUMP/EUR",
+      "INJ/EUR",
+      "SUI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T15:30:42.034167+00:00",
+  "last_run_at": "2026-08-15T15:58:00.458334+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
