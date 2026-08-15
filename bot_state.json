@@ -262,10 +262,10 @@
       "TRX/EUR",
       "ZEC/EUR",
       "TAO/EUR",
-      "HYPE/EUR",
       "PUMP/EUR",
-      "PAXG/EUR",
+      "HYPE/EUR",
       "AVAX/EUR",
+      "PAXG/EUR",
       "BNB/EUR",
       "INJ/EUR",
       "XLM/EUR",
@@ -279,7 +279,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T02:56:02.694729+00:00",
+  "last_run_at": "2026-08-15T03:44:55.210026+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
