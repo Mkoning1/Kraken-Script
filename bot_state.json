@@ -256,23 +256,23 @@
       "COW/EUR",
       "WLD/EUR",
       "APR/EUR",
-      "ADA/EUR",
       "XLM/EUR",
       "UNI/EUR",
+      "ADA/EUR",
       "FET/EUR",
       "DOGE/EUR",
       "PUMP/EUR",
-      "PAXG/EUR",
       "HYPE/EUR",
+      "PAXG/EUR",
       "EURC/EUR",
       "BNB/EUR",
       "SUI/EUR",
-      "BCH/EUR",
-      "WAL/EUR"
+      "WAL/EUR",
+      "BCH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T21:00:44.482823+00:00",
+  "last_run_at": "2026-08-15T21:35:56.621217+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
