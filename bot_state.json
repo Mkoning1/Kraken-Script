@@ -21,7 +21,6 @@
     "UNI/EUR": 1786723200000,
     "PAXG/EUR": 1786723200000,
     "NEAR/EUR": 1786723200000,
-    "BNB/EUR": 1786723200000,
     "PUMP/EUR": 1786723200000,
     "INJ/EUR": 1786723200000
   },
@@ -258,24 +257,24 @@
       "AVAX/EUR",
       "UNI/EUR",
       "ADA/EUR",
-      "INJ/EUR",
       "APR/EUR",
       "HYPE/EUR",
       "COW/EUR",
       "WLD/EUR",
       "XLM/EUR",
-      "PUMP/EUR",
+      "INJ/EUR",
+      "FET/EUR",
       "EURC/EUR",
       "DOGE/EUR",
+      "PUMP/EUR",
+      "ICP/EUR",
       "NEAR/EUR",
-      "SUI/EUR",
       "PAXG/EUR",
-      "BNB/EUR",
-      "ICP/EUR"
+      "SHIB/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-15T15:00:02.248713+00:00",
+  "last_run_at": "2026-08-15T15:30:42.034167+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
