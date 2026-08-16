@@ -255,21 +255,21 @@
       "EURC/EUR",
       "AVAX/EUR",
       "DOGE/EUR",
-      "XNY/EUR",
       "SUI/EUR",
       "XLM/EUR",
-      "TAO/EUR",
+      "BCH/EUR",
+      "XNY/EUR",
       "FET/EUR",
+      "TAO/EUR",
       "NEAR/EUR",
-      "UNI/EUR",
-      "PAXG/EUR",
       "AKT/EUR",
-      "AB/EUR",
-      "KAS/EUR"
+      "PAXG/EUR",
+      "UNI/EUR",
+      "AB/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T21:50:35.390003+00:00",
+  "last_run_at": "2026-08-16T22:26:27.856856+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
