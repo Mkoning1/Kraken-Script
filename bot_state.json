@@ -260,16 +260,16 @@
       "AVAX/EUR",
       "BCH/EUR",
       "XNY/EUR",
-      "TAO/EUR",
       "FET/EUR",
+      "TAO/EUR",
       "NEAR/EUR",
       "AKT/EUR",
       "BNB/EUR",
-      "UNI/EUR"
+      "STBL/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T23:24:37.832647+00:00",
+  "last_run_at": "2026-08-16T23:46:53.118147+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
