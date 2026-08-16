@@ -242,8 +242,8 @@
   "config": {
     "watchlist": [
       "BTC/EUR",
-      "ETH/EUR",
       "SOL/EUR",
+      "ETH/EUR",
       "XRP/EUR",
       "LINK/EUR",
       "LTC/EUR",
@@ -258,18 +258,18 @@
       "XLM/EUR",
       "DOGE/EUR",
       "TAO/EUR",
+      "SUI/EUR",
       "NEAR/EUR",
       "FET/EUR",
-      "SUI/EUR",
       "PAXG/EUR",
       "AKT/EUR",
       "AB/EUR",
-      "UNI/EUR",
-      "CRV/EUR"
+      "KAS/EUR",
+      "UNI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T20:31:40.410450+00:00",
+  "last_run_at": "2026-08-16T20:59:26.479317+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
