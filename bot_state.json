@@ -257,19 +257,19 @@
       "AVAX/EUR",
       "XLM/EUR",
       "DOGE/EUR",
-      "FET/EUR",
       "WLD/EUR",
+      "FET/EUR",
       "NEAR/EUR",
       "SUI/EUR",
       "PAXG/EUR",
-      "COW/EUR",
-      "TAO/EUR",
       "BNB/EUR",
+      "TAO/EUR",
+      "COW/EUR",
       "AB/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T15:37:23.025674+00:00",
+  "last_run_at": "2026-08-16T15:59:01.309273+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
