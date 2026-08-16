@@ -250,13 +250,13 @@
       "LINK/EUR",
       "LTC/EUR",
       "TRX/EUR",
-      "FUN/EUR",
       "COW/EUR",
+      "FUN/EUR",
       "APR/EUR",
       "HYPE/EUR",
       "FET/EUR",
-      "ADA/EUR",
       "XNY/EUR",
+      "ADA/EUR",
       "ZEC/EUR",
       "DOGE/EUR",
       "AVAX/EUR",
@@ -271,7 +271,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T05:12:21.462485+00:00",
+  "last_run_at": "2026-08-16T05:46:37.238205+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
