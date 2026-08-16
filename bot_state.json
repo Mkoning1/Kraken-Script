@@ -251,14 +251,14 @@
       "FUN/EUR",
       "TRX/EUR",
       "HYPE/EUR",
-      "ZEC/EUR",
       "EURC/EUR",
+      "ZEC/EUR",
       "AVAX/EUR",
       "XNY/EUR",
       "XLM/EUR",
       "DOGE/EUR",
-      "FET/EUR",
       "TAO/EUR",
+      "FET/EUR",
       "NEAR/EUR",
       "SUI/EUR",
       "WLD/EUR",
@@ -269,7 +269,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T19:35:16.692549+00:00",
+  "last_run_at": "2026-08-16T19:56:48.567795+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
