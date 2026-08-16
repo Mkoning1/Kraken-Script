@@ -251,9 +251,9 @@
       "ADA/EUR",
       "TRX/EUR",
       "HYPE/EUR",
+      "ZEC/EUR",
       "EURC/EUR",
       "XNY/EUR",
-      "ZEC/EUR",
       "AVAX/EUR",
       "XLM/EUR",
       "DOGE/EUR",
@@ -264,12 +264,12 @@
       "NEAR/EUR",
       "PAXG/EUR",
       "AB/EUR",
-      "COW/EUR",
-      "BNB/EUR"
+      "AKT/EUR",
+      "COW/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-16T17:35:12.144691+00:00",
+  "last_run_at": "2026-08-16T17:57:16.565353+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
