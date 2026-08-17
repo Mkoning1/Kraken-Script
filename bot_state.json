@@ -255,8 +255,8 @@
       "BNB/EUR",
       "EURC/EUR",
       "VVV/EUR",
-      "TAO/EUR",
       "DOGE/EUR",
+      "TAO/EUR",
       "PUMP/EUR",
       "PAXG/EUR",
       "INJ/EUR",
@@ -269,7 +269,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-17T20:45:16.893304+00:00",
+  "last_run_at": "2026-08-17T21:11:51.016332+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
