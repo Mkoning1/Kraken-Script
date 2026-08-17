@@ -265,11 +265,11 @@
       "AKT/EUR",
       "UNI/EUR",
       "BNB/EUR",
-      "CRV/EUR"
+      "PUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-17T04:48:28.365799+00:00",
+  "last_run_at": "2026-08-17T05:38:38.431358+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
