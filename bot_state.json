@@ -243,8 +243,8 @@
     "watchlist": [
       "BTC/EUR",
       "ETH/EUR",
-      "XRP/EUR",
       "SOL/EUR",
+      "XRP/EUR",
       "HYPE/EUR",
       "LTC/EUR",
       "ZEC/EUR",
@@ -259,17 +259,17 @@
       "PUMP/EUR",
       "PAXG/EUR",
       "DOGE/EUR",
-      "STBL/EUR",
       "NEAR/EUR",
+      "STBL/EUR",
+      "UNI/EUR",
       "XLM/EUR",
       "SUI/EUR",
-      "UNI/EUR",
       "HBAR/EUR",
       "FHE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-17T23:02:45.030352+00:00",
+  "last_run_at": "2026-08-17T23:38:38.444586+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
