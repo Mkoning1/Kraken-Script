@@ -261,15 +261,15 @@
       "DOGE/EUR",
       "INJ/EUR",
       "STBL/EUR",
-      "XLM/EUR",
       "NEAR/EUR",
+      "XLM/EUR",
       "SUI/EUR",
-      "HBAR/EUR",
-      "FHE/EUR"
+      "UNI/EUR",
+      "HBAR/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-17T22:02:57.273944+00:00",
+  "last_run_at": "2026-08-17T22:42:57.711147+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
