@@ -256,20 +256,20 @@
       "LINK/EUR",
       "AAVE/EUR",
       "PAXG/EUR",
-      "BNB/EUR",
       "TAO/EUR",
+      "BNB/EUR",
       "XLM/EUR",
       "NEAR/EUR",
       "UNI/EUR",
       "AVAX/EUR",
       "DOGE/EUR",
       "DOT/EUR",
-      "FHE/EUR",
-      "PUMP/EUR"
+      "PUMP/EUR",
+      "FHE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-18T16:41:33.734122+00:00",
+  "last_run_at": "2026-08-18T17:11:01.656142+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
