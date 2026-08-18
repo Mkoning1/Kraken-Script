@@ -260,16 +260,16 @@
       "PAXG/EUR",
       "DOGE/EUR",
       "NEAR/EUR",
-      "STBL/EUR",
       "UNI/EUR",
-      "XLM/EUR",
       "SUI/EUR",
-      "HBAR/EUR",
+      "STBL/EUR",
+      "XLM/EUR",
+      "AVAX/EUR",
       "FHE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-18T00:00:14.522839+00:00",
+  "last_run_at": "2026-08-18T01:46:12.444176+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
