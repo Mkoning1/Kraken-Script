@@ -252,8 +252,8 @@
       "SUI/EUR",
       "TRX/EUR",
       "LINK/EUR",
-      "ADA/EUR",
       "PAXG/EUR",
+      "ADA/EUR",
       "VVV/EUR",
       "TAO/EUR",
       "BNB/EUR",
@@ -265,11 +265,11 @@
       "DOT/EUR",
       "ONDO/EUR",
       "DOGE/EUR",
-      "UNI/EUR"
+      "TON/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-18T22:54:49.908730+00:00",
+  "last_run_at": "2026-08-18T23:26:42.265428+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
