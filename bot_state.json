@@ -258,8 +258,8 @@
       "VVV/EUR",
       "EURC/EUR",
       "PAXG/EUR",
-      "PUMP/EUR",
       "UNI/EUR",
+      "PUMP/EUR",
       "XLM/EUR",
       "DOGE/EUR",
       "AVAX/EUR",
@@ -269,7 +269,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-18T04:40:12.236709+00:00",
+  "last_run_at": "2026-08-18T05:14:00.629878+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
