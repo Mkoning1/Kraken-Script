@@ -254,22 +254,22 @@
       "POL/EUR",
       "VVV/EUR",
       "LINK/EUR",
-      "PAXG/EUR",
       "AAVE/EUR",
+      "PAXG/EUR",
       "BNB/EUR",
-      "TAO/EUR",
       "XLM/EUR",
+      "TAO/EUR",
       "UNI/EUR",
-      "DOGE/EUR",
       "NEAR/EUR",
+      "DOGE/EUR",
       "AVAX/EUR",
-      "DOT/EUR",
       "FHE/EUR",
+      "DOT/EUR",
       "PUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-18T14:44:46.931263+00:00",
+  "last_run_at": "2026-08-18T15:15:58.893923+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
