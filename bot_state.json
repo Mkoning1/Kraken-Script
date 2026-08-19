@@ -257,9 +257,9 @@
       "DOGE/EUR",
       "PUMP/EUR",
       "TAO/EUR",
+      "NEAR/EUR",
       "BNB/EUR",
       "XLM/EUR",
-      "NEAR/EUR",
       "AVAX/EUR",
       "M/EUR",
       "ONDO/EUR",
@@ -268,7 +268,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-19T17:29:57.650886+00:00",
+  "last_run_at": "2026-08-19T17:54:17.332762+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
