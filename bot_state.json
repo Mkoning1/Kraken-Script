@@ -262,13 +262,13 @@
       "BNB/EUR",
       "AVAX/EUR",
       "M/EUR",
-      "ONDO/EUR",
       "DASH/EUR",
-      "WLD/EUR"
+      "WLD/EUR",
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-19T18:41:05.907196+00:00",
+  "last_run_at": "2026-08-19T19:11:45.509316+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
