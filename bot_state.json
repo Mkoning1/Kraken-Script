@@ -254,22 +254,22 @@
       "PAXG/EUR",
       "ADA/EUR",
       "PUMP/EUR",
-      "SUI/EUR",
       "BNB/EUR",
       "VVV/EUR",
+      "SUI/EUR",
       "XLM/EUR",
       "TAO/EUR",
-      "POL/EUR",
       "NEAR/EUR",
+      "POL/EUR",
       "ONDO/EUR",
       "M/EUR",
       "DOGE/EUR",
       "ATOM/EUR",
-      "KNTQ/EUR"
+      "TON/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-19T06:51:35.250542+00:00",
+  "last_run_at": "2026-08-19T07:42:46.417659+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
