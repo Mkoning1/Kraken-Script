@@ -252,23 +252,23 @@
       "AAVE/EUR",
       "TRX/EUR",
       "SUI/EUR",
-      "PAXG/EUR",
       "DOGE/EUR",
-      "UNI/EUR",
+      "PAXG/EUR",
       "AVAX/EUR",
+      "UNI/EUR",
       "XLM/EUR",
+      "PUMP/EUR",
       "TAO/EUR",
       "NEAR/EUR",
-      "PUMP/EUR",
       "BNB/EUR",
       "DASH/EUR",
       "WLD/EUR",
       "M/EUR",
-      "ONDO/EUR"
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-19T21:29:25.935443+00:00",
+  "last_run_at": "2026-08-19T21:54:33.453243+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
