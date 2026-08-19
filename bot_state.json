@@ -249,26 +249,26 @@
       "LINK/EUR",
       "ZEC/EUR",
       "PAXG/EUR",
-      "TRX/EUR",
       "ADA/EUR",
+      "TRX/EUR",
       "HYPE/EUR",
       "PUMP/EUR",
       "SUI/EUR",
       "BNB/EUR",
       "VVV/EUR",
-      "TAO/EUR",
       "NEAR/EUR",
+      "TAO/EUR",
       "M/EUR",
       "XLM/EUR",
+      "DOGE/EUR",
       "ONDO/EUR",
-      "POL/EUR",
       "EURC/EUR",
-      "WLD/EUR",
-      "AVAX/EUR"
+      "POL/EUR",
+      "WLD/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-19T10:33:11.035562+00:00",
+  "last_run_at": "2026-08-19T11:03:25.585329+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
