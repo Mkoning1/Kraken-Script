@@ -253,8 +253,8 @@
       "SUI/EUR",
       "AAVE/EUR",
       "TRX/EUR",
-      "AVAX/EUR",
       "PAXG/EUR",
+      "AVAX/EUR",
       "UNI/EUR",
       "XLM/EUR",
       "NEAR/EUR",
@@ -268,7 +268,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T04:21:42.824791+00:00",
+  "last_run_at": "2026-08-20T05:05:03.166788+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
