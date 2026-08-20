@@ -249,8 +249,8 @@
       "ADA/EUR",
       "LINK/EUR",
       "SUI/EUR",
-      "LTC/EUR",
       "DOGE/EUR",
+      "LTC/EUR",
       "AVAX/EUR",
       "TRX/EUR",
       "TAO/EUR",
@@ -263,12 +263,12 @@
       "WLD/EUR",
       "BNB/EUR",
       "TRUMP/EUR",
-      "DOT/EUR",
-      "BCH/EUR"
+      "BCH/EUR",
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T14:10:55.458898+00:00",
+  "last_run_at": "2026-08-20T14:56:29.806975+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
