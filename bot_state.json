@@ -251,24 +251,24 @@
       "DOGE/EUR",
       "XLM/EUR",
       "TAO/EUR",
-      "AVAX/EUR",
       "SUI/EUR",
+      "AVAX/EUR",
       "LTC/EUR",
       "PUMP/EUR",
       "TRX/EUR",
       "PAXG/EUR",
       "NEAR/EUR",
-      "WLD/EUR",
       "BNB/EUR",
       "BCH/EUR",
-      "AAVE/EUR",
       "PEPE/EUR",
+      "AAVE/EUR",
       "TRUMP/EUR",
-      "SPX/EUR"
+      "WLD/EUR",
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T22:10:12.269275+00:00",
+  "last_run_at": "2026-08-20T22:46:22.158412+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
