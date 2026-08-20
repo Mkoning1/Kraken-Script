@@ -248,8 +248,8 @@
       "ZEC/EUR",
       "ADA/EUR",
       "LINK/EUR",
-      "SUI/EUR",
       "DOGE/EUR",
+      "SUI/EUR",
       "AVAX/EUR",
       "XLM/EUR",
       "LTC/EUR",
@@ -261,14 +261,14 @@
       "AAVE/EUR",
       "BNB/EUR",
       "TRUMP/EUR",
+      "BCH/EUR",
       "WLD/EUR",
       "PEPE/EUR",
-      "BCH/EUR",
       "UNI/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T18:04:29.178897+00:00",
+  "last_run_at": "2026-08-20T19:01:16.960123+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
