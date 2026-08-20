@@ -251,8 +251,8 @@
       "LTC/EUR",
       "DOGE/EUR",
       "SUI/EUR",
-      "TRX/EUR",
       "PAXG/EUR",
+      "TRX/EUR",
       "AAVE/EUR",
       "AVAX/EUR",
       "UNI/EUR",
@@ -268,7 +268,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T08:19:21.327334+00:00",
+  "last_run_at": "2026-08-20T09:06:34.216855+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
