@@ -259,8 +259,8 @@
       "PAXG/EUR",
       "NEAR/EUR",
       "BNB/EUR",
-      "PEPE/EUR",
       "AAVE/EUR",
+      "PEPE/EUR",
       "BCH/EUR",
       "TRUMP/EUR",
       "WLD/EUR",
@@ -268,7 +268,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T23:29:42.046339+00:00",
+  "last_run_at": "2026-08-20T23:53:56.682868+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
