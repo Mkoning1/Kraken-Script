@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "LINK/EUR",
   "entry_price": 7.76271,
-  "peak_price": 9.13028,
+  "peak_price": 9.17291,
   "position_size": 1.61827506,
   "is_runner": true,
   "last_candle_ts": {
@@ -16,10 +16,10 @@
     "XLM/EUR": 1786723200000,
     "TRX/EUR": 1786723200000,
     "HYPE/EUR": 1786723200000,
-    "LINK/EUR": 1787212800000
+    "LINK/EUR": 1787227200000
   },
-  "current_price": 9.13028,
-  "current_atr": 0.1995200000000002,
+  "current_price": 9.17291,
+  "current_atr": 0.20500500000000027,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 54378.3,
@@ -250,13 +250,13 @@
       "LINK/EUR",
       "SUI/EUR",
       "DOGE/EUR",
-      "LTC/EUR",
       "AVAX/EUR",
+      "LTC/EUR",
       "TAO/EUR",
       "XLM/EUR",
       "PUMP/EUR",
-      "PAXG/EUR",
       "TRX/EUR",
+      "PAXG/EUR",
       "AAVE/EUR",
       "NEAR/EUR",
       "UNI/EUR",
@@ -264,11 +264,11 @@
       "TRUMP/EUR",
       "WLD/EUR",
       "DOT/EUR",
-      "PEPE/EUR"
+      "BCH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-20T15:40:18.260905+00:00",
+  "last_run_at": "2026-08-20T16:13:19.122962+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
