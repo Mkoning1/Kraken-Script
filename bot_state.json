@@ -257,18 +257,18 @@
       "PEPE/EUR",
       "TAO/EUR",
       "LTC/EUR",
-      "PUMP/EUR",
       "ENA/EUR",
+      "PUMP/EUR",
       "VVV/EUR",
-      "WLD/EUR",
       "NEAR/EUR",
-      "TRX/EUR",
+      "WLD/EUR",
       "CRV/EUR",
+      "TRX/EUR",
       "PAXG/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-21T19:31:40.949670+00:00",
+  "last_run_at": "2026-08-21T19:58:55.970833+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
