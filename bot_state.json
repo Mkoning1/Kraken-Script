@@ -259,16 +259,16 @@
       "LTC/EUR",
       "NEAR/EUR",
       "ENA/EUR",
+      "WLD/EUR",
       "PUMP/EUR",
       "VVV/EUR",
-      "WLD/EUR",
       "TRX/EUR",
       "CRV/EUR",
       "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-21T22:01:34.178484+00:00",
+  "last_run_at": "2026-08-21T22:43:19.225841+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
