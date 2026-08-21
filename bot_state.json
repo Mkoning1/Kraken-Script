@@ -255,20 +255,20 @@
       "BCH/EUR",
       "AVAX/EUR",
       "TAO/EUR",
+      "PEPE/EUR",
       "LTC/EUR",
       "NEAR/EUR",
-      "PEPE/EUR",
       "PUMP/EUR",
       "VVV/EUR",
       "ENA/EUR",
       "TRX/EUR",
       "CRV/EUR",
-      "WLD/EUR",
-      "PAXG/EUR"
+      "PAXG/EUR",
+      "WLD/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-21T16:05:08.224148+00:00",
+  "last_run_at": "2026-08-21T16:52:37.806367+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
