@@ -241,8 +241,8 @@
   "config": {
     "watchlist": [
       "BTC/EUR",
-      "XRP/EUR",
       "ETH/EUR",
+      "XRP/EUR",
       "SOL/EUR",
       "HYPE/EUR",
       "ZEC/EUR",
@@ -260,15 +260,15 @@
       "PUMP/EUR",
       "ENA/EUR",
       "VVV/EUR",
-      "NEAR/EUR",
       "WLD/EUR",
+      "NEAR/EUR",
       "TRX/EUR",
       "CRV/EUR",
       "PAXG/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-21T18:57:29.649106+00:00",
+  "last_run_at": "2026-08-21T19:31:40.949670+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
