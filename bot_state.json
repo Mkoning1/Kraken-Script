@@ -256,19 +256,19 @@
       "TAO/EUR",
       "BCH/EUR",
       "PUMP/EUR",
-      "VVV/EUR",
       "LTC/EUR",
+      "VVV/EUR",
       "NEAR/EUR",
       "TRX/EUR",
-      "CRV/EUR",
       "PAXG/EUR",
       "PEPE/EUR",
+      "CRV/EUR",
       "ENA/EUR",
       "BNB/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-21T09:41:19.053065+00:00",
+  "last_run_at": "2026-08-21T10:13:22.313878+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
