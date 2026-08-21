@@ -244,8 +244,8 @@
       "ETH/EUR",
       "XRP/EUR",
       "SOL/EUR",
-      "HYPE/EUR",
       "ZEC/EUR",
+      "HYPE/EUR",
       "ADA/EUR",
       "AAVE/EUR",
       "LINK/EUR",
@@ -268,7 +268,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-21T22:43:19.225841+00:00",
+  "last_run_at": "2026-08-21T23:03:33.027976+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
