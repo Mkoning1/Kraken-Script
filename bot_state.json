@@ -257,18 +257,18 @@
       "TAO/EUR",
       "TRUMP/EUR",
       "PEPE/EUR",
-      "BCH/EUR",
       "LTC/EUR",
+      "BCH/EUR",
       "NEAR/EUR",
       "TRX/EUR",
       "ENA/EUR",
       "WLD/EUR",
-      "FET/EUR",
-      "ONDO/EUR"
+      "ONDO/EUR",
+      "FET/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T08:35:12.153255+00:00",
+  "last_run_at": "2026-08-22T09:04:34.328213+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
