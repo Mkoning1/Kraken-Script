@@ -256,19 +256,19 @@
       "TRUMP/EUR",
       "TAO/EUR",
       "AVAX/EUR",
-      "BCH/EUR",
       "PEPE/EUR",
+      "BCH/EUR",
       "LTC/EUR",
       "NEAR/EUR",
       "UNI/EUR",
       "TRX/EUR",
-      "ENA/EUR",
       "FARTCOIN/EUR",
-      "ONDO/EUR"
+      "ENA/EUR",
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T13:59:49.831712+00:00",
+  "last_run_at": "2026-08-22T14:31:58.767436+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
