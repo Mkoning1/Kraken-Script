@@ -241,8 +241,8 @@
   "config": {
     "watchlist": [
       "BTC/EUR",
-      "ETH/EUR",
       "XRP/EUR",
+      "ETH/EUR",
       "SOL/EUR",
       "ZEC/EUR",
       "HYPE/EUR",
@@ -263,12 +263,12 @@
       "ENA/EUR",
       "WLD/EUR",
       "PUMP/EUR",
-      "ONDO/EUR",
-      "FET/EUR"
+      "FET/EUR",
+      "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T05:44:09.398570+00:00",
+  "last_run_at": "2026-08-22T06:04:02.946162+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
