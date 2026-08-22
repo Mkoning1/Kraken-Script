@@ -246,8 +246,8 @@
       "SOL/EUR",
       "ZEC/EUR",
       "HYPE/EUR",
-      "ADA/EUR",
       "AAVE/EUR",
+      "ADA/EUR",
       "LINK/EUR",
       "SUI/EUR",
       "DOGE/EUR",
@@ -258,8 +258,8 @@
       "TAO/EUR",
       "LTC/EUR",
       "NEAR/EUR",
-      "WLD/EUR",
       "ENA/EUR",
+      "WLD/EUR",
       "PUMP/EUR",
       "VVV/EUR",
       "TRX/EUR",
@@ -268,7 +268,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T02:58:05.936972+00:00",
+  "last_run_at": "2026-08-22T03:49:45.908340+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
