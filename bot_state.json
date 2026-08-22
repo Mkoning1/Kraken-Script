@@ -253,22 +253,22 @@
       "AAVE/EUR",
       "XLM/EUR",
       "PUMP/EUR",
+      "TRUMP/EUR",
       "TAO/EUR",
       "AVAX/EUR",
-      "TRUMP/EUR",
       "PEPE/EUR",
       "LTC/EUR",
       "BCH/EUR",
       "TRX/EUR",
       "NEAR/EUR",
-      "ENA/EUR",
       "UNI/EUR",
+      "ENA/EUR",
       "WLD/EUR",
       "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T09:44:02.888005+00:00",
+  "last_run_at": "2026-08-22T10:02:26.216879+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
