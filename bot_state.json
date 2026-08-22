@@ -240,8 +240,8 @@
   ],
   "config": {
     "watchlist": [
-      "BTC/EUR",
       "XRP/EUR",
+      "BTC/EUR",
       "ETH/EUR",
       "SOL/EUR",
       "ZEC/EUR",
@@ -258,17 +258,17 @@
       "AVAX/EUR",
       "PEPE/EUR",
       "LTC/EUR",
-      "BCH/EUR",
       "NEAR/EUR",
       "UNI/EUR",
+      "BCH/EUR",
       "TRX/EUR",
       "FARTCOIN/EUR",
       "ENA/EUR",
-      "ONDO/EUR"
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T14:59:38.010117+00:00",
+  "last_run_at": "2026-08-22T15:30:39.431739+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
