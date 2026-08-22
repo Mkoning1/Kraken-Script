@@ -249,9 +249,9 @@
       "SUI/EUR",
       "ADA/EUR",
       "DOGE/EUR",
+      "AAVE/EUR",
       "HYPE/EUR",
       "XLM/EUR",
-      "AAVE/EUR",
       "PUMP/EUR",
       "TRUMP/EUR",
       "TAO/EUR",
@@ -260,15 +260,15 @@
       "NEAR/EUR",
       "UNI/EUR",
       "PEPE/EUR",
-      "BCH/EUR",
       "TRX/EUR",
+      "BCH/EUR",
       "FARTCOIN/EUR",
       "EURC/EUR",
       "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-22T17:00:52.467078+00:00",
+  "last_run_at": "2026-08-22T17:37:37.956340+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
