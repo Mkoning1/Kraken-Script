@@ -243,13 +243,13 @@
       "XRP/EUR",
       "ETH/EUR",
       "SOL/EUR",
-      "AAVE/EUR",
       "ZEC/EUR",
+      "AAVE/EUR",
       "ADA/EUR",
-      "PUMP/EUR",
       "TRUMP/EUR",
-      "HYPE/EUR",
+      "PUMP/EUR",
       "LINK/EUR",
+      "HYPE/EUR",
       "SUI/EUR",
       "DOGE/EUR",
       "KNTQ/EUR",
@@ -260,14 +260,14 @@
       "NEAR/EUR",
       "ENA/EUR",
       "FARTCOIN/EUR",
-      "DASH/EUR",
       "AVAX/EUR",
+      "DASH/EUR",
       "XPL/EUR",
       "JUP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-23T17:36:18.896851+00:00",
+  "last_run_at": "2026-08-23T17:57:57.317121+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
