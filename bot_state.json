@@ -256,8 +256,8 @@
       "XLM/EUR",
       "FARTCOIN/EUR",
       "LTC/EUR",
-      "TAO/EUR",
       "NEAR/EUR",
+      "TAO/EUR",
       "EURC/EUR",
       "VVV/EUR",
       "UNI/EUR",
@@ -267,7 +267,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-23T10:43:03.206294+00:00",
+  "last_run_at": "2026-08-23T11:03:07.457408+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
