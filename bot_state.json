@@ -253,21 +253,21 @@
       "DOGE/EUR",
       "HYPE/EUR",
       "KNTQ/EUR",
-      "XLM/EUR",
       "LTC/EUR",
+      "XLM/EUR",
       "UNI/EUR",
       "NEAR/EUR",
-      "EURC/EUR",
-      "TAO/EUR",
       "ENA/EUR",
+      "TAO/EUR",
       "FARTCOIN/EUR",
-      "AVAX/EUR",
       "JUP/EUR",
+      "AVAX/EUR",
+      "DASH/EUR",
       "BCH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-23T14:01:47.191393+00:00",
+  "last_run_at": "2026-08-23T14:42:01.161543+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
