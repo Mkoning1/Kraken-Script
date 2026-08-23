@@ -251,8 +251,8 @@
       "TRUMP/EUR",
       "HYPE/EUR",
       "LINK/EUR",
-      "KNTQ/EUR",
       "UNI/EUR",
+      "KNTQ/EUR",
       "TAO/EUR",
       "DOGE/EUR",
       "NEAR/EUR",
@@ -267,7 +267,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-23T23:30:59.199246+00:00",
+  "last_run_at": "2026-08-23T23:58:09.950515+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
