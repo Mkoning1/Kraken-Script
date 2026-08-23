@@ -248,26 +248,26 @@
       "AAVE/EUR",
       "LINK/EUR",
       "ADA/EUR",
-      "TRUMP/EUR",
       "SUI/EUR",
       "DOGE/EUR",
+      "TRUMP/EUR",
       "HYPE/EUR",
       "KNTQ/EUR",
       "XLM/EUR",
-      "FARTCOIN/EUR",
       "LTC/EUR",
+      "FARTCOIN/EUR",
       "NEAR/EUR",
-      "TAO/EUR",
       "EURC/EUR",
-      "VVV/EUR",
+      "TAO/EUR",
       "UNI/EUR",
+      "VVV/EUR",
       "AVAX/EUR",
-      "JUP/EUR",
-      "ENA/EUR"
+      "ENA/EUR",
+      "JUP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-23T11:03:07.457408+00:00",
+  "last_run_at": "2026-08-23T11:36:30.442426+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
