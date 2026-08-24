@@ -243,8 +243,8 @@
       "ETH/EUR",
       "XRP/EUR",
       "SOL/EUR",
-      "ZEC/EUR",
       "ADA/EUR",
+      "ZEC/EUR",
       "SUI/EUR",
       "HYPE/EUR",
       "AAVE/EUR",
@@ -259,15 +259,15 @@
       "UNI/EUR",
       "BCH/EUR",
       "PAXG/EUR",
-      "TRX/EUR",
       "ENA/EUR",
+      "TRX/EUR",
       "PEPE/EUR",
-      "XPL/EUR",
-      "AVAX/EUR"
+      "AVAX/EUR",
+      "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-24T18:13:37.877189+00:00",
+  "last_run_at": "2026-08-24T19:04:10.882097+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
