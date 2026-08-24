@@ -261,13 +261,13 @@
       "LTC/EUR",
       "PAXG/EUR",
       "BCH/EUR",
-      "DASH/EUR",
+      "ONDO/EUR",
       "AVAX/EUR",
-      "ONDO/EUR"
+      "TRX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-24T05:54:23.211775+00:00",
+  "last_run_at": "2026-08-24T07:07:00.971917+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
