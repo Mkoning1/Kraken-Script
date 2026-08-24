@@ -253,21 +253,21 @@
       "LINK/EUR",
       "UNI/EUR",
       "TAO/EUR",
-      "DOGE/EUR",
       "NEAR/EUR",
-      "XLM/EUR",
+      "DOGE/EUR",
       "ENA/EUR",
+      "XLM/EUR",
       "LTC/EUR",
       "XPL/EUR",
       "PAXG/EUR",
       "BCH/EUR",
-      "AVAX/EUR",
       "ONDO/EUR",
-      "DASH/EUR"
+      "DASH/EUR",
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-24T04:06:58.082910+00:00",
+  "last_run_at": "2026-08-24T05:02:49.245477+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
