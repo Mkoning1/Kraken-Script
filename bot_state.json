@@ -257,17 +257,17 @@
       "LTC/EUR",
       "XLM/EUR",
       "UNI/EUR",
-      "PAXG/EUR",
       "BCH/EUR",
-      "ENA/EUR",
+      "PAXG/EUR",
       "TRX/EUR",
+      "ENA/EUR",
+      "PEPE/EUR",
       "XPL/EUR",
-      "AVAX/EUR",
-      "PEPE/EUR"
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-24T17:34:55.479471+00:00",
+  "last_run_at": "2026-08-24T18:13:37.877189+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
