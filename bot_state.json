@@ -251,8 +251,8 @@
       "LTC/EUR",
       "DOGE/EUR",
       "TAO/EUR",
-      "AAVE/EUR",
       "PUMP/EUR",
+      "AAVE/EUR",
       "NEAR/EUR",
       "XLM/EUR",
       "TRX/EUR",
@@ -261,13 +261,13 @@
       "PAXG/EUR",
       "TRUMP/EUR",
       "ENA/EUR",
-      "JUP/EUR",
+      "ZRO/EUR",
       "AVAX/EUR",
-      "ZRO/EUR"
+      "JUP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-25T17:38:34.931807+00:00",
+  "last_run_at": "2026-08-25T18:05:57.002641+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
