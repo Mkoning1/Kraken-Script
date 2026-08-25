@@ -261,13 +261,13 @@
       "TRX/EUR",
       "ONDO/EUR",
       "PAXG/EUR",
-      "ENA/EUR",
       "INJ/EUR",
+      "ENA/EUR",
       "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-25T04:55:00.812576+00:00",
+  "last_run_at": "2026-08-25T05:35:50.614196+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
