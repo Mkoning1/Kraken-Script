@@ -251,9 +251,9 @@
       "LINK/EUR",
       "AAVE/EUR",
       "NEAR/EUR",
-      "TRUMP/EUR",
       "DOGE/EUR",
       "PUMP/EUR",
+      "TRUMP/EUR",
       "TAO/EUR",
       "XLM/EUR",
       "BCH/EUR",
@@ -267,7 +267,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-24T23:37:59.480851+00:00",
+  "last_run_at": "2026-08-25T00:00:01.117583+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
