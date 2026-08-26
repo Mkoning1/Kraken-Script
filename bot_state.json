@@ -248,10 +248,10 @@
       "ADA/EUR",
       "LINK/EUR",
       "LTC/EUR",
-      "SUI/EUR",
       "TAO/EUR",
-      "DOGE/EUR",
+      "SUI/EUR",
       "PUMP/EUR",
+      "DOGE/EUR",
       "UNI/EUR",
       "TRX/EUR",
       "NEAR/EUR",
@@ -260,14 +260,14 @@
       "ZRO/EUR",
       "PAXG/EUR",
       "TRUMP/EUR",
-      "ONDO/EUR",
       "POL/EUR",
+      "ONDO/EUR",
       "AVAX/EUR",
-      "PEPE/EUR"
+      "SPX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-26T04:48:41.990291+00:00",
+  "last_run_at": "2026-08-26T05:38:19.690541+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
