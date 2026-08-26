@@ -255,19 +255,19 @@
       "XLM/EUR",
       "DOGE/EUR",
       "TRX/EUR",
-      "NEAR/EUR",
       "ZRO/EUR",
+      "NEAR/EUR",
       "POL/EUR",
+      "WLD/EUR",
       "AAVE/EUR",
       "TRUMP/EUR",
       "PAXG/EUR",
-      "WLD/EUR",
       "SPX/EUR",
-      "ONDO/EUR"
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-26T11:15:40.634682+00:00",
+  "last_run_at": "2026-08-26T11:57:31.263706+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
