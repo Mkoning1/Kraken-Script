@@ -243,8 +243,8 @@
       "ETH/EUR",
       "XRP/EUR",
       "SOL/EUR",
-      "ZEC/EUR",
       "HYPE/EUR",
+      "ZEC/EUR",
       "ADA/EUR",
       "LTC/EUR",
       "SUI/EUR",
@@ -252,22 +252,22 @@
       "TAO/EUR",
       "PUMP/EUR",
       "UNI/EUR",
-      "DOGE/EUR",
       "XLM/EUR",
+      "DOGE/EUR",
       "TRX/EUR",
       "POL/EUR",
       "WLD/EUR",
+      "AAVE/EUR",
+      "PAXG/EUR",
       "NEAR/EUR",
       "ZRO/EUR",
-      "PAXG/EUR",
-      "AAVE/EUR",
-      "TRUMP/EUR",
+      "EURC/EUR",
       "SPX/EUR",
-      "ONDO/EUR"
+      "TRUMP/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-26T13:08:21.280398+00:00",
+  "last_run_at": "2026-08-26T14:04:54.944220+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
