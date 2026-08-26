@@ -254,20 +254,20 @@
       "DOGE/EUR",
       "UNI/EUR",
       "TRX/EUR",
-      "NEAR/EUR",
       "XLM/EUR",
+      "NEAR/EUR",
       "AAVE/EUR",
       "ZRO/EUR",
       "PAXG/EUR",
       "TRUMP/EUR",
-      "POL/EUR",
       "SPX/EUR",
+      "ONDO/EUR",
       "AVAX/EUR",
-      "ONDO/EUR"
+      "POL/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-26T06:18:48.779280+00:00",
+  "last_run_at": "2026-08-26T07:26:45.859591+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
