@@ -261,13 +261,13 @@
       "PAXG/EUR",
       "TRUMP/EUR",
       "POL/EUR",
-      "ONDO/EUR",
+      "SPX/EUR",
       "AVAX/EUR",
-      "SPX/EUR"
+      "ONDO/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-26T05:38:19.690541+00:00",
+  "last_run_at": "2026-08-26T06:18:48.779280+00:00",
   "dry_run": false,
   "entry_time": "2026-08-14T20:17:01.035869+00:00"
 }
