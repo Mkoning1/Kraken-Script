@@ -1,10 +1,10 @@
 {
-  "in_position": true,
-  "symbol": "LINK/EUR",
-  "entry_price": 7.76271,
-  "peak_price": 10.57863,
-  "position_size": 1.61827506,
-  "is_runner": true,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
+  "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1786723200000,
     "SOL/EUR": 1786723200000,
@@ -14,10 +14,10 @@
     "ZEC/EUR": 1786723200000,
     "LTC/EUR": 1786723200000,
     "HYPE/EUR": 1786723200000,
-    "LINK/EUR": 1788105600000
+    "LINK/EUR": 1788120000000
   },
-  "current_price": 10.00594,
-  "current_atr": 0.1341185714285711,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 54378.3,
@@ -234,6 +234,14 @@
       "pnl_pct": -3.13,
       "was_runner": false,
       "exit_time": "2026-08-14T13:25:24.181988+00:00"
+    },
+    {
+      "symbol": "LINK/EUR",
+      "entry_price": 7.76271,
+      "exit_price": 9.63387,
+      "pnl_pct": 24.1,
+      "was_runner": true,
+      "exit_time": "2026-08-31T01:15:01.053445+00:00"
     }
   ],
   "config": {
@@ -244,29 +252,29 @@
       "SOL/EUR",
       "ZEC/EUR",
       "DOGE/EUR",
-      "TRUMP/EUR",
       "ADA/EUR",
+      "TRUMP/EUR",
       "UNI/EUR",
       "LINK/EUR",
       "SUI/EUR",
       "SKR/EUR",
       "HYPE/EUR",
-      "HNT/EUR",
       "PUMP/EUR",
-      "AAVE/EUR",
-      "TAO/EUR",
+      "HNT/EUR",
       "NEAR/EUR",
-      "XMR/EUR",
+      "TAO/EUR",
+      "EURC/EUR",
+      "AAVE/EUR",
       "LTC/EUR",
-      "TRX/EUR",
+      "XMR/EUR",
       "AVAX/EUR",
-      "DASH/EUR",
-      "BCH/EUR",
-      "FET/EUR"
+      "PEPE/EUR",
+      "TRX/EUR",
+      "XLM/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-08-30T22:46:05.820709+00:00",
+  "last_run_at": "2026-08-31T01:15:01.053489+00:00",
   "dry_run": false,
-  "entry_time": "2026-08-14T20:17:01.035869+00:00"
+  "entry_time": null
 }
