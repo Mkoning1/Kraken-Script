@@ -267,14 +267,14 @@
       "XPL/EUR",
       "NEAR/EUR",
       "LINK/EUR",
-      "TAO/EUR",
       "SUI/EUR",
-      "CRV/EUR",
+      "TAO/EUR",
       "LTC/EUR",
-      "ARB/EUR",
       "DOGE/EUR",
-      "PUMP/EUR",
+      "CRV/EUR",
+      "ARB/EUR",
       "ENA/EUR",
+      "PUMP/EUR",
       "EURC/EUR",
       "SKR/EUR",
       "SPX/EUR",
@@ -283,7 +283,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-01T21:22:37.867787+00:00",
+  "last_run_at": "2026-09-01T23:29:39.789004+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
