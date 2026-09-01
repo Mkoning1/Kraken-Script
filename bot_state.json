@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "USELESS/EUR",
   "entry_price": 0.08015,
-  "peak_price": 0.089,
+  "peak_price": 0.10036,
   "position_size": 190.99189,
   "is_runner": false,
   "last_candle_ts": {
@@ -23,10 +23,10 @@
     "TAO/EUR": 1788192000000,
     "NEAR/EUR": 1788192000000,
     "TRX/EUR": 1788192000000,
-    "USELESS/EUR": 1788264000000
+    "USELESS/EUR": 1788278400000
   },
-  "current_price": 0.089,
-  "current_atr": 0.006312857142857142,
+  "current_price": 0.10036,
+  "current_atr": 0.00788,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 67940.6,
@@ -260,22 +260,22 @@
       "XRP/EUR",
       "SOL/EUR",
       "ZEC/EUR",
-      "ADA/EUR",
       "UNI/EUR",
       "HYPE/EUR",
+      "ADA/EUR",
       "TRX/EUR",
       "XPL/EUR",
       "NEAR/EUR",
+      "LINK/EUR",
+      "TAO/EUR",
       "SUI/EUR",
       "CRV/EUR",
       "LTC/EUR",
       "ARB/EUR",
-      "LINK/EUR",
       "DOGE/EUR",
-      "TAO/EUR",
       "PUMP/EUR",
-      "EURC/EUR",
       "ENA/EUR",
+      "EURC/EUR",
       "SKR/EUR",
       "SPX/EUR",
       "AAVE/EUR",
@@ -283,7 +283,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-01T18:33:21.211309+00:00",
+  "last_run_at": "2026-09-01T21:22:37.867787+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
