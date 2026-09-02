@@ -269,21 +269,21 @@
       "DOGE/EUR",
       "NEAR/EUR",
       "CRV/EUR",
-      "TRX/EUR",
       "SKR/EUR",
+      "ARB/EUR",
+      "TRX/EUR",
       "AAVE/EUR",
       "PUMP/EUR",
-      "ARB/EUR",
+      "XMR/EUR",
       "DOT/EUR",
       "TAO/EUR",
-      "XMR/EUR",
       "TRUMP/EUR",
       "PAXG/EUR",
-      "AVAX/EUR"
+      "ENA/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-02T21:39:06.262199+00:00",
+  "last_run_at": "2026-09-02T23:34:27.678406+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
