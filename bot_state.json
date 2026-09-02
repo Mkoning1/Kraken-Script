@@ -23,10 +23,10 @@
     "TAO/EUR": 1788192000000,
     "NEAR/EUR": 1788192000000,
     "TRX/EUR": 1788192000000,
-    "USELESS/EUR": 1788278400000
+    "USELESS/EUR": 1788292800000
   },
-  "current_price": 0.10036,
-  "current_atr": 0.00788,
+  "current_price": 0.0965,
+  "current_atr": 0.008462142857142857,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 67940.6,
@@ -270,20 +270,20 @@
       "SUI/EUR",
       "TAO/EUR",
       "LTC/EUR",
-      "DOGE/EUR",
       "CRV/EUR",
+      "DOGE/EUR",
       "ARB/EUR",
       "ENA/EUR",
-      "PUMP/EUR",
       "EURC/EUR",
+      "PUMP/EUR",
       "SKR/EUR",
-      "SPX/EUR",
       "AAVE/EUR",
-      "USELESS/EUR"
+      "SPX/EUR",
+      "PAXG/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-01T23:29:39.789004+00:00",
+  "last_run_at": "2026-09-02T01:19:37.036915+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
