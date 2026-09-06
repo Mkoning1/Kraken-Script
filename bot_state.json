@@ -252,21 +252,21 @@
   ],
   "config": {
     "watchlist": [
-      "XRP/EUR",
       "ZEC/EUR",
-      "BTC/EUR",
       "ETH/EUR",
+      "BTC/EUR",
+      "XRP/EUR",
       "SOL/EUR",
       "ARB/EUR",
       "DOGE/EUR",
       "UNI/EUR",
       "LINK/EUR",
       "SUI/EUR",
-      "DASH/EUR",
-      "NEAR/EUR",
       "HYPE/EUR",
-      "ADA/EUR",
       "TAO/EUR",
+      "NEAR/EUR",
+      "ADA/EUR",
+      "DASH/EUR",
       "USELESS/EUR",
       "PUMP/EUR",
       "ENA/EUR",
@@ -275,12 +275,12 @@
       "JUP/EUR",
       "BCH/EUR",
       "DOT/EUR",
-      "ASTER/EUR",
-      "AAVE/EUR"
+      "AAVE/EUR",
+      "CRV/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-06T12:20:58.458884+00:00",
+  "last_run_at": "2026-09-06T15:40:55.599359+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
