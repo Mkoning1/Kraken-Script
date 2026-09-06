@@ -267,20 +267,20 @@
       "SUI/EUR",
       "DASH/EUR",
       "ADA/EUR",
-      "ENA/EUR",
-      "USELESS/EUR",
       "JUP/EUR",
-      "LTC/EUR",
+      "USELESS/EUR",
+      "ENA/EUR",
       "PUMP/EUR",
       "WLD/EUR",
+      "LTC/EUR",
       "BCH/EUR",
       "DOT/EUR",
       "CRV/EUR",
-      "TRX/EUR"
+      "AVAX/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-06T21:45:20.228089+00:00",
+  "last_run_at": "2026-09-06T23:16:30.595289+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
