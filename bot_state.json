@@ -261,26 +261,26 @@
       "SUI/EUR",
       "WLD/EUR",
       "LTC/EUR",
-      "TAO/EUR",
       "DOT/EUR",
-      "HYPE/EUR",
-      "NEAR/EUR",
+      "TAO/EUR",
       "ADA/EUR",
+      "HYPE/EUR",
       "UNI/EUR",
-      "DOGE/EUR",
+      "NEAR/EUR",
       "ARB/EUR",
+      "DOGE/EUR",
       "HBAR/EUR",
       "TRX/EUR",
       "PUMP/EUR",
       "DASH/EUR",
       "BCH/EUR",
       "USELESS/EUR",
-      "EURC/EUR",
-      "XLM/EUR"
+      "XLM/EUR",
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-07T21:25:32.586449+00:00",
+  "last_run_at": "2026-09-07T23:41:37.418717+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
