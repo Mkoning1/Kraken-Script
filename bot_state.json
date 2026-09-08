@@ -269,18 +269,18 @@
       "NEAR/EUR",
       "USELESS/EUR",
       "ARB/EUR",
-      "LTC/EUR",
       "VVV/EUR",
+      "LTC/EUR",
       "TRX/EUR",
       "XLM/EUR",
       "PUMP/EUR",
-      "DASH/EUR",
       "ATOM/EUR",
-      "BCH/EUR"
+      "DASH/EUR",
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-08T21:42:46.246651+00:00",
+  "last_run_at": "2026-09-08T23:41:59.281037+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
