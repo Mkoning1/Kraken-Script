@@ -257,8 +257,8 @@
       "XRP/EUR",
       "SOL/EUR",
       "ZEC/EUR",
-      "NEAR/EUR",
       "ADA/EUR",
+      "NEAR/EUR",
       "HYPE/EUR",
       "SUI/EUR",
       "TAO/EUR",
@@ -266,21 +266,21 @@
       "UNI/EUR",
       "DOGE/EUR",
       "VVV/EUR",
-      "PUMP/EUR",
       "USELESS/EUR",
+      "PUMP/EUR",
+      "AAVE/EUR",
       "LTC/EUR",
       "XLM/EUR",
-      "AAVE/EUR",
       "APT/EUR",
       "TRX/EUR",
-      "ARB/EUR",
+      "DOT/EUR",
       "PEPE/EUR",
       "BCH/EUR",
-      "DOT/EUR"
+      "ARB/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-10T17:14:29.334168+00:00",
+  "last_run_at": "2026-09-10T19:48:17.669367+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
