@@ -272,15 +272,15 @@
       "PUMP/EUR",
       "PAXG/EUR",
       "DOT/EUR",
+      "XLM/EUR",
       "AVAX/EUR",
       "WLD/EUR",
-      "XLM/EUR",
       "AAVE/EUR",
-      "ARB/EUR"
+      "ENA/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-11T20:03:06.386081+00:00",
+  "last_run_at": "2026-09-11T22:36:43.259691+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
