@@ -18,12 +18,11 @@
     "DOGE/EUR": 1788192000000,
     "UNI/EUR": 1788192000000,
     "SUI/EUR": 1788192000000,
-    "PUMP/EUR": 1788192000000,
     "NEAR/EUR": 1788192000000,
-    "USELESS/EUR": 1789185600000
+    "USELESS/EUR": 1789200000000
   },
-  "current_price": 0.20217,
-  "current_atr": 0.019563571428571427,
+  "current_price": 0.20646,
+  "current_atr": 0.01923285714285714,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 67940.6,
@@ -258,29 +257,29 @@
       "SOL/EUR",
       "ZEC/EUR",
       "ADA/EUR",
-      "LINK/EUR",
       "NEAR/EUR",
+      "LINK/EUR",
       "HYPE/EUR",
       "UNI/EUR",
-      "SUI/EUR",
-      "DOGE/EUR",
       "TRX/EUR",
-      "TAO/EUR",
+      "DOGE/EUR",
+      "SUI/EUR",
       "LTC/EUR",
+      "TAO/EUR",
       "JUP/EUR",
       "DOT/EUR",
-      "AVAX/EUR",
       "USELESS/EUR",
       "WLD/EUR",
+      "AVAX/EUR",
       "XLM/EUR",
       "PAXG/EUR",
-      "PUMP/EUR",
-      "AAVE/EUR",
-      "ENA/EUR"
+      "INJ/EUR",
+      "MINA/EUR",
+      "AAVE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-12T09:24:36.983874+00:00",
+  "last_run_at": "2026-09-12T13:02:31.983960+00:00",
   "dry_run": false,
   "entry_time": "2026-08-31T20:51:56.170193+00:00"
 }
