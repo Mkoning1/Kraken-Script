@@ -25,15 +25,15 @@
     "TAO/EUR": 1789315200000,
     "VVV/EUR": 1789315200000,
     "BCH/EUR": 1789315200000,
-    "FIL/EUR": 1789315200000,
+    "FIL/EUR": 1789329600000,
     "AVA/EUR": 1789315200000,
     "ARB/EUR": 1789315200000,
     "PUMP/EUR": 1789315200000,
     "CRV/EUR": 1789315200000,
     "TRX/EUR": 1789315200000
   },
-  "current_price": 0.847,
-  "current_atr": null,
+  "current_price": 0.822,
+  "current_atr": 0.027071428571428562,
   "watchlist_snapshot": {
     "ETH/EUR": {
       "price": 2160.52,
@@ -290,15 +290,15 @@
       "FIL/EUR",
       "USELESS/EUR",
       "DOGE/EUR",
-      "AVA/EUR",
       "ARB/EUR",
+      "AVA/EUR",
       "PUMP/EUR",
-      "CRV/EUR",
-      "TRX/EUR"
+      "TRX/EUR",
+      "CRV/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-13T23:02:26.236523+00:00",
+  "last_run_at": "2026-09-14T01:07:47.457055+00:00",
   "dry_run": false,
   "entry_time": "2026-09-13T23:02:26.236484+00:00"
 }
