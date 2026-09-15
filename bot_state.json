@@ -1,9 +1,9 @@
 {
-  "in_position": true,
-  "symbol": "FIL/EUR",
-  "entry_price": 0.847,
-  "peak_price": 0.867,
-  "position_size": 40.84250295,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1789315200000,
@@ -23,11 +23,11 @@
     "LSK/EUR": 1789315200000,
     "TAO/EUR": 1789315200000,
     "VVV/EUR": 1789315200000,
-    "FIL/EUR": 1789416000000,
+    "FIL/EUR": 1789430400000,
     "TRX/EUR": 1789315200000
   },
-  "current_price": 0.81,
-  "current_atr": 0.04335714285714287,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "ETH/EUR": {
       "price": 2160.52,
@@ -260,13 +260,21 @@
       "pnl_pct": 133.41,
       "was_runner": true,
       "exit_time": "2026-09-13T15:00:55.569802+00:00"
+    },
+    {
+      "symbol": "FIL/EUR",
+      "entry_price": 0.847,
+      "exit_price": 0.776,
+      "pnl_pct": -8.38,
+      "was_runner": false,
+      "exit_time": "2026-09-15T05:25:31.191427+00:00"
     }
   ],
   "config": {
     "watchlist": [
       "ETH/EUR",
-      "BTC/EUR",
       "XRP/EUR",
+      "BTC/EUR",
       "SOL/EUR",
       "ZEC/EUR",
       "ADA/EUR",
@@ -277,12 +285,12 @@
       "UNI/EUR",
       "DOGE/EUR",
       "DOT/EUR",
-      "FIL/EUR",
       "SUI/EUR",
+      "FIL/EUR",
       "USELESS/EUR",
+      "LTC/EUR",
       "TAO/EUR",
       "TRX/EUR",
-      "LTC/EUR",
       "VVV/EUR",
       "LSK/EUR",
       "EURC/EUR",
@@ -292,7 +300,7 @@
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-15T00:40:10.261283+00:00",
+  "last_run_at": "2026-09-15T05:25:31.191485+00:00",
   "dry_run": false,
-  "entry_time": "2026-09-13T23:02:26.236484+00:00"
+  "entry_time": null
 }
