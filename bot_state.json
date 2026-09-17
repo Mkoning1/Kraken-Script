@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "ZEC/EUR",
   "entry_price": 1206.736,
-  "peak_price": 1291.589,
+  "peak_price": 1301.203,
   "position_size": 0.02668238,
   "is_runner": false,
   "last_candle_ts": {
@@ -11,7 +11,7 @@
     "BTC/EUR": 1789603200000,
     "ETH/EUR": 1789603200000,
     "XRP/EUR": 1789603200000,
-    "ZEC/EUR": 1789646400000,
+    "ZEC/EUR": 1789660800000,
     "LTC/EUR": 1789603200000,
     "HYPE/EUR": 1789603200000,
     "LINK/EUR": 1789603200000,
@@ -24,13 +24,12 @@
     "PAXG/EUR": 1789603200000,
     "ARB/EUR": 1789603200000,
     "AAVE/EUR": 1789603200000,
-    "LSK/EUR": 1789603200000,
     "DOT/EUR": 1789603200000,
     "ONDO/EUR": 1789603200000,
     "USELESS/EUR": 1789603200000
   },
-  "current_price": 1291.589,
-  "current_atr": 58.898357142857165,
+  "current_price": 1301.203,
+  "current_atr": 63.17092857142859,
   "watchlist_snapshot": {
     "ETH/EUR": {
       "price": 2124.13,
@@ -287,23 +286,23 @@
       "AAVE/EUR",
       "LINK/EUR",
       "SUI/EUR",
-      "ARB/EUR",
       "DOT/EUR",
+      "ARB/EUR",
       "TAO/EUR",
-      "XLM/EUR",
       "ONDO/EUR",
       "DOGE/EUR",
-      "PAXG/EUR",
       "VVV/EUR",
       "LTC/EUR",
-      "USELESS/EUR",
       "POL/EUR",
+      "USELESS/EUR",
       "BCH/EUR",
-      "LSK/EUR"
+      "PAXG/EUR",
+      "XLM/EUR",
+      "DASH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-17T19:03:43.561565+00:00",
+  "last_run_at": "2026-09-17T22:11:31.039031+00:00",
   "dry_run": false,
   "entry_time": "2026-09-17T05:11:08.149665+00:00"
 }
