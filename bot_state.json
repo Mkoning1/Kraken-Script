@@ -271,8 +271,8 @@
   "config": {
     "watchlist": [
       "BTC/EUR",
-      "ETH/EUR",
       "XRP/EUR",
+      "ETH/EUR",
       "SOL/EUR",
       "ZEC/EUR",
       "ADA/EUR",
@@ -285,20 +285,20 @@
       "AAVE/EUR",
       "ENA/EUR",
       "LINK/EUR",
-      "LTC/EUR",
-      "DOGE/EUR",
       "PEPE/EUR",
+      "DOGE/EUR",
+      "LTC/EUR",
       "INJ/EUR",
       "XLM/EUR",
       "USELESS/EUR",
       "ARB/EUR",
-      "DASH/EUR",
-      "ONDO/EUR",
-      "DOT/EUR"
+      "FIL/EUR",
+      "JUP/EUR",
+      "DASH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-19T21:25:57.932815+00:00",
+  "last_run_at": "2026-09-19T23:25:31.240643+00:00",
   "dry_run": false,
   "entry_time": "2026-09-17T05:11:08.149665+00:00"
 }
