@@ -1,9 +1,9 @@
 {
-  "in_position": true,
-  "symbol": "ZEC/EUR",
-  "entry_price": 1206.736,
-  "peak_price": 1363.937,
-  "position_size": 0.02668238,
+  "in_position": false,
+  "symbol": null,
+  "entry_price": null,
+  "peak_price": null,
+  "position_size": null,
   "is_runner": false,
   "last_candle_ts": {
     "ADA/EUR": 1789603200000,
@@ -11,7 +11,7 @@
     "BTC/EUR": 1789603200000,
     "ETH/EUR": 1789603200000,
     "XRP/EUR": 1789603200000,
-    "ZEC/EUR": 1789862400000,
+    "ZEC/EUR": 1789891200000,
     "LTC/EUR": 1789603200000,
     "HYPE/EUR": 1789603200000,
     "LINK/EUR": 1789603200000,
@@ -23,8 +23,8 @@
     "ARB/EUR": 1789603200000,
     "AAVE/EUR": 1789603200000
   },
-  "current_price": 1267.622,
-  "current_atr": 50.02957142857143,
+  "current_price": null,
+  "current_atr": null,
   "watchlist_snapshot": {
     "ETH/EUR": {
       "price": 2124.13,
@@ -265,39 +265,47 @@
       "pnl_pct": -8.38,
       "was_runner": false,
       "exit_time": "2026-09-15T05:25:31.191427+00:00"
+    },
+    {
+      "symbol": "ZEC/EUR",
+      "entry_price": 1206.736,
+      "exit_price": 1259.273,
+      "pnl_pct": 4.35,
+      "was_runner": false,
+      "exit_time": "2026-09-20T12:09:05.052062+00:00"
     }
   ],
   "config": {
     "watchlist": [
       "BTC/EUR",
-      "XRP/EUR",
       "ETH/EUR",
+      "XRP/EUR",
       "SOL/EUR",
       "AVAX/EUR",
       "ZEC/EUR",
       "ADA/EUR",
-      "TAO/EUR",
-      "SUI/EUR",
       "NEAR/EUR",
+      "SUI/EUR",
       "ENA/EUR",
-      "UNI/EUR",
       "LINK/EUR",
+      "TAO/EUR",
       "HYPE/EUR",
       "PEPE/EUR",
+      "UNI/EUR",
       "INJ/EUR",
       "DOGE/EUR",
-      "AAVE/EUR",
       "LTC/EUR",
+      "AAVE/EUR",
       "XLM/EUR",
-      "EURC/EUR",
-      "DOT/EUR",
+      "ONDO/EUR",
       "ALGO/EUR",
-      "JUP/EUR",
-      "ARB/EUR"
+      "ARB/EUR",
+      "EURC/EUR",
+      "DOT/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-20T06:53:35.050089+00:00",
+  "last_run_at": "2026-09-20T12:09:05.052127+00:00",
   "dry_run": false,
-  "entry_time": "2026-09-17T05:11:08.149665+00:00"
+  "entry_time": null
 }
