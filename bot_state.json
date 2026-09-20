@@ -295,25 +295,25 @@
       "ZEC/EUR",
       "ENA/EUR",
       "SUI/EUR",
+      "HYPE/EUR",
       "LINK/EUR",
       "TAO/EUR",
-      "HYPE/EUR",
       "UNI/EUR",
-      "INJ/EUR",
       "AAVE/EUR",
+      "INJ/EUR",
+      "ARB/EUR",
       "DOGE/EUR",
       "LTC/EUR",
-      "ARB/EUR",
       "ALGO/EUR",
-      "DOT/EUR",
       "HBAR/EUR",
       "ONDO/EUR",
-      "EURC/EUR",
-      "XLM/EUR"
+      "DOT/EUR",
+      "XLM/EUR",
+      "EURC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-20T21:19:49.080634+00:00",
+  "last_run_at": "2026-09-20T23:23:27.451398+00:00",
   "dry_run": false,
   "entry_time": "2026-09-20T18:51:06.038936+00:00"
 }
