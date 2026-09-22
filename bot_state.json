@@ -2,9 +2,9 @@
   "in_position": true,
   "symbol": "HBAR/EUR",
   "entry_price": 0.07529,
-  "peak_price": 0.08185,
+  "peak_price": 0.08629,
   "position_size": 450.37189,
-  "is_runner": false,
+  "is_runner": true,
   "last_candle_ts": {
     "ADA/EUR": 1789905600000,
     "SOL/EUR": 1789905600000,
@@ -25,10 +25,10 @@
     "AVAX/EUR": 1789905600000,
     "ENA/EUR": 1789905600000,
     "ONDO/EUR": 1789905600000,
-    "HBAR/EUR": 1790064000000
+    "HBAR/EUR": 1790078400000
   },
-  "current_price": 0.08185,
-  "current_atr": 0.00302357142857143,
+  "current_price": 0.08629,
+  "current_atr": 0.0032442857142857156,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 70398.9,
@@ -282,34 +282,34 @@
   "config": {
     "watchlist": [
       "BTC/EUR",
-      "ETH/EUR",
       "XRP/EUR",
+      "ETH/EUR",
       "SOL/EUR",
       "NEAR/EUR",
-      "DOGE/EUR",
-      "SUI/EUR",
-      "TAO/EUR",
       "ADA/EUR",
-      "AVAX/EUR",
+      "DOGE/EUR",
+      "TAO/EUR",
+      "UNI/EUR",
       "ZEC/EUR",
+      "BCH/EUR",
+      "SUI/EUR",
+      "AVAX/EUR",
       "LINK/EUR",
       "PEPE/EUR",
-      "UNI/EUR",
-      "LTC/EUR",
       "HYPE/EUR",
-      "ARB/EUR",
-      "AAVE/EUR",
+      "LTC/EUR",
       "XLM/EUR",
-      "ONDO/EUR",
-      "BCH/EUR",
       "USELESS/EUR",
+      "ARB/EUR",
+      "ONDO/EUR",
       "ENA/EUR",
-      "PAXG/EUR",
-      "WIF/EUR"
+      "AAVE/EUR",
+      "WIF/EUR",
+      "HBAR/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-22T12:29:46.949241+00:00",
+  "last_run_at": "2026-09-22T17:13:21.783906+00:00",
   "dry_run": false,
   "entry_time": "2026-09-20T18:51:06.038936+00:00"
 }
