@@ -25,10 +25,10 @@
     "AVAX/EUR": 1789905600000,
     "ENA/EUR": 1789905600000,
     "ONDO/EUR": 1789905600000,
-    "HBAR/EUR": 1790078400000
+    "HBAR/EUR": 1790092800000
   },
-  "current_price": 0.08629,
-  "current_atr": 0.0032442857142857156,
+  "current_price": 0.08615,
+  "current_atr": 0.0034371428571428587,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 70398.9,
@@ -287,29 +287,29 @@
       "SOL/EUR",
       "NEAR/EUR",
       "ADA/EUR",
-      "DOGE/EUR",
-      "TAO/EUR",
-      "UNI/EUR",
       "ZEC/EUR",
       "BCH/EUR",
+      "UNI/EUR",
+      "DOGE/EUR",
+      "TAO/EUR",
       "SUI/EUR",
       "AVAX/EUR",
       "LINK/EUR",
-      "PEPE/EUR",
       "HYPE/EUR",
       "LTC/EUR",
+      "PEPE/EUR",
       "XLM/EUR",
-      "USELESS/EUR",
       "ARB/EUR",
+      "USELESS/EUR",
       "ONDO/EUR",
       "ENA/EUR",
-      "AAVE/EUR",
+      "HBAR/EUR",
       "WIF/EUR",
-      "HBAR/EUR"
+      "AAVE/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-22T17:13:21.783906+00:00",
+  "last_run_at": "2026-09-22T20:13:47.635434+00:00",
   "dry_run": false,
   "entry_time": "2026-09-20T18:51:06.038936+00:00"
 }
