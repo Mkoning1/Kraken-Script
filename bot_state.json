@@ -2,7 +2,7 @@
   "in_position": true,
   "symbol": "HBAR/EUR",
   "entry_price": 0.07529,
-  "peak_price": 0.08629,
+  "peak_price": 0.08654,
   "position_size": 450.37189,
   "is_runner": true,
   "last_candle_ts": {
@@ -23,11 +23,10 @@
     "ARB/EUR": 1789905600000,
     "AVAX/EUR": 1789905600000,
     "ENA/EUR": 1789905600000,
-    "ONDO/EUR": 1789905600000,
-    "HBAR/EUR": 1790092800000
+    "HBAR/EUR": 1790107200000
   },
-  "current_price": 0.08615,
-  "current_atr": 0.0034371428571428587,
+  "current_price": 0.08654,
+  "current_atr": 0.0030478571428571447,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 70398.9,
@@ -290,25 +289,25 @@
       "ADA/EUR",
       "BCH/EUR",
       "SUI/EUR",
-      "TAO/EUR",
       "DOGE/EUR",
       "AVAX/EUR",
-      "LINK/EUR",
+      "TAO/EUR",
       "HYPE/EUR",
+      "LINK/EUR",
       "LTC/EUR",
       "PEPE/EUR",
       "ARB/EUR",
-      "XLM/EUR",
       "USELESS/EUR",
+      "XLM/EUR",
       "HBAR/EUR",
-      "ENA/EUR",
       "WIF/EUR",
-      "ONDO/EUR",
-      "INJ/EUR"
+      "INJ/EUR",
+      "ENA/EUR",
+      "DASH/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-22T23:01:10.882674+00:00",
+  "last_run_at": "2026-09-23T01:31:14.868008+00:00",
   "dry_run": false,
   "entry_time": "2026-09-20T18:51:06.038936+00:00"
 }
