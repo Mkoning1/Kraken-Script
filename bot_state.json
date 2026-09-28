@@ -22,10 +22,10 @@
     "TAO/EUR": 1789905600000,
     "ARB/EUR": 1789905600000,
     "AVAX/EUR": 1789905600000,
-    "HBAR/EUR": 1790553600000
+    "HBAR/EUR": 1790568000000
   },
-  "current_price": 0.08354,
-  "current_atr": 0.0018207142857142855,
+  "current_price": 0.08509,
+  "current_atr": 0.002025,
   "watchlist_snapshot": {
     "BTC/EUR": {
       "price": 70398.9,
@@ -280,33 +280,33 @@
     "watchlist": [
       "BTC/EUR",
       "QNT/EUR",
-      "SUI/EUR",
       "SOL/EUR",
-      "XRP/EUR",
-      "NEAR/EUR",
       "ETH/EUR",
+      "XRP/EUR",
+      "SUI/EUR",
+      "NEAR/EUR",
       "ZEC/EUR",
+      "LTC/EUR",
       "LINK/EUR",
-      "TAO/EUR",
-      "AVAX/EUR",
-      "BCH/EUR",
+      "ONDO/EUR",
+      "HBAR/EUR",
       "ADA/EUR",
       "PUMP/EUR",
-      "ONDO/EUR",
-      "LTC/EUR",
       "UNI/EUR",
-      "DOGE/EUR",
+      "TAO/EUR",
       "ARB/EUR",
+      "DOGE/EUR",
+      "BCH/EUR",
+      "AVAX/EUR",
       "ENA/EUR",
-      "DOT/EUR",
-      "HYPE/EUR",
-      "W/EUR",
       "XLM/EUR",
-      "AAVE/EUR"
+      "HYPE/EUR",
+      "DOT/EUR",
+      "XDC/EUR"
     ],
     "runner_threshold_atr": 3.0
   },
-  "last_run_at": "2026-09-28T04:40:57.065565+00:00",
+  "last_run_at": "2026-09-28T11:15:47.214382+00:00",
   "dry_run": false,
   "entry_time": "2026-09-20T18:51:06.038936+00:00"
 }
