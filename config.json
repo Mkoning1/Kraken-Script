@@ -1,0 +1,58 @@
+{
+  "mode": "live",
+
+  "live": {
+    "validate_only": true,
+    "budget_eur": "alles",
+    "trading_enabled": true
+  },
+
+  "shadow": {
+    "capital_eur": 1000
+  },
+
+  "profile": "agressief",
+
+  "universe": {
+    "size": 15,
+    "always_include": ["BTC/EUR", "ETH/EUR"],
+    "exclude_bases": ["USDT", "USDC", "DAI", "USD", "GBP", "PYUSD", "TUSD", "USDG", "EURT", "EURR", "EUROC", "EURC", "USDS"]
+  },
+  "regime_market": "BTC/EUR",
+  "benchmark_market": "BTC/EUR",
+
+  "fee_pct": 0.40,
+  "slippage_pct": 0.08,
+  "min_order_eur": 5,
+
+  "profiles": {
+    "voorzichtig": { "risk_per_trade_pct": 1.0, "max_position_pct": 25, "max_open_positions": 2, "max_exposure_pct": 50,  "max_daily_loss_pct": 3, "max_drawdown_pct": 15, "cooldown_candles": 8 },
+    "normaal":     { "risk_per_trade_pct": 1.5, "max_position_pct": 35, "max_open_positions": 3, "max_exposure_pct": 75,  "max_daily_loss_pct": 5, "max_drawdown_pct": 20, "cooldown_candles": 6 },
+    "agressief":   { "risk_per_trade_pct": 2.5, "max_position_pct": 50, "max_open_positions": 3, "max_exposure_pct": 100, "max_daily_loss_pct": 8, "max_drawdown_pct": 30, "cooldown_candles": 4 }
+  },
+
+  "regime_multiplier": { "stijgend": 1.0, "neutraal": 0.7, "dalend": 0.0 },
+
+  "decision": { "min_score": 0.55, "veto_strength": 0.8, "confluence_bonus": 0.15 },
+
+  "learning": { "enabled": true, "min_trades": 5, "window": 20, "min_weight": 0.3, "max_weight": 1.6 },
+
+  "promotion": {
+    "enabled": true,
+    "all_agents_live": false,
+    "promote_after_trades": 20,
+    "promote_expectancy_r": 0.2,
+    "demote_window": 10,
+    "demote_expectancy_r": -0.25
+  },
+
+  "exits": { "breakeven_at_r": 1.0, "trail_after_r": 1.5, "min_stop_pct": 2.0, "catastrophe_atr": 1.0 },
+
+  "agents": {
+    "trend4h":        { "start": "live",    "force": null, "use_regime": false, "lookback": 55, "rsi_min": 50, "initial_atr": 2.0, "runner_atr": 6.0, "runner_threshold_atr": 3.0 },
+    "mean_reversion": { "start": "schaduw", "force": null, "use_regime": true, "rsi_buy": 28, "stop_atr": 1.8, "max_candles": 24 },
+    "breakout":       { "start": "schaduw", "force": null, "use_regime": true, "lookback": 24, "volume_mult": 1.2, "stop_atr": 2.5 },
+    "momentum":       { "start": "schaduw", "force": null, "use_regime": true, "volume_mult": 1.5, "stop_atr": 2.0 },
+    "squeeze":        { "start": "schaduw", "force": null, "use_regime": true, "squeeze_lookback": 120, "squeeze_pct": 10, "stop_atr": 2.0 }
+  }
+}

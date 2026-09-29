@@ -1,41 +1,45 @@
-name: Trading bot cycle
+name: Trader
 
 on:
   schedule:
-    - cron: '*/15 * * * *'   # elke 15 min -- GitHub kan dit een paar minuten
-                              # vertragen bij drukte, geen probleem voor een
-                              # strategie op 4h-candles.
-  workflow_dispatch: {}       # handmatig een cyclus draaien via de Actions-tab
+    - cron: "3,18,33,48 * * * *"   # elke 15 minuten, 3 minuten na het sluiten van een candle (UTC)
+  workflow_dispatch: {}              # handmatig starten via de Actions-tab
 
 permissions:
-  contents: write   # nodig om bot_state.json / STATUS.md terug te committen
+  contents: write                    # nodig om data/ en het dashboard terug te zetten
+
+concurrency:
+  group: trader                      # nooit twee runs tegelijk: voorkomt dubbele orders
+  cancel-in-progress: false
 
 jobs:
-  run-bot:
+  run:
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: pip
 
-      - name: Install dependencies
+      - name: Installeren
         run: pip install -r requirements.txt
 
-      - name: Run bot cycle
+      - name: Agents draaien
         env:
           KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
           KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
-        run: python kraken_multi_momentum_bot.py
+        run: python main.py
 
-      - name: Commit updated state (alleen als er iets veranderd is)
+      - name: Resultaten opslaan
+        if: always()
         run: |
           git config user.name "trading-bot"
-          git config user.email "[email protected]"
-          git add bot_state.json STATUS.md
-          git diff --staged --quiet || git commit -m "Bot update [skip ci]"
-          git push
+          git config user.email "trading-bot@users.noreply.github.com"
+          git add data docs/data.json
+          if git diff --cached --quiet; then echo "Niets nieuws"; exit 0; fi
+          git commit -m "Bot update [skip ci]"
+          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done
+          exit 1

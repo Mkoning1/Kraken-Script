@@ -1,2 +1,1 @@
-ccxt
-pandas
+ccxt==4.5.84
