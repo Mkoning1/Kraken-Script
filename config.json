@@ -2,7 +2,7 @@
   "mode": "live",
 
   "live": {
-    "validate_only": true,
+    "validate_only": false,
     "budget_eur": "alles",
     "trading_enabled": true
   },

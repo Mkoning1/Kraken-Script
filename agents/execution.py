@@ -296,7 +296,13 @@ class LiveExecutionAgent:
                 stop_txt = f"stop-loss order afgekeurd: {e}"
             return {"ok": False, "validated": True,
                     "text": f"VALIDATIEMODUS: Kraken keurde de koop van {amount} {m['base']} goed, niet uitgevoerd; {stop_txt}"}
-        filled, avg, cost, fee_eur, fee_base, _ = self._wait_fill(o["id"], market)
+        try:
+            filled, avg, cost, fee_eur, fee_base, _ = self._wait_fill(o["id"], market)
+        except Exception as e:
+            # De order is wel geplaatst: positie nooit kwijtraken, schatten en volgende runs controleren
+            self.errors.append(f"{market}: aankoop geplaatst maar bevestiging ophalen mislukt ({e}); bedragen geschat")
+            filled, avg = amount, price * (1 + self.slip)
+            cost, fee_eur, fee_base = filled * avg, filled * avg * self.fee, 0.0
         if filled <= 0:
             return {"ok": False, "text": "Order niet (of niet op tijd) uitgevoerd door Kraken"}
         net_qty = filled - fee_base
@@ -329,7 +335,12 @@ class LiveExecutionAgent:
         if amount <= 0:
             raise RuntimeError(f"geen {self._base(market)} gevonden om te verkopen")
         o = self.ex.create_order(market, "market", "sell", amount, None, self._params())
-        filled, avg, cost, fee_eur, fee_base, _ = self._wait_fill(o["id"], market)
+        try:
+            filled, avg, cost, fee_eur, fee_base, _ = self._wait_fill(o["id"], market)
+        except Exception as e:
+            self.errors.append(f"{market}: verkoop geplaatst maar bevestiging ophalen mislukt ({e}); bedragen geschat")
+            filled, avg = amount, price * (1 - self.slip)
+            cost, fee_eur, fee_base = filled * avg, filled * avg * self.fee, 0.0
         self._bal = None
         fee = fee_eur + fee_base * avg
         return record_exit(book, pos, avg, cost - fee, fee, ts, reason, learner, self.cooldown_sec)
@@ -341,7 +352,11 @@ class LiveExecutionAgent:
             return None
         oid = pos.get("stop_order_id")
         if oid:
-            o = self.ex.fetch_order(oid, market)
+            try:
+                o = self.ex.fetch_order(oid, market)
+            except Exception as e:
+                self.errors.append(f"{market}: stop-order opvragen mislukt ({e}), controle via saldo")
+                o = {"status": "unknown"}
             status = o.get("status")
             if status == "closed":
                 return self._exit_from_order(book, pos, o, f"Stop-loss op Kraken uitgevoerd op {px(pos.get('exchange_stop_price') or 0)}", learner)
@@ -349,6 +364,11 @@ class LiveExecutionAgent:
                 pos["stop_order_id"] = None
         total = float(self.balance()["total"].get(self._base(market), 0) or 0)
         if total < pos["qty"] * 0.5:
+            if status == "unknown" and pos.get("exchange_stop_price"):
+                est = pos["exchange_stop_price"]
+                proceeds = pos["qty"] * est
+                return record_exit(book, pos, est, proceeds * (1 - self.fee), proceeds * self.fee, self.now,
+                                   f"Stop-loss op Kraken uitgevoerd (geschat op {px(est)})", learner, self.cooldown_sec)
             value = total * last_price
             return record_exit(book, pos, last_price, value, 0.0, self.now,
                                "Munt niet meer (volledig) op Kraken gevonden: handmatig verkocht?", learner, self.cooldown_sec)
