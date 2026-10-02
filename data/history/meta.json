@@ -58,5 +58,169 @@
  "UNI": {
   "exchange": "kucoin",
   "symbol": "UNI/USDT"
+ },
+ "DOGE": {
+  "exchange": "kucoin",
+  "symbol": "DOGE/USDT"
+ },
+ "DOT": {
+  "exchange": "kucoin",
+  "symbol": "DOT/USDT"
+ },
+ "AVAX": {
+  "exchange": "kucoin",
+  "symbol": "AVAX/USDT"
+ },
+ "BCH": {
+  "exchange": "kucoin",
+  "symbol": "BCH/USDT"
+ },
+ "TRX": {
+  "exchange": "kucoin",
+  "symbol": "TRX/USDT"
+ },
+ "ATOM": {
+  "exchange": "kucoin",
+  "symbol": "ATOM/USDT"
+ },
+ "FIL": {
+  "exchange": "kucoin",
+  "symbol": "FIL/USDT"
+ },
+ "ICP": {
+  "exchange": "kucoin",
+  "symbol": "ICP/USDT"
+ },
+ "APT": {
+  "exchange": "kucoin",
+  "symbol": "APT/USDT"
+ },
+ "ARB": {
+  "exchange": "kucoin",
+  "symbol": "ARB/USDT"
+ },
+ "OP": {
+  "exchange": "kucoin",
+  "symbol": "OP/USDT"
+ },
+ "INJ": {
+  "exchange": "kucoin",
+  "symbol": "INJ/USDT"
+ },
+ "TIA": {
+  "exchange": "kucoin",
+  "symbol": "TIA/USDT"
+ },
+ "LDO": {
+  "exchange": "kucoin",
+  "symbol": "LDO/USDT"
+ },
+ "ETC": {
+  "exchange": "kucoin",
+  "symbol": "ETC/USDT"
+ },
+ "XLM": {
+  "exchange": "kucoin",
+  "symbol": "XLM/USDT"
+ },
+ "ALGO": {
+  "exchange": "kucoin",
+  "symbol": "ALGO/USDT"
+ },
+ "HBAR": {
+  "exchange": "kucoin",
+  "symbol": "HBAR/USDT"
+ },
+ "GRT": {
+  "exchange": "kucoin",
+  "symbol": "GRT/USDT"
+ },
+ "SAND": {
+  "exchange": "kucoin",
+  "symbol": "SAND/USDT"
+ },
+ "MANA": {
+  "exchange": "kucoin",
+  "symbol": "MANA/USDT"
+ },
+ "FET": {
+  "exchange": "kucoin",
+  "symbol": "FET/USDT"
+ },
+ "RENDER": {
+  "exchange": "kucoin",
+  "symbol": "RENDER/USDT"
+ },
+ "PEPE": {
+  "exchange": "kucoin",
+  "symbol": "PEPE/USDT"
+ },
+ "SHIB": {
+  "exchange": "kucoin",
+  "symbol": "SHIB/USDT"
+ },
+ "BONK": {
+  "exchange": "kucoin",
+  "symbol": "BONK/USDT"
+ },
+ "WIF": {
+  "exchange": "kucoin",
+  "symbol": "WIF/USDT"
+ },
+ "SEI": {
+  "exchange": "kucoin",
+  "symbol": "SEI/USDT"
+ },
+ "TAO": {
+  "exchange": "kucoin",
+  "symbol": "TAO/USDT"
+ },
+ "ZRO": {
+  "exchange": "kucoin",
+  "symbol": "ZRO/USDT"
+ },
+ "ENA": {
+  "exchange": "kucoin",
+  "symbol": "ENA/USDT"
+ },
+ "NIGHT": {
+  "exchange": "kucoin",
+  "symbol": "NIGHT/USDT"
+ },
+ "MON": {
+  "exchange": "kucoin",
+  "symbol": "MON/USDT"
+ },
+ "PAXG": {
+  "exchange": "kucoin",
+  "symbol": "PAXG/USDT"
+ },
+ "ONDO": {
+  "exchange": "kucoin",
+  "symbol": "ONDO/USDT"
+ },
+ "XDC": {
+  "exchange": "kucoin",
+  "symbol": "XDC/USDT"
+ },
+ "MOVR": {
+  "exchange": "kucoin",
+  "symbol": "MOVR/USDT"
+ },
+ "WLD": {
+  "exchange": "kucoin",
+  "symbol": "WLD/USDT"
+ },
+ "POL": {
+  "exchange": "kucoin",
+  "symbol": "POL/USDT"
+ },
+ "VVV": {
+  "exchange": "kucoin",
+  "symbol": "VVV/USDT"
+ },
+ "KAS": {
+  "exchange": "kucoin",
+  "symbol": "KAS/USDT"
  }
 }
