@@ -1,0 +1,25 @@
+11:22:22   binance niet bereikbaar: binance GET https://api.binance.com/api/v3/exchangeInfo 451  {
+  "code": 0,
+  "m
+11:22:28 BTC: 17519 nieuwe uurcandles van kucoin (BTC/USDT), totaal 17519
+11:22:32 ETH: 17519 nieuwe uurcandles van kucoin (ETH/USDT), totaal 17519
+11:22:35 SOL: 17519 nieuwe uurcandles van kucoin (SOL/USDT), totaal 17519
+11:22:39 XRP: 17519 nieuwe uurcandles van kucoin (XRP/USDT), totaal 17519
+11:22:43 ZEC: 17519 nieuwe uurcandles van kucoin (ZEC/USDT), totaal 17519
+11:22:47 NEAR: 17519 nieuwe uurcandles van kucoin (NEAR/USDT), totaal 17519
+11:22:51 AAVE: 17519 nieuwe uurcandles van kucoin (AAVE/USDT), totaal 17519
+11:22:55 SUI: 17519 nieuwe uurcandles van kucoin (SUI/USDT), totaal 17519
+11:22:59 ADA: 17519 nieuwe uurcandles van kucoin (ADA/USDT), totaal 17519
+11:23:03 QNT: 17519 nieuwe uurcandles van kucoin (QNT/USDT), totaal 17519
+11:23:06 LINK: 17519 nieuwe uurcandles van kucoin (LINK/USDT), totaal 17519
+11:23:10 HYPE: 15932 nieuwe uurcandles van kucoin (HYPE/USDT), totaal 15932
+11:23:14 PUMP: 10674 nieuwe uurcandles van kucoin (PUMP/USDT), totaal 10674
+11:23:17 LTC: 17519 nieuwe uurcandles van kucoin (LTC/USDT), totaal 17519
+11:23:21 UNI: 17519 nieuwe uurcandles van kucoin (UNI/USDT), totaal 17519
+11:23:22 15 munten, periode 2024-11-11 tot 2026-10-02
+11:23:37 trend4h: 179 trades, gem. 1.085R, rendement 271.6%, controleperiode 0.251R
+11:23:52 mean_reversion: 239 trades, gem. -0.404R, rendement -53.0%, controleperiode -0.465R
+11:24:07 breakout: 556 trades, gem. -0.11R, rendement -36.8%, controleperiode -0.06R
+11:24:15 momentum: 485 trades, gem. -0.388R, rendement -81.2%, controleperiode -0.392R
+11:24:24 squeeze: 448 trades, gem. -0.413R, rendement -75.7%, controleperiode -0.439R
+11:24:26 Team: 593 trades, rendement -18.3%, grootste daling 63.2%, BTC vasthouden 5.0%. Klaar in 124 s.

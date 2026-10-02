@@ -1,0 +1,62 @@
+{
+ "BTC": {
+  "exchange": "kucoin",
+  "symbol": "BTC/USDT"
+ },
+ "ETH": {
+  "exchange": "kucoin",
+  "symbol": "ETH/USDT"
+ },
+ "SOL": {
+  "exchange": "kucoin",
+  "symbol": "SOL/USDT"
+ },
+ "XRP": {
+  "exchange": "kucoin",
+  "symbol": "XRP/USDT"
+ },
+ "ZEC": {
+  "exchange": "kucoin",
+  "symbol": "ZEC/USDT"
+ },
+ "NEAR": {
+  "exchange": "kucoin",
+  "symbol": "NEAR/USDT"
+ },
+ "AAVE": {
+  "exchange": "kucoin",
+  "symbol": "AAVE/USDT"
+ },
+ "SUI": {
+  "exchange": "kucoin",
+  "symbol": "SUI/USDT"
+ },
+ "ADA": {
+  "exchange": "kucoin",
+  "symbol": "ADA/USDT"
+ },
+ "QNT": {
+  "exchange": "kucoin",
+  "symbol": "QNT/USDT"
+ },
+ "LINK": {
+  "exchange": "kucoin",
+  "symbol": "LINK/USDT"
+ },
+ "HYPE": {
+  "exchange": "kucoin",
+  "symbol": "HYPE/USDT"
+ },
+ "PUMP": {
+  "exchange": "kucoin",
+  "symbol": "PUMP/USDT"
+ },
+ "LTC": {
+  "exchange": "kucoin",
+  "symbol": "LTC/USDT"
+ },
+ "UNI": {
+  "exchange": "kucoin",
+  "symbol": "UNI/USDT"
+ }
+}
