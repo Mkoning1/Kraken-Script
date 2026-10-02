@@ -92,7 +92,20 @@ button { font: inherit; }
 .caption { position: fixed; z-index: 4; left: 14px; bottom: 14px; right: 400px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; pointer-events: none; }
 .caption .now { background: var(--glass); border: 1px solid var(--edge); padding: 8px 14px; border-radius: 4px; font-family: var(--cond); font-size: 1.15rem; font-weight: 500; backdrop-filter: blur(8px); }
 .caption .now b { color: var(--money); font-weight: 600; margin-right: 8px; }
-.legend { position: fixed; z-index: 4; left: 14px; top: 76px; background: var(--glass); border: 1px solid var(--edge); padding: 10px 12px; border-radius: 4px; font-size: .8rem; backdrop-filter: blur(8px); }
+.leftcol { position: fixed; z-index: 4; left: 14px; top: 76px; width: 290px; max-height: calc(100vh - 200px); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.legend { background: var(--glass); border: 1px solid var(--edge); padding: 10px 12px; border-radius: 4px; font-size: .8rem; backdrop-filter: blur(8px); }
+.cashp { background: var(--glass); border: 1px solid rgba(255, 181, 71, 0.45); padding: 12px 14px; border-radius: 4px; backdrop-filter: blur(8px); font-size: .86rem; }
+.cashp h2 { font-family: var(--cond); font-weight: 600; font-size: 1.05rem; margin: 0 0 2px; color: var(--money); }
+.cashp .total { font-family: var(--cond); font-weight: 600; font-size: 1.6rem; line-height: 1.1; }
+.cashp .src { color: var(--muted); font-size: .76rem; margin: 0 0 8px; }
+#compact .cashp h2 { color: var(--money); margin: 0 0 2px; }
+.split { display: flex; height: 12px; border-radius: 2px; overflow: hidden; background: rgba(185, 174, 255, 0.22); margin: 4px 0 6px; }
+.split i { display: block; background: var(--money); }
+.split i.pos2 { background: #E8962E; } .split i.pos3 { background: #C97A1E; }
+.cashp .row { display: flex; justify-content: space-between; gap: 10px; margin: 2px 0; }
+.cashp .row span:first-child { color: var(--muted); }
+.cashp .rules { margin: 8px 0 0; padding: 8px 0 0; border-top: 1px solid rgba(190, 170, 255, 0.18); }
+.cashp .next { margin-top: 8px; padding: 6px 8px; background: rgba(255, 181, 71, 0.08); border-radius: 3px; }
 .legend p { margin: 0 0 4px; color: var(--muted); }
 .legend div { margin: 2px 0; }
 .legend .sw { display: inline-block; width: 18px; height: 10px; margin-right: 6px; vertical-align: 0; border-radius: 2px; }
@@ -118,6 +131,7 @@ button { font: inherit; }
 .screens i { flex: 1; height: 14px; border-radius: 2px; border-bottom: 3px solid; }
 .sheet { position: fixed; inset: auto 0 0 0; width: auto; max-height: 82vh; overflow-y: auto; z-index: 9; background: #1A1146; border-top: 1px solid var(--edge); padding: 16px 18px 28px; border-radius: 12px 12px 0 0; }
 @media (max-width: 1200px) { .legend { display: none; } }
+@media (max-height: 760px) { .legend { display: none; } }
 @media (prefers-reduced-motion: reduce) { .desk-tag.ping { animation: none; } .story p.cursor::after { animation: none; } }
 </style>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
@@ -141,7 +155,7 @@ button { font: inherit; }
 <div id="stage" aria-label="De handelsvloer met alle agents"></div>
 <div class="loading" id="loading">De handelsvloer wordt ingericht…</div>
 <aside class="panel" id="panel" aria-live="polite" hidden></aside>
-<div class="legend" id="legend" hidden></div>
+<div class="leftcol" id="leftcol" hidden><section class="cashp" id="money" aria-label="Je geld"></section><div class="legend" id="legend"></div></div>
 <div class="tools" id="tools" hidden><button id="reset">Overzicht</button><span>Slepen om te schuiven, scrollen om te zoomen, rechts slepen om te draaien</span></div>
 <div class="caption" id="caption" hidden><div class="now" id="now"></div></div>
 <main id="compact" hidden></main>
@@ -389,6 +403,7 @@ function buildCompact() {
   el.hidden = false; document.getElementById("loading").hidden = true; document.getElementById("stage").hidden = true;
   const lp = Object.fromEntries((D.books.live?.positions || []).map(p => [p.market, p]));
   el.innerHTML = `<p class="when">Op je pc zie je de volledige handelsvloer in 3D. Laatste run ${clock(D.generated_ts)}.</p>
+    <section class="cashp" style="margin-top:12px">${moneyHTML()}</section>
     <h2>Handelsvloer</h2><div class="desks-c">${D.markets.map(m => { const e = D.evaluations[m]; return `<button data-coin="${esc(m)}" class="${lp[m] ? "real" : ""}"><span class="t">${esc(base(m))}${lp[m] ? `<span class="${lp[m].unrealized >= 0 ? "up" : "down"}">${signed(lp[m].unrealized)}</span>` : ""}</span><span class="p">${price(e?.price)}</span>
       <span class="screens">${D.agents.map(a => { const s = e?.signals[a.agent]; return `<i title="${esc(a.agent)}" style="background:${SIGNAL[s?.action || "hold"]};border-color:${TEAM[a.name]}"></i>`; }).join("")}</span></button>`; }).join("")}</div>
     <h2>Afdelingen</h2><div class="rooms-c">${ROOMS.map(r => `<button data-room="${r.key}"><b><span class="dot" style="background:${r.color}"></span>${r.label}</b><span>${esc(roomStatus(r.key))}</span></button>`).join("")}</div>
@@ -442,7 +457,7 @@ function initFloor() {
   addEventListener("resize", onResize);
   setupPicking();
   document.getElementById("reset").onclick = resetView;
-  ["panel", "legend", "tools", "caption"].forEach(id => document.getElementById(id).hidden = false);
+  ["panel", "leftcol", "tools", "caption"].forEach(id => document.getElementById(id).hidden = false);
   document.getElementById("loading").hidden = true;
   renderer.setAnimationLoop(frame);
 }
@@ -745,7 +760,8 @@ function drawBigScreen(flash) {
   g.fillStyle = "#A9A0D6"; g.font = "500 36px Saira, sans-serif";
   g.fillText(`BTC vasthouden ${pct(st.benchmark_return_pct)}`, 50, 310);
   g.fillText(`${live.positions.length} open positie${live.positions.length === 1 ? "" : "s"}, ${st.trades} trades`, 50, 360);
-  g.fillText(`Markt ${D.regime.label}, laatste run ${clock(D.generated_ts)}`, 50, 410);
+  g.fillText(`In de markt ${eur.format(live.exposure)}, vrij ${eur.format(live.cash)}`, 50, 410);
+  g.fillText(`Markt ${D.regime.label}, laatste run ${clock(D.generated_ts)}`, 50, 460);
   const h = live.equity_history || [];
   const X0 = 700, X1 = 1550, Y0 = 80, Y1 = 460;
   g.strokeStyle = "rgba(190,170,255,.18)"; g.lineWidth = 2; for (let i = 0; i <= 4; i++) { const y = Y0 + (Y1 - Y0) * i / 4; g.beginPath(); g.moveTo(X0, y); g.lineTo(X1, y); g.stroke(); }
@@ -765,10 +781,37 @@ function drawTicker() {
   while (x < c.width) for (const it of items) { if (x > c.width) break; g.fillStyle = it.buys ? "#5CF2B3" : "#D8D0FF"; g.fillText(it.t, x, 68); x += g.measureText(it.t).width + 70; }
   shared.tickerTex.needsUpdate = true;
 }
+function moneyHTML() {
+  const live = D.books.live;
+  if (!live) return `<h2>Je geld</h2><p class="src">Alleen schaduwgeld actief.</p>`;
+  const eq = live.stats.equity, inv = live.exposure, free = live.cash, L = D.risk_limits;
+  const allIn = String(D.budget_eur).toLowerCase() === "alles";
+  const pc = v => eq ? v / eq * 100 : 0;
+  const riskEur = eq * L.risk_per_trade_pct / 100;
+  const lo = Math.min(riskEur / 0.12, eq * L.max_position_pct / 100, free * 0.99), hi = Math.min(riskEur / 0.06, eq * L.max_position_pct / 100, free * 0.99);
+  const slots = L.max_open_positions - live.positions.length;
+  return `<h2>Je geld</h2>
+    <div class="total">${eur.format(eq)}</div>
+    <p class="src">${allIn ? "Heel je vrije euro-saldo op Kraken mag gebruikt worden" : `Budget ${eur.format(D.budget_eur)}`}</p>
+    <div class="split" role="img" aria-label="${num(pc(inv), 0)}% in de markt, ${num(pc(free), 0)}% vrij">${live.positions.map((p, i) => `<i class="pos${i + 1}" style="width:${pc(p.value)}%" title="${esc(p.market)}"></i>`).join("")}</div>
+    <div class="row"><span>In de markt</span><b style="color:var(--money)">${eur.format(inv)} (${num(pc(inv), 0)}%)</b></div>
+    ${live.positions.map(p => `<div class="row"><span>&nbsp;&nbsp;${esc(base(p.market))}</span><span>${eur.format(p.value)} (${num(pc(p.value), 0)}%) <span class="${p.unrealized >= 0 ? "up" : "down"}">${signed(p.unrealized)}</span></span></div>`).join("")}
+    <div class="row"><span>Vrij</span><b>${eur.format(free)} (${num(pc(free), 0)}%)</b></div>
+    <div class="rules">
+      <div class="row"><span>Max verlies per trade</span><span>${num(L.risk_per_trade_pct, 1)}% = ${eur.format(riskEur)}</span></div>
+      <div class="row"><span>Max per positie</span><span>${L.max_position_pct}% = ${eur.format(eq * L.max_position_pct / 100)}</span></div>
+      <div class="row"><span>Max posities</span><span>${L.max_open_positions} (${live.positions.length} in gebruik)</span></div>
+      <div class="row"><span>Max in de markt</span><span>${L.max_exposure_pct}%</span></div>
+      <div class="row"><span>Noodstop bij daling van</span><span>${L.max_drawdown_pct}%</span></div>
+    </div>
+    <div class="next">${slots > 0 && hi >= 1 ? `Volgende trade: ongeveer <b>${eur.format(lo)} tot ${eur.format(hi)}</b>, afhankelijk van hoe ver de stop-loss ligt. Kleiner dan het Kraken-minimum wordt afgerond naar dat minimum.` : slots <= 0 ? "Alle posities zijn bezet; nieuwe trades wachten tot er een verkocht is." : "Te weinig vrij geld voor een nieuwe trade."}</div>`;
+}
+
 function legend() {
-  document.getElementById("legend").innerHTML = `<p>Team (kleur van het shirt)</p>${D.agents.map(a => `<div><span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}${a.status === "live" ? ` <span style="color:var(--money)">echt geld</span>` : ""}</div>`).join("")}
+  document.getElementById("money").innerHTML = moneyHTML();
+  document.getElementById("legend").innerHTML = `<details><summary style="cursor:pointer;color:var(--muted)">Legenda</summary><p style="margin-top:6px">Team (kleur van het shirt)</p>${D.agents.map(a => `<div><span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}${a.status === "live" ? ` <span style="color:var(--money)">echt geld</span>` : ""}</div>`).join("")}
     <p style="margin-top:8px">Schermen: koers van de munt, 48 uur</p><div><span class="sw" style="background:#5CF2B3"></span>agent wil kopen</div><div><span class="sw" style="background:#FF6B78"></span>negatief</div><div><span class="sw" style="background:#7F8FB0"></span>afwachten</div>
-    <p style="margin-top:8px">Ring om een bureau</p><div><span class="sw" style="background:#FFB547"></span>positie met echt geld</div><div><span class="sw" style="background:#B9AEFF"></span>schaduwpositie</div>`;
+    <p style="margin-top:8px">Ring om een bureau</p><div><span class="sw" style="background:#FFB547"></span>positie met echt geld</div><div><span class="sw" style="background:#B9AEFF"></span>schaduwpositie</div></details>`;
 }
 function setBubble(key, text, hot) {
   const b = roomRefs[key].bubble.element; b.textContent = text; b.className = "bubble" + (hot ? " hot" : " quiet");

@@ -228,6 +228,7 @@ function bookSection(key, title, b, d) {
     </div>
     <p class="verdict">${key === "live" ? `Inleg ${eur.format(s.start)} (${String(d.budget_eur).toLowerCase() === "alles" ? "heel je Kraken-saldo" : "budget " + eur.format(d.budget_eur)}). ` : ""}Vrij: ${eur.format(b.cash)}, belegd: ${eur.format(b.exposure)}.
       ${diff == null ? "" : diff >= 0 ? `${num(Math.abs(diff), 1)} procentpunt beter dan vasthouden.` : `${num(Math.abs(diff), 1)} procentpunt slechter dan vasthouden.`}</p>
+    ${key === "live" ? `<p class="verdict" style="margin-top:6px">Regels: per trade maximaal ${num(L.risk_per_trade_pct, 1)}% verlies (${eur.format(s.equity * L.risk_per_trade_pct / 100)}), maximaal ${L.max_position_pct}% per positie (${eur.format(s.equity * L.max_position_pct / 100)}), maximaal ${L.max_open_positions} posities en maximaal ${L.max_exposure_pct}% in de markt. Nu in de markt: ${eur.format(b.exposure)} (${num(b.exposure / Math.max(s.equity, 1) * 100, 0)}%), vrij: ${eur.format(b.cash)}.</p>` : ""}
     ${r.halted ? `<p class="halt"><strong>Noodstop actief.</strong> ${esc(r.halt_reason)}. Zie de README om verder te gaan.</p>` : ""}
     ${r.trading_enabled === false ? `<p class="halt">Nieuwe aankopen staan uit in config.json. Open posities worden wel bewaakt.</p>` : ""}
     <div class="chart" id="chart-${key}"></div>
