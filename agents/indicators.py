@@ -169,3 +169,29 @@ def snapshot_4h(candles, lookback=55):
         "rsi": rsi_sma(closes, 14)[-1],
         "atr": atr_sma(highs, lows, closes, 14)[-1],
     }
+
+
+def h4_series(candles, period=14):
+    """Alle 4-uurscandles met hun ATR (zoals je oude bot), voor het alsnog verwerken van gemiste candles."""
+    highs = [c["high"] for c in candles]
+    lows = [c["low"] for c in candles]
+    closes = [c["close"] for c in candles]
+    a = atr_sma(highs, lows, closes, period)
+    return [{"ts": c["ts"], "close": c["close"], "atr": a[i]} for i, c in enumerate(candles)]
+
+
+def correlation(candles_a, candles_b, n=90):
+    """Samenhang (-1 tot 1) tussen de 4-uursrendementen van twee munten over de laatste n candles."""
+    import math
+    ca = {c["ts"]: c["close"] for c in candles_a}
+    common = [c["ts"] for c in candles_b if c["ts"] in ca][-(n + 1):]
+    cb = {c["ts"]: c["close"] for c in candles_b}
+    if len(common) < 30:
+        return None
+    ra = [math.log(ca[t2] / ca[t1]) for t1, t2 in zip(common, common[1:])]
+    rb = [math.log(cb[t2] / cb[t1]) for t1, t2 in zip(common, common[1:])]
+    ma, mb = sum(ra) / len(ra), sum(rb) / len(rb)
+    cov = sum((x - ma) * (y - mb) for x, y in zip(ra, rb))
+    va = sum((x - ma) ** 2 for x in ra)
+    vb = sum((y - mb) ** 2 for y in rb)
+    return cov / math.sqrt(va * vb) if va > 0 and vb > 0 else None

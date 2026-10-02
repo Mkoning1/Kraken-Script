@@ -2,7 +2,7 @@ name: Trader
 
 on:
   schedule:
-    - cron: "3,18,33,48 * * * *"   # elke 15 minuten, 3 minuten na het sluiten van een candle (UTC)
+    - cron: "3,18,33,48 * * * *"   # reserve; GitHub voert dit maar een paar keer per dag uit. De echte wekker is cron-job.org
   workflow_dispatch: {}              # handmatig starten via de Actions-tab
 
 permissions:
@@ -15,7 +15,7 @@ concurrency:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 14
     steps:
       - uses: actions/checkout@v4
 
@@ -26,6 +26,9 @@ jobs:
 
       - name: Installeren
         run: pip install -r requirements.txt
+
+      - name: Veiligheidstest (bij een fout wordt er niet gehandeld)
+        run: python -m tests.quick
 
       - name: Agents draaien
         env:

@@ -127,7 +127,6 @@ button { font: inherit; }
   <span class="brand">Kraken agents</span>
   <nav class="tabs" aria-label="Weergave">
     <a href="index.html" aria-current="page">Handelsvloer</a>
-    <a href="radar.html">Radar</a>
     <a href="details.html">Details</a>
   </nav>
   <span class="mode other" id="mode">Laden</span>
@@ -171,10 +170,10 @@ const ACT = { buy: "kopen", sell: "negatief", hold: "afwachten" };
 const TYPES = { entry: "Gekocht", exit: "Verkocht", blocked: "Tegengehouden", validated: "Gevalideerd", note: "Melding" };
 const METHOD = {
   trend4h: "Jouw oorspronkelijke bot. Koopt als een 4-uursslot boven het hoogste punt van de vorige 55 candles breekt, met RSI boven 50. Verkoopt via een tweetraps trailing stop: 2 ATR onder de piek, 6 ATR zodra de winst 3 ATR is.",
-  mean_reversion: "Koopt paniekdalingen: RSI onder 28 en de koers onder de onderste Bollinger-band, in een munt die op uurbasis stijgt. Verkoopt als de koers terug is bij het gemiddelde, of na 6 uur zonder herstel.",
-  breakout: "Koopt als de koers met extra volume door het hoogste punt van de laatste 6 uur breekt, in een stijgende trend. Zijn stop schuift mee omhoog.",
-  momentum: "Koopt een versnelling: de MACD kruist omhoog met veel volume, boven het gemiddelde. Verkoopt als de MACD weer omlaag kruist.",
-  squeeze: "Wacht tot de markt heel rustig is (smalle Bollinger-banden) en koopt de uitbraak omhoog die daarna komt.",
+  mean_reversion: "Koopt paniekdalingen: RSI onder 28 en de koers onder de onderste Bollinger-band, op uurcandles, in een munt die op 4-uursbasis stijgt. Verkoopt als de koers terug is bij het gemiddelde, of na 12 uur zonder herstel.",
+  breakout: "Koopt als de koers met extra volume door het hoogste punt van de laatste 24 uur breekt, in een stijgende trend. Zijn stop schuift mee omhoog.",
+  momentum: "Koopt een versnelling op uurcandles: de MACD kruist omhoog met veel volume, boven het gemiddelde. Verkoopt als de MACD weer omlaag kruist.",
+  squeeze: "Wacht tot de markt op uurbasis heel rustig is (smalle Bollinger-banden) en koopt de uitbraak omhoog die daarna komt.",
 };
 const ROOMS = [
   { key: "data", label: "Data-agent", x: -21, color: "#8FA8E8", role: "Kiest elke run de 15 drukste EUR-munten op Kraken en haalt de koersen op: 15 minuten, 1 uur en 4 uur." },
@@ -188,7 +187,7 @@ const ROOMS = [
 const ROOM = Object.fromEntries(ROOMS.map(r => [r.key, r]));
 
 /* ============ data ============ */
-let D = null, lastGen = null;
+let D = null, lastGen = null, BT = null;
 const agentByName = n => D.agents.find(a => a.name === n);
 const lastRunEvents = () => D.events.filter(e => e.ts >= D.generated_ts - 20 * 60);
 function buyList() {
@@ -223,6 +222,7 @@ async function load() {
     const d = await res.json();
     if (d.generated_ts === lastGen) return;
     D = d; lastGen = d.generated_ts;
+    try { const b = await fetch("backtest.json?t=" + Date.now(), { cache: "no-store" }); BT = b.ok ? await b.json() : null; } catch { BT = null; }
     header();
     if (COMPACT) buildCompact(); else rebuildFloor();
   } catch (e) {
@@ -298,10 +298,26 @@ function analystHTML(name, coin) {
       <dt>Resultaat echt geld</dt><dd class="${a.pnl_live >= 0 ? "up" : "down"}">${signed(a.pnl_live)}</dd>
       <dt>Resultaat schaduw</dt><dd class="${a.pnl_schaduw >= 0 ? "up" : "down"}">${signed(a.pnl_schaduw)}</dd>
     </dl>${a.promotion_note ? `<p class="when" style="margin-top:6px">Naar echt geld: ${esc(a.promotion_note)}</p>` : ""}</section>
+    <section><h2>Backtest: 2 jaar historie</h2>${btHTML(a.backtest)}</section>
     ${pos.length ? `<section><h2>Zijn open posities</h2><ul class="list">${pos.map(p => `<li><button class="link" data-coin="${esc(p.market)}">${esc(p.market)}</button> ${p.book === "live" ? "echt geld" : "schaduw"}, ${eur.format(p.value)} <span class="${p.unrealized >= 0 ? "up" : "down"}">${signed(p.unrealized)}</span></li>`).join("")}</ul></section>` : ""}
     <section><h2>Zijn mening over de hele vloer</h2>
       <p>${counts.buy.length ? `Wil kopen: ${counts.buy.map(m => `<button class="link" style="border:0;background:none;color:#C9BDFF;cursor:pointer;padding:0;font-weight:600" data-analyst="${name}|${esc(m)}">${esc(base(m))}</button>`).join(", ")}. ` : "Wil nergens kopen. "}${counts.sell} keer negatief, ${counts.hold} keer afwachten.</p></section>
     <p><button class="link" style="border:0;background:none;color:#C9BDFF;cursor:pointer;padding:0" data-coin="${esc(coin)}">Bekijk wat alle agents van ${esc(base(coin))} vinden</button></p>`;
+}
+
+const PARAM = { lookback: "periode", initial_atr: "krappe stop (ATR)", runner_atr: "runner-stop (ATR)", rsi_buy: "RSI-grens", stop_atr: "stop (ATR)",
+  max_candles: "max uren", volume_mult: "volume-eis", squeeze_pct: "rust-grens (%)" };
+function btHTML(b) {
+  if (!b) return `<p class="when">Nog geen backtest gedraaid.</p>`;
+  const r = v => v == null ? "–" : (v > 0 ? "+" : "") + num(v, 2) + " R";
+  return `<dl class="kv">
+    <dt>Trades</dt><dd>${b.trades}</dd>
+    <dt>Met winst</dt><dd>${b.win_rate_pct ?? "–"}%</dd>
+    <dt>Gemiddeld per trade</dt><dd class="${(b.expectancy_r || 0) >= 0 ? "up" : "down"}">${r(b.expectancy_r)}</dd>
+    <dt>Rendement (op € 1.000)</dt><dd class="${b.return_pct >= 0 ? "up" : "down"}">${pct(b.return_pct)}</dd>
+    <dt>Grootste daling</dt><dd>${num(b.max_drawdown_pct, 1)}%</dd>
+    <dt>Controleperiode (nooit gezien)</dt><dd class="${(b.oos_expectancy_r || 0) >= 0 ? "up" : "down"}">${r(b.oos_expectancy_r)} over ${b.oos_trades} trades</dd>
+  </dl><p class="when" style="margin-top:6px">${b.tuned ? "Instellingen geoptimaliseerd en bevestigd in de controleperiode: " : "Standaardinstellingen: "}${Object.entries(b.params || {}).map(([k, v]) => `${PARAM[k] || k} ${v}`).join(", ")}.</p>`;
 }
 
 function coinHTML(coin) {
@@ -321,7 +337,12 @@ function roomHTML(key) {
   let extra = "";
   if (key === "data") extra = `<section><h2>Munten deze run</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
   if (key === "markt") extra = `<div class="doing"><div class="act ${D.regime.label === "stijgend" ? "act-buy" : D.regime.label === "dalend" ? "act-sell" : "act-hold"}">Markt ${esc(D.regime.label)}</div><p>${esc(D.regime.reason)}. Koopkansen tellen voor ${num(D.regime.multiplier * 100, 0)}% mee.</p></div>`;
-  if (key === "prestatie") extra = `<section><h2>Het team</h2><ul class="list">${D.agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br>Invloed ${num(a.weight, 2)}×, ${a.trades} trades${a.expectancy_r != null ? `, gem. ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r, 2)}R` : ""}${a.promotion_note ? `. ${esc(a.promotion_note)}` : ""}</li>`).join("")}</ul></section>`;
+  if (key === "prestatie") extra = (BT ? `<section><h2>Backtest van het hele team</h2><dl class="kv">
+      <dt>Periode</dt><dd>${new Date(BT.period.start * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })} tot ${new Date(BT.period.end * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })}</dd>
+      <dt>Trades</dt><dd>${BT.team.trades}</dd><dt>Rendement</dt><dd class="${BT.team.return_pct >= 0 ? "up" : "down"}">${pct(BT.team.return_pct)}</dd>
+      <dt>BTC vasthouden</dt><dd>${pct(BT.btc_return_pct)}</dd><dt>Grootste daling</dt><dd>${num(BT.team.max_drawdown_pct, 1)}%</dd>
+      <dt>Noodstops</dt><dd>${BT.team.halts}</dd></dl>
+      <p class="when">Met kosten (${num(BT.fee_pct, 2)}% per order) en ${num(BT.slippage_pct, 2)}% slippage, profiel ${esc(BT.profile)}.</p></section>` : "") + `<section><h2>Het team</h2><ul class="list">${D.agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br>Invloed ${num(a.weight, 2)}×, ${a.trades} trades${a.expectancy_r != null ? `, gem. ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r, 2)}R` : ""}${a.promotion_note ? `. ${esc(a.promotion_note)}` : ""}</li>`).join("")}</ul></section>`;
   if (key === "beslis") { const b = buyList(); extra = `<section><h2>Op tafel</h2>${b.length ? `<ul class="list">${b.map(x => `<li><span class="dot" style="background:${TEAM[x.agent]}"></span><button class="link" data-analyst="${x.agent}|${esc(x.coin)}">${esc(x.label)}</button> op ${esc(base(x.coin))}, sterkte ${num(x.s.strength, 2)}<br>${esc(x.s.reason)}</li>`).join("")}</ul>` : `<p>Geen koopadviezen. Er valt niets te beslissen.</p>`}
     ${Object.entries(D.evaluations).flatMap(([m, e]) => (e.notes || []).filter(n => n.startsWith("Kandidaat") || n.startsWith("Risico") || n.startsWith("Uitvoer")).map(n => `<p class="when">${esc(base(m))}: ${esc(n)}</p>`)).join("")}</section>`; }
   if (key === "risico") extra = `<section><h2>Limieten (profiel ${esc(D.profile)})</h2><dl class="kv">
@@ -386,6 +407,7 @@ function initFloor() {
   renderer.setSize(innerWidth, innerHeight);
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.25;
   stage.appendChild(renderer.domElement);
   labels = new CSS2DRenderer(); labels.setSize(innerWidth, innerHeight);
   labels.domElement.className = "l2d"; labels.domElement.style.cssText = "position:absolute;inset:0;pointer-events:none";
@@ -480,8 +502,14 @@ function buildShared() {
     deskPanel: new THREE.BoxGeometry(7.3, 0.6, 0.06),
     carry: new THREE.BoxGeometry(0.42, 0.06, 0.32),
   };
+  const star = [0, 1, 2, 3, 4].map(k => new THREE.BoxGeometry(0.06, 0.05, 0.36).translate(0, 0.05, 0.18).rotateY(k * Math.PI * 2 / 5).translate(0, 0, 0.12));
   shared.g.chair = mergeGeometries([
-    shared.g.seat.clone().translate(0, 0.78, 0.12), shared.g.back.clone().translate(0, 1.2, 0.42), shared.g.post.clone().translate(0, 0.38, 0.12)]);
+    shared.g.seat.clone().translate(0, 0.78, 0.12), shared.g.back.clone().translate(0, 1.2, 0.42), shared.g.post.clone().translate(0, 0.42, 0.12), ...star]);
+  const leg = (x) => [new THREE.BoxGeometry(0.15, 0.14, 0.46).translate(x, 0.88, -0.14), new THREE.BoxGeometry(0.14, 0.68, 0.14).translate(x, 0.5, -0.36),
+                      new THREE.BoxGeometry(0.15, 0.08, 0.26).translate(x, 0.14, -0.44)];
+  shared.g.lap = mergeGeometries([...leg(-0.12), ...leg(0.12)]);
+  shared.g.privacy = new THREE.BoxGeometry(7.4, 0.42, 0.05);
+  shared.g.mug = new THREE.CylinderGeometry(0.07, 0.06, 0.16, 10);
 }
 
 /* --- het kantoor zelf (verandert niet) --- */
@@ -497,21 +525,27 @@ let bigScreen, ticker, gateRing, gateDisc, roomRefs = {};
 function buildStatic() {
   // vloer, tapijt onder de bureaus, muren, ramen
   box(56, 0.4, 40, mat("#2E2373"), 0, -0.2, -2, scene, false);
-  box(48, 0.02, 25, mat("#382B8A"), 0, 0.01, 2.2, scene, false);
-  const grid = new THREE.GridHelper(48, 24, "#4A3BA3", "#3F3196"); grid.position.set(0, 0.03, 2.2); grid.scale.z = 25 / 48; scene.add(grid);
+  box(48, 0.02, 25, new THREE.MeshStandardMaterial({ map: carpetTexture(), roughness: 0.95 }), 0, 0.01, 2.2, scene, false);
   box(56, 9, 0.5, mat("#251A63"), 0, 4.5, -22.2);
   box(0.5, 9, 40, mat("#2A1E6E"), -28, 4.5, -2);
-  [6, 11.5].forEach(z => { const w = box(0.1, 4.5, 3.6, new THREE.MeshBasicMaterial({ color: "#5E4FC4" }), -27.7, 3.8, z, scene, false); });
+  const sky = skylineTexture();
+  [[4.2, 5.2], [10.4, 5.2]].forEach(([z, w]) => {
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(w, 4.6), new THREE.MeshBasicMaterial({ map: sky, toneMapped: false }));
+    win.rotation.y = Math.PI / 2; win.position.set(-27.72, 4.1, z); scene.add(win);
+    box(0.12, 4.9, 0.12, mat("#1B1346"), -27.7, 4.1, z - w / 2); box(0.12, 4.9, 0.12, mat("#1B1346"), -27.7, 4.1, z + w / 2);
+    box(0.12, 0.12, w, mat("#1B1346"), -27.7, 6.45, z); box(0.3, 0.12, w, mat("#1B1346"), -27.6, 1.8, z);
+  });
+  for (let x = -24; x <= 24; x += 8) box(0.18, 9, 0.12, new THREE.MeshBasicMaterial({ color: "#3A2C8E" }), x, 4.5, -21.9, scene, false);
 
   // wandscherm met saldo en grafiek, en een lichtkrant met koersen
   const c = document.createElement("canvas"); c.width = 1600; c.height = 520; shared.screenCanvas = c;
   shared.screenTex = new THREE.CanvasTexture(c); shared.screenTex.colorSpace = THREE.SRGBColorSpace;
-  bigScreen = new THREE.Mesh(new THREE.PlaneGeometry(17, 5.5), new THREE.MeshBasicMaterial({ map: shared.screenTex }));
+  bigScreen = new THREE.Mesh(new THREE.PlaneGeometry(17, 5.5), new THREE.MeshBasicMaterial({ map: shared.screenTex, toneMapped: false }));
   bigScreen.position.set(0, 6.6, -21.9); scene.add(bigScreen);
   box(17.6, 6.1, 0.2, mat("#120B33"), 0, 6.6, -22.05, scene, false);
   const tc = document.createElement("canvas"); tc.width = 4096; tc.height = 96; shared.tickerCanvas = tc;
   shared.tickerTex = new THREE.CanvasTexture(tc); shared.tickerTex.wrapS = THREE.RepeatWrapping; shared.tickerTex.colorSpace = THREE.SRGBColorSpace;
-  ticker = new THREE.Mesh(new THREE.PlaneGeometry(52, 0.9), new THREE.MeshBasicMaterial({ map: shared.tickerTex }));
+  ticker = new THREE.Mesh(new THREE.PlaneGeometry(52, 0.9), new THREE.MeshBasicMaterial({ map: shared.tickerTex, toneMapped: false }));
   ticker.position.set(0, 3.25, -21.9); scene.add(ticker);
 
   // de afdelingen
@@ -523,10 +557,10 @@ function buildStatic() {
     const pane = (w - 1.7) / 2;
     box(pane, 2.5, 0.08, glass, x - w / 2 + pane / 2, 1.35, front, scene, false);
     box(pane, 2.5, 0.08, glass, x + w / 2 - pane / 2, 1.35, front, scene, false);
-    const strip = box(w, 0.08, 0.1, new THREE.MeshBasicMaterial({ color: r.color }), x, 2.62, front, scene, false);
+    const strip = box(w, 0.08, 0.1, new THREE.MeshBasicMaterial({ color: r.color, toneMapped: false }), x, 2.62, front, scene, false);
     box(2.8, 0.1, 1.1, shared.deskTop, x, 1.0, zc - 1.3); box(2.6, 0.9, 0.08, shared.deskSide, x, 0.5, zc - 1.8);
-    const scr = new THREE.Mesh(shared.g.screen, new THREE.MeshBasicMaterial({ color: r.color })); scr.position.set(x - 0.6, 1.55, zc - 1.6); scene.add(scr);
-    const scr2 = new THREE.Mesh(shared.g.screen, new THREE.MeshBasicMaterial({ color: r.color })); scr2.position.set(x + 0.6, 1.55, zc - 1.6); scene.add(scr2);
+    const scr = new THREE.Mesh(shared.g.screen, new THREE.MeshBasicMaterial({ color: r.color, toneMapped: false })); scr.position.set(x - 0.6, 1.55, zc - 1.6); scene.add(scr);
+    const scr2 = new THREE.Mesh(shared.g.screen, new THREE.MeshBasicMaterial({ color: r.color, toneMapped: false })); scr2.position.set(x + 0.6, 1.55, zc - 1.6); scene.add(scr2);
     const person = makePerson(r.color, true); person.position.set(x, 0.12, zc - 0.25); scene.add(person);
     Object.assign(person.userData, { pick: "room", key: r.key });
     const hit = box(w, 2.6, depth, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }), x, 1.3, zc, scene, false);
@@ -554,6 +588,50 @@ function buildStatic() {
   box(0.9, 1.4, 0.7, mat("#5B4BB8"), 25.3, 0.7, -3.5); box(0.6, 0.3, 0.5, mat("#2A2350"), 25.3, 1.55, -3.5);
 }
 
+function carpetTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d");
+  g.fillStyle = "#33287F"; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${150 + Math.random() * 60},${130 + Math.random() * 60},255,${Math.random() * 0.06})`; g.fillRect(Math.random() * 256, Math.random() * 256, 2, 2); }
+  g.strokeStyle = "rgba(20,12,60,0.55)"; g.lineWidth = 2; g.strokeRect(1, 1, 254, 254);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(24, 12.5); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function skylineTexture() {
+  const c = document.createElement("canvas"); c.width = 512; c.height = 400; const g = c.getContext("2d");
+  const grd = g.createLinearGradient(0, 0, 0, 400); grd.addColorStop(0, "#0B0826"); grd.addColorStop(0.6, "#2A1A5E"); grd.addColorStop(1, "#5B2C7A");
+  g.fillStyle = grd; g.fillRect(0, 0, 512, 400);
+  for (let i = 0; i < 60; i++) { g.fillStyle = "rgba(255,255,255,.6)"; g.fillRect(Math.random() * 512, Math.random() * 160, 1, 1); }
+  let x = 0;
+  while (x < 512) {
+    const w = 24 + Math.random() * 46, h = 90 + Math.random() * 230;
+    g.fillStyle = `rgb(${18 + Math.random() * 14},${14 + Math.random() * 10},${48 + Math.random() * 20})`; g.fillRect(x, 400 - h, w, h);
+    for (let wy = 400 - h + 8; wy < 392; wy += 11) for (let wx = x + 5; wx < x + w - 5; wx += 8)
+      if (Math.random() < 0.38) { g.fillStyle = Math.random() < 0.8 ? "rgba(255,214,140,.85)" : "rgba(160,200,255,.8)"; g.fillRect(wx, wy, 4, 5); }
+    x += w + 3;
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function lightPoolTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+  const r = g.createRadialGradient(64, 64, 4, 64, 64, 64); r.addColorStop(0, "rgba(255,240,220,0.55)"); r.addColorStop(1, "rgba(255,240,220,0)");
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+}
+function deskChartTexture(m) {
+  const c = document.createElement("canvas"); c.width = 256; c.height = 160; const g = c.getContext("2d");
+  g.fillStyle = "#0A0F1E"; g.fillRect(0, 0, 256, 160);
+  g.strokeStyle = "rgba(255,255,255,.08)"; for (let y = 40; y < 160; y += 30) { g.beginPath(); g.moveTo(0, y); g.lineTo(256, y); g.stroke(); }
+  const pts = (D.spark && D.spark[m]) || [];
+  g.fillStyle = "#FFFFFF"; g.font = "700 26px 'Saira Condensed', sans-serif"; g.fillText(base(m), 10, 28);
+  if (pts.length > 1) {
+    const lo = Math.min(...pts), hi = Math.max(...pts), chg = (pts[pts.length - 1] / pts[0] - 1) * 100;
+    g.font = "600 20px 'Saira Condensed', sans-serif"; g.fillText(`${chg >= 0 ? "+" : "−"}${num(Math.abs(chg), 1)}% 48u`, 150, 28);
+    g.strokeStyle = "#FFFFFF"; g.lineWidth = 4; g.beginPath();
+    pts.forEach((v, i) => { const x = 8 + i / (pts.length - 1) * 240, y = 150 - (v - lo) / ((hi - lo) || 1) * 100; i ? g.lineTo(x, y) : g.moveTo(x, y); });
+    g.stroke(); g.lineTo(248, 158); g.lineTo(8, 158); g.closePath(); g.fillStyle = "rgba(255,255,255,.12)"; g.fill();
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const TINT = { buy: "#7DFFC9", sell: "#FF8A95", hold: "#7F8FB0" };
+
 /* --- figuren --- */
 function makePerson(color, seated, carryColor) {
   const g = new THREE.Group();
@@ -570,12 +648,13 @@ function makePerson(color, seated, carryColor) {
   if (seated) {
     armL.rotation.x = armR.rotation.x = -0.55;
     const chair = new THREE.Mesh(shared.g.chair, shared.chair); chair.castShadow = true; g.add(chair);
+    const lap = new THREE.Mesh(shared.g.lap, pants); g.add(lap);
   } else {
     const legL = new THREE.Mesh(shared.g.leg, pants), legR = new THREE.Mesh(shared.g.leg, pants);
     legL.position.set(-0.13, 0.82, 0); legR.position.set(0.13, 0.82, 0);
     [legL, legR].forEach(m => { m.castShadow = true; g.add(m); });
     g.userData.parts.legL = legL; g.userData.parts.legR = legR;
-    armL.rotation.x = armR.rotation.x = Math.PI / 2 - 0.05;
+    armL.rotation.x = armR.rotation.x = carryColor ? -0.95 : -Math.PI / 2 + 0.05;
     const carry = new THREE.Mesh(shared.g.carry, new THREE.MeshBasicMaterial({ color: carryColor || "#FFFFFF" }));
     carry.position.set(0, 1.22, -0.42); carry.visible = !!carryColor; g.add(carry); g.userData.parts.carry = carry;
   }
@@ -602,12 +681,19 @@ function rebuildFloor() {
   // gebundelde vormen: weinig tekenwerk voor 75 werkplekken
   const IM = (geo, material, n) => { const im = new THREE.InstancedMesh(geo, material, Math.max(1, n)); im.count = n; im.castShadow = true; im.receiveShadow = true; dyn.add(im); return im; };
   const deskTop = IM(shared.g.deskTop, shared.deskTop, markets.length), deskSideL = IM(shared.g.deskSide, shared.deskSide, markets.length * 2), deskPanel = IM(shared.g.deskPanel, shared.deskSide, markets.length);
-  const screens = Object.fromEntries(["buy", "sell", "hold"].map(k => [k, IM(shared.g.screen, shared.screenMat[k], nScreens[k])]));
+  const privacy = IM(shared.g.privacy, new THREE.MeshStandardMaterial({ color: "#B7ACEF", transparent: true, opacity: 0.55, roughness: 0.3 }), markets.length);
+  const mugs = IM(shared.g.mug, mat("#F4F1FF"), plan.length);
+  const pool = lightPoolTexture();
   const frames = IM(shared.g.frame, shared.dark, plan.length), stands = IM(shared.g.stand, shared.dark, plan.length), keys = IM(shared.g.keys, shared.dark, plan.length);
   const M = new THREE.Matrix4(), set = (im, i, x, y, z) => { M.makeTranslation(x, y, z); im.setMatrixAt(i, M); };
   markets.forEach((m, i) => {
     const dx = L.cols[i % 5], dz = L.rows[Math.floor(i / 5)];
     set(deskTop, i, dx, 1.0, dz); set(deskSideL, i * 2, dx - 3.6, 0.48, dz); set(deskSideL, i * 2 + 1, dx + 3.6, 0.48, dz); set(deskPanel, i, dx, 0.55, dz - 0.78);
+    set(privacy, i, dx, 1.28, dz - 0.86);
+    const lp = new THREE.Mesh(new THREE.PlaneGeometry(10, 6), new THREE.MeshBasicMaterial({ map: pool, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 }));
+    lp.rotation.x = -Math.PI / 2; lp.position.set(dx, 0.045, dz + 0.6); dyn.add(lp);
+    const chart = deskChartTexture(m);
+    deskRefs[m] = { dx, dz, mats: Object.fromEntries(["buy", "sell", "hold"].map(k => [k, new THREE.MeshBasicMaterial({ map: chart, color: TINT[k], toneMapped: false })])) };
     const live = livePos[m], sh = shPos[m];
     if (live || sh) {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(4.6, live ? 0.09 : 0.05, 8, 72), new THREE.MeshBasicMaterial({ color: live ? "#FFB547" : "#B9AEFF" }));
@@ -615,14 +701,15 @@ function rebuildFloor() {
     }
     const tag = label(`${esc(base(m))}<small>${price(D.evaluations[m]?.price)}</small>${live ? `<span class="pos">${signed(live.unrealized)}</span>` : sh ? `<span class="pos sh">schaduw</span>` : ""}`, "desk-tag", dx - 3.0, 2.75, dz - 0.95, dyn);
     tag.element.onclick = () => selectCoin(m);
-    deskRefs[m] = { dx, dz, tag };
+    deskRefs[m].tag = tag;
   });
   const idx = { buy: 0, sell: 0, hold: 0 };
   plan.forEach((p, j) => {
     const mx = p.dx + (p.k - 2) * 1.42, mz = p.dz - 0.5;
-    const si = idx[p.act]++;
-    set(screens[p.act], si, mx, 1.56, mz + 0.035); screenRecs.push({ im: screens[p.act], i: si, coin: p.m, agent: p.a.name });
+    const scr = new THREE.Mesh(shared.g.screen, deskRefs[p.m].mats[p.act]);
+    scr.position.set(mx, 1.56, mz + 0.035); Object.assign(scr.userData, { pick: "analyst", agent: p.a.name, coin: p.m }); dyn.add(scr); screenRecs.push(scr);
     set(frames, j, mx, 1.56, mz); set(stands, j, mx, 1.18, mz - 0.02); set(keys, j, mx, 1.07, p.dz + 0.38);
+    if (Math.random() < 0.35) set(mugs, j, mx + 0.45, 1.13, p.dz + 0.25); else set(mugs, j, 0, -5, 0);
     const person = makePerson(TEAM[p.a.name], true);
     person.position.set(mx, 0, p.dz + 1.05);
     person.userData.pick = "analyst"; person.userData.agent = p.a.name; person.userData.coin = p.m;
@@ -633,9 +720,9 @@ function rebuildFloor() {
       analysts[analysts.length - 1].marker = mk;
     }
   });
-  [deskTop, deskSideL, deskPanel, frames, stands, keys, ...Object.values(screens)].forEach(im => { im.instanceMatrix.needsUpdate = true; });
-  hitList = [deskTop, ...Object.values(screens), ...analysts.map(a => a.person), ...Object.values(roomRefs).flatMap(r => [r.person, r.hit])];
-  shared.deskTopIM = deskTop; shared.screensIM = screens;
+  [deskTop, deskSideL, deskPanel, frames, stands, keys, privacy, mugs].forEach(im => { im.instanceMatrix.needsUpdate = true; });
+  hitList = [deskTop, ...screenRecs, ...analysts.map(a => a.person), ...Object.values(roomRefs).flatMap(r => [r.person, r.hit])];
+  shared.deskTopIM = deskTop;
 
   drawBigScreen(); drawTicker();
   ROOMS.forEach(r => setBubble(r.key, roomStatus(r.key), false));
@@ -677,7 +764,7 @@ function drawTicker() {
 }
 function legend() {
   document.getElementById("legend").innerHTML = `<p>Team (kleur van het shirt)</p>${D.agents.map(a => `<div><span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}${a.status === "live" ? ` <span style="color:var(--money)">echt geld</span>` : ""}</div>`).join("")}
-    <p style="margin-top:8px">Schermen</p><div><span class="sw" style="background:#5CF2B3"></span>kopen</div><div><span class="sw" style="background:#FF6B78"></span>negatief</div><div><span class="sw" style="background:#33405A"></span>afwachten</div>
+    <p style="margin-top:8px">Schermen: koers van de munt, 48 uur</p><div><span class="sw" style="background:#5CF2B3"></span>agent wil kopen</div><div><span class="sw" style="background:#FF6B78"></span>negatief</div><div><span class="sw" style="background:#7F8FB0"></span>afwachten</div>
     <p style="margin-top:8px">Ring om een bureau</p><div><span class="sw" style="background:#FFB547"></span>positie met echt geld</div><div><span class="sw" style="background:#B9AEFF"></span>schaduwpositie</div>`;
 }
 function setBubble(key, text, hot) {
@@ -713,6 +800,8 @@ class Walker {
     else { pos.x += dx / dist * step; pos.z += dz / dist * step; this.g.rotation.y = Math.atan2(-dx, -dz); }
     const sw = Math.sin(this.t * 11) * 0.55;
     P.legL.rotation.x = sw; P.legR.rotation.x = -sw;
+    if (P.carry.visible) { P.armL.rotation.x = P.armR.rotation.x = -0.95; }
+    else { P.armL.rotation.x = -Math.PI / 2 + 0.05 - sw * 0.7; P.armR.rotation.x = -Math.PI / 2 + 0.05 + sw * 0.7; }
     P.body.position.y = 1.25 + Math.abs(Math.sin(this.t * 11)) * 0.04;
   }
 }
@@ -821,9 +910,9 @@ function update(dt) {
       P.armR.rotation.x = -0.55 + Math.sin(clockT * sp + a.phase + 2.2) * 0.13;
       P.head.position.y = 1.84 + Math.sin(clockT * 1.7 + a.phase) * 0.02;
       P.hair.position.y = P.head.position.y + 0.03;
+      P.head.rotation.y = P.hair.rotation.y = Math.max(0, Math.sin(clockT * 0.23 + a.phase * 3) - 0.75) * 2.2 * (a.phase > 3.14 ? 1 : -1);
       a.person.rotation.y = Math.sin(clockT * 0.4 + a.phase) * 0.08;
     }
-    for (const k of ["buy", "sell", "hold"]) shared.tex[k].offset.x = (shared.tex[k].offset.x + dt * (k === "hold" ? 0.03 : 0.12) * typingBoost) % 1;
     shared.tickerTex.offset.x = (shared.tickerTex.offset.x + dt * 0.012) % 1;
     for (const w of walkers) w.update(dt);
     Object.values(roomRefs).forEach((r, i) => { const P = r.person.userData.parts; P.armL.rotation.x = -0.55 + Math.sin(clockT * 7 + i) * 0.1; P.armR.rotation.x = -0.55 + Math.sin(clockT * 7 + i + 2) * 0.1; });
@@ -846,7 +935,6 @@ function pick(ev) {
     let o = h.object;
     if (o.isInstancedMesh) {
       if (o === shared.deskTopIM) return { kind: "coin", coin: Object.keys(deskRefs)[h.instanceId] };
-      const s = screenRecs.find(x => x.im === o && x.i === h.instanceId); if (s) return { kind: "analyst", agent: s.agent, coin: s.coin };
       continue;
     }
     while (o && !o.userData.pick) o = o.parent;

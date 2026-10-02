@@ -4,6 +4,8 @@
   meer bij een hoge score (tot 1,5x), minder bij een lage (tot 0,5x).
 - Grenzen: max grootte per positie, max aantal posities, max totaal belegd, beschikbaar geld.
   Nooit geleend geld.
+- Samenhang: beweegt een nieuwe munt sterk mee met een munt waar je al in zit, dan halve inzet.
+  Bijna alle crypto volgt BTC; drie sterk samenhangende posities zijn in de praktijk één grote gok.
 - Na een verliestrade: een paar candles afkoelen voor die munt.
 - Verlies vandaag boven max_daily_loss_pct: vandaag niets nieuws.
 - Vermogen max_drawdown_pct onder de hoogste stand: NOODSTOP, alles verkopen, stoppen.
@@ -38,7 +40,7 @@ class RiskAgent:
                 "daily_limit_hit": daily_loss >= self.p["max_daily_loss_pct"],
                 "trading_enabled": trading_enabled}, trigger
 
-    def approve_entry(self, book, status, equity, exposure, market, price, stop, available_cash, score, candle_ts):
+    def approve_entry(self, book, status, equity, exposure, market, price, stop, available_cash, score, candle_ts, corr=None):
         """Geeft (ok, hoeveelheid, risico in euro, uitleg)."""
         if status["halted"]:
             return False, 0, 0, "Noodstop actief"
@@ -57,6 +59,11 @@ class RiskAgent:
         scale = max(0.5, min(1.5, score))
         wanted_risk = equity * self.p["risk_per_trade_pct"] / 100 * scale
         qty = wanted_risk / risk_per_unit
+        corr_note = ""
+        limit = self.p.get("correlation_limit", 0.85)
+        if corr and corr[0] is not None and corr[0] >= limit:
+            qty *= 0.5
+            corr_note = f" Halve inzet: beweegt sterk mee met {corr[1]} (samenhang {corr[0]:.2f})."
         caps = {
             "max positiegrootte": equity * self.p["max_position_pct"] / 100,
             "max totaal belegd": equity * self.p["max_exposure_pct"] / 100 - exposure,
@@ -73,5 +80,5 @@ class RiskAgent:
         text = (f"Inzet {eur(value)} ({value / equity * 100:.0f}% van het vermogen"
                 + (f", begrensd door {capped_by}" if capped_by else "") + "). "
                 f"Noodstop {px(stop)} ({risk_per_unit / price * 100:.1f}% lager): maximaal verlies ca. {eur(risk_eur)} "
-                f"({risk_eur / equity * 100:.1f}% van het vermogen) plus kosten.")
+                f"({risk_eur / equity * 100:.1f}% van het vermogen) plus kosten." + corr_note)
         return True, qty, risk_eur, text

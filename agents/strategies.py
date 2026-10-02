@@ -27,9 +27,9 @@ class MarketRegimeAgent:
     def assess(self, htf):
         c, e50, e200 = htf["close"], htf["ema50"], htf["ema200"]
         if c > e200 and e50 > e200:
-            return "stijgend", "BTC staat boven het 200-uursgemiddelde en de trend wijst omhoog"
+            return "stijgend", "BTC staat boven zijn gemiddelde van ruim een maand en de trend wijst omhoog"
         if c < e200 and e50 < e200:
-            return "dalend", "BTC staat onder het 200-uursgemiddelde en de trend wijst omlaag"
+            return "dalend", "BTC staat onder zijn gemiddelde van ruim een maand en de trend wijst omlaag"
         return "neutraal", "BTC heeft geen duidelijke richting"
 
 
@@ -46,16 +46,16 @@ class MeanReversionAgent:
         self.rsi_buy, self.stop_atr, self.max_candles = rsi_buy, stop_atr, max_candles
 
     def analyse(self, ctx):
-        i, htf = ctx["m15"], ctx["h1"]
+        i, htf = ctx["sig"], ctx["trend"]
         if _htf_up(htf) and i["rsi"] < self.rsi_buy and i["close"] < i["bb_lower"]:
             strength = min(1.0, 0.6 + (self.rsi_buy - i["rsi"]) / 25)
             return Signal("buy", strength,
-                          f"Paniekdaling: RSI {i['rsi']:.0f} en koers onder de onderste Bollinger-band, uurtrend omhoog",
+                          f"Paniekdaling: RSI {i['rsi']:.0f} en koers onder de onderste Bollinger-band, 4-uurstrend omhoog",
                           self.stop_atr, False, self.max_candles)
         if i["close"] >= i["bb_mid"]:
             return Signal("sell", 0.7, "Koers terug bij het gemiddelde: dip is hersteld")
         if not _htf_up(htf):
-            return Signal("sell", 0.6, "Uurtrend is omgeslagen naar dalend")
+            return Signal("sell", 0.6, "4-uurstrend is omgeslagen naar dalend")
         return Signal("hold", 0.0, f"Geen paniekdaling (RSI {i['rsi']:.0f})")
 
 
@@ -68,17 +68,17 @@ class BreakoutAgent:
         self.lookback, self.volume_mult, self.stop_atr = lookback, volume_mult, stop_atr
 
     def analyse(self, ctx):
-        i, htf = ctx["m15"], ctx["h1"]
+        i, htf = ctx["sig"], ctx["trend"]
         vol_ratio = i["volume"] / i["volume_avg"] if i["volume_avg"] else 0
         if _htf_up(htf) and i["close"] > i["prev_high"] and vol_ratio >= self.volume_mult and i["ema20"] > i["ema50"]:
             strength = min(0.95, 0.7 + (vol_ratio - self.volume_mult) * 0.1)
             return Signal("buy", strength,
-                          f"Uitbraak boven het hoogste punt van {self.lookback} candles met {vol_ratio:.1f}x normaal volume",
+                          f"Uitbraak boven het hoogste punt van de laatste {self.lookback} uur met {vol_ratio:.1f}x normaal volume",
                           self.stop_atr, True)
         if not _htf_up(htf):
-            return Signal("sell", 0.9, "Uurkoers onder het 200-uursgemiddelde: dalende markt")
+            return Signal("sell", 0.9, "Koers onder het 4-uursgemiddelde van ruim een maand: dalende markt")
         if i["close"] < i["ema50"]:
-            return Signal("sell", 0.6, "Koers onder het 50-candlegemiddelde: uitbraak mislukt")
+            return Signal("sell", 0.6, "Koers onder het 50-uursgemiddelde: uitbraak mislukt")
         return Signal("hold", 0.0, "Geen uitbraak")
 
 
@@ -91,7 +91,7 @@ class MomentumAgent:
         self.volume_mult, self.stop_atr = volume_mult, stop_atr
 
     def analyse(self, ctx):
-        i, htf = ctx["m15"], ctx["h1"]
+        i, htf = ctx["sig"], ctx["trend"]
         crossed_up = i["prev_macd"] <= i["prev_macd_signal"] and i["macd"] > i["macd_signal"]
         crossed_down = i["prev_macd"] >= i["prev_macd_signal"] and i["macd"] < i["macd_signal"]
         vol_ratio = i["volume"] / i["volume_avg"] if i["volume_avg"] else 0
@@ -113,13 +113,13 @@ class SqueezeAgent:
         self.squeeze_pct, self.stop_atr = squeeze_pct, stop_atr
 
     def analyse(self, ctx):
-        i, htf = ctx["m15"], ctx["h1"]
+        i, htf = ctx["sig"], ctx["trend"]
         was_squeezed = i["squeeze_rank"] <= self.squeeze_pct
         if was_squeezed and i["close"] > i["bb_upper"] and htf["close"] > htf["ema50"]:
             return Signal("buy", 0.8, "Na een zeer rustige periode breekt de koers boven de bovenste band",
                           self.stop_atr, True)
         if i["close"] < i["ema50"]:
-            return Signal("sell", 0.6, "Koers terug onder het 50-candlegemiddelde: uitbraak mislukt")
+            return Signal("sell", 0.6, "Koers terug onder het 50-uursgemiddelde: uitbraak mislukt")
         state = "rustig, wacht op uitbraak" if was_squeezed else "niet rustig genoeg"
         return Signal("hold", 0.0, f"Markt {state}")
 

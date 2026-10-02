@@ -28,8 +28,8 @@ def plan_stops(signal, price, ctx, exits, agent_cfg):
                  "initial_atr": agent_cfg.get("initial_atr", 2.0), "runner_atr": agent_cfg.get("runner_atr", 6.0),
                  "runner_threshold_atr": agent_cfg.get("runner_threshold_atr", 3.0)}
         return stop, hard, extra
-    atr15 = ctx["m15"]["atr"]
-    stop = min(price - signal.stop_atr * atr15, price * (1 - exits["min_stop_pct"] / 100))
+    atr1 = ctx["sig"]["atr"]
+    stop = min(price - signal.stop_atr * atr1, price * (1 - exits["min_stop_pct"] / 100))
     return stop, stop, {}
 
 
@@ -37,11 +37,12 @@ def exchange_stop(pos):
     return pos["hard_stop"] if pos["exit_style"] == "two_stage" else pos["stop"]
 
 
-def advance(pos, new15, h4, exits, fee, slip, tf_sec, intrabar):
+def advance(pos, new_candles, h4_list, exits, fee, slip, tf_sec, intrabar):
     """Loop nieuwe candles af, verplaats stops en geef (prijs, tijd, reden) terug als de positie dicht moet.
-    intrabar=True: ook controleren of een stop binnen een candle geraakt is (papier).
-    Bij echt geld doet Kraken dat zelf met de stop-loss order."""
-    for c in new15:
+    intrabar=True: ook controleren of een stop binnen een candle geraakt is (papier en backtest).
+    Bij echt geld doet Kraken dat zelf met de stop-loss order.
+    h4_list: alle gesloten 4-uurscandles met hun ATR; gemiste candles worden alsnog verwerkt."""
+    for c in new_candles:
         if c["ts"] <= pos["last_checked_ts"]:
             continue
         close_ts = c["ts"] + tf_sec
@@ -63,19 +64,22 @@ def advance(pos, new15, h4, exits, fee, slip, tf_sec, intrabar):
             if pos["max_candles"] and pos["candles_held"] >= pos["max_candles"]:
                 return c["close"], close_ts, f"Tijdslimiet: na {pos['max_candles']} candles geen herstel"
 
-    if pos["exit_style"] == "two_stage" and h4 and h4["ts"] > pos["last_4h_ts"]:
-        pos["last_4h_ts"] = h4["ts"]
-        price, atr = h4["close"], h4["atr"]
-        pos["atr"] = atr
-        pos["peak"] = max(pos["peak"], price)
-        if atr and (price - pos["entry_price"]) / atr >= pos["runner_threshold_atr"]:
-            pos["is_runner"] = True
-        mult = pos["runner_atr"] if pos["is_runner"] else pos["initial_atr"]
-        pos["stop"] = pos["peak"] - mult * atr
-        pos["hard_stop"] = pos["stop"] - exits["catastrophe_atr"] * atr
-        if price < pos["stop"]:
-            mode = "runner, 6 ATR" if pos["is_runner"] else "krap, 2 ATR"
-            return price, h4["ts"] + 14400, f"4-uursslot onder de trailing stop ({mode}) op {px(pos['stop'])}"
+    if pos["exit_style"] == "two_stage" and h4_list:
+        for h4 in h4_list:
+            if h4["ts"] <= pos["last_4h_ts"] or not h4.get("atr"):
+                continue
+            pos["last_4h_ts"] = h4["ts"]
+            price, atr = h4["close"], h4["atr"]
+            pos["atr"] = atr
+            pos["peak"] = max(pos["peak"], price)
+            if (price - pos["entry_price"]) / atr >= pos["runner_threshold_atr"]:
+                pos["is_runner"] = True
+            mult = pos["runner_atr"] if pos["is_runner"] else pos["initial_atr"]
+            pos["stop"] = pos["peak"] - mult * atr
+            pos["hard_stop"] = pos["stop"] - exits["catastrophe_atr"] * atr
+            if price < pos["stop"]:
+                mode = "runner, 6 ATR" if pos["is_runner"] else "krap, 2 ATR"
+                return price, h4["ts"] + 14400, f"4-uursslot onder de trailing stop ({mode}) op {px(pos['stop'])}"
     return None
 
 
@@ -152,11 +156,11 @@ class PaperExecutionAgent:
         fee = proceeds * self.fee
         return record_exit(book, pos, fill, proceeds - fee, fee, ts, reason, learner, self.cooldown_sec)
 
-    def manage(self, book, market, new15, h4, learner, last_price):
+    def manage(self, book, market, new_candles, h4_list, learner, last_price):
         pos = book["positions"].get(market)
         if not pos:
             return None
-        hit = advance(pos, new15, h4, self.exits, self.fee, self.slip, self.tf_sec, intrabar=True)
+        hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip, self.tf_sec, intrabar=True)
         return self.sell(book, market, hit[0], hit[1], hit[2], learner) if hit else None
 
 
@@ -374,14 +378,14 @@ class LiveExecutionAgent:
                                "Munt niet meer (volledig) op Kraken gevonden: handmatig verkocht?", learner, self.cooldown_sec)
         return None
 
-    def manage(self, book, market, new15, h4, learner, last_price):
+    def manage(self, book, market, new_candles, h4_list, learner, last_price):
         pos = book["positions"].get(market)
         if not pos:
             return None
         trade = self.reconcile(book, market, last_price, learner)
         if trade:
             return trade
-        hit = advance(pos, new15, h4, self.exits, self.fee, self.slip, self.tf_sec, intrabar=False)
+        hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip, self.tf_sec, intrabar=False)
         if hit:
             return self.sell(book, market, hit[0], hit[1], hit[2], learner)
         target = float(self.ex.price_to_precision(market, exchange_stop(pos)))

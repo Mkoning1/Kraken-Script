@@ -156,7 +156,9 @@ async function load() {
   try {
     const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
     if (!res.ok) throw new Error(res.status);
-    render(await res.json());
+    const d = await res.json();
+    try { const b = await fetch("backtest.json?t=" + Date.now(), { cache: "no-store" }); d.__bt = b.ok ? await b.json() : null; } catch { d.__bt = null; }
+    render(d);
   } catch (e) {
     document.getElementById("app").innerHTML = `<div class="notice"><h1>Nog geen gegevens</h1>
       <p class="muted">De bot heeft nog niet gedraaid, of GitHub Pages werkt de site nog bij. Start een run via Actions, Trader, Run workflow.</p></div>`;
@@ -171,7 +173,7 @@ function render(d) {
     : `<span class="mode paper">Alleen papier</span>`;
 
   document.getElementById("app").innerHTML = `
-    <p style="margin:0 0 12px;display:flex;gap:16px"><a href="index.html">Handelsvloer</a><a href="radar.html">Radar</a><b>Details</b></p>
+    <p style="margin:0 0 12px;display:flex;gap:16px"><a href="index.html">Handelsvloer</a><b>Details</b></p>
     ${modeHtml}
     <p class="intro">Laatste run: <strong>${when(d.generated_ts)}</strong>${d.last_run_ok ? "" : ", met meldingen (zie onderaan)"}.
       Markt: <strong class="regime-${d.regime.label}">${d.regime.label}</strong>. Profiel: <strong>${esc(d.profile)}</strong>. ${d.markets.length} munten gevolgd.</p>
@@ -185,6 +187,8 @@ function render(d) {
       <p class="muted" style="margin-bottom:12px;font-size:.9375rem">Nieuwe agents handelen eerst met schaduwgeld. Na genoeg trades met winst (na kosten) krijgen ze echt geld; wie met echt geld verliest, gaat terug naar de schaduw.</p>
       ${agentsTable(d.agents)}
     </section>
+
+    ${backtestSection(d.__bt)}
 
     <section style="margin-bottom:40px">
       <h2>Wat vindt elke agent per munt</h2>
@@ -241,6 +245,22 @@ function bookSection(key, title, b, d) {
     ${tradesTable(b.trades)}`;
 }
 
+function backtestSection(bt) {
+  if (!bt) return `<section style="margin-bottom:40px"><h2>Backtest</h2><p class="empty">Nog geen backtest gedraaid.</p></section>`;
+  const r = v => v == null ? "–" : (v > 0 ? "+" : "") + num(v, 2) + " R";
+  const P = { lookback: "periode", initial_atr: "krappe stop", runner_atr: "runner-stop", rsi_buy: "RSI-grens", stop_atr: "stop (ATR)", max_candles: "max uren", volume_mult: "volume-eis", squeeze_pct: "rust-grens" };
+  const period = `${new Date(bt.period.start * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })} tot ${new Date(bt.period.end * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })}`;
+  return `<section style="margin-bottom:40px"><h2>Backtest: ${period}</h2>
+    <p class="muted" style="margin-bottom:12px;font-size:.9375rem">Elke agent speelt de historie van ${bt.coins.length} munten na, met ${num(bt.fee_pct, 2)}% kosten per order en ${num(bt.slippage_pct, 2)}% slippage.
+      De laatste 40% van de periode is de controleperiode: die is nooit gebruikt om instellingen te kiezen. Het hele team samen: ${pct(bt.team.return_pct)} (BTC vasthouden ${pct(bt.btc_return_pct)}), grootste daling ${num(bt.team.max_drawdown_pct, 1)}%, ${bt.team.halts} noodstop(s).</p>
+    <div class="scroll"><table><thead><tr><th>Agent</th><th class="num">Trades</th><th class="num">Met winst</th><th class="num">Gem. per trade</th><th class="num">Rendement</th><th class="num">Grootste daling</th><th class="num">Controleperiode</th><th>Instellingen</th></tr></thead><tbody>
+    ${Object.entries(bt.agents).map(([n, b]) => `<tr><td>${esc(AG[n] || n)}</td><td class="num">${b.trades}</td><td class="num">${b.win_rate_pct ?? "–"}%</td>
+      <td class="num ${cls(b.expectancy_r || 0)}">${r(b.expectancy_r)}</td><td class="num ${cls(b.return_pct)}">${pct(b.return_pct)}</td><td class="num">${num(b.max_drawdown_pct, 1)}%</td>
+      <td class="num ${cls(b.oos_expectancy_r || 0)}">${r(b.oos_expectancy_r)}<br><small class="muted">${b.oos_trades} trades</small></td>
+      <td><small class="muted">${b.tuned ? "geoptimaliseerd: " : "standaard: "}${Object.entries(b.params || {}).map(([k, v]) => `${P[k] || k} ${v}`).join(", ")}</small></td></tr>`).join("")}
+    </tbody></table></div></section>`;
+}
+
 function limitBar(label, value, max, note, isCount = false) {
   const ratio = Math.min(1, max ? value / max : 0);
   const state = ratio >= 1 ? "full" : ratio >= 0.66 ? "warn" : "";
@@ -265,7 +285,7 @@ function positionsTable(ps, key) {
 
 function agentsTable(as) {
   return `<div class="scroll"><table><thead><tr><th>Agent</th><th>Geld</th><th class="num">Invloed</th><th class="num">Trades</th><th class="num">Met winst</th><th class="num">Echt</th><th class="num">Schaduw</th><th class="num">Gem. per trade</th></tr></thead><tbody>
-    ${as.map(a => `<tr><td>${esc(a.agent)}<br><small class="muted">${a.horizon === "lang" ? "4-uurscandles" : "15-minutencandles"}</small></td>
+    ${as.map(a => `<tr><td>${esc(a.agent)}<br><small class="muted">${a.horizon === "lang" ? "4-uurscandles" : "uurcandles"}</small></td>
       <td><span class="pill ${a.status === "live" ? "live" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span>${a.promotion_note ? `<br><small class="muted">${esc(a.promotion_note)}</small>` : ""}</td>
       <td class="num">${num(a.weight, 2)}×</td><td class="num">${a.trades}</td>
       <td class="num">${a.win_rate_pct != null ? a.win_rate_pct + "%" : "–"}</td>

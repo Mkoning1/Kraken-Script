@@ -22,7 +22,7 @@ from agents.data import DataAgent
 from agents.decision import DecisionAgent
 from agents.execution import LiveExecutionAgent, PaperExecutionAgent, plan_stops
 from agents.fmt import eur, px
-from agents.indicators import snapshot, snapshot_4h, trend_snapshot
+from agents.indicators import correlation, h4_series, snapshot, snapshot_4h, trend_snapshot
 from agents.learning import LearningAgent
 from agents.monitor import MonitorAgent, book_equity, book_exposure
 from agents.risk import RiskAgent
@@ -33,7 +33,8 @@ STATE_PATH = ROOT / "data" / "state.json"
 DASHBOARD_PATH = ROOT / "docs" / "data.json"
 LEGACY_STATE = ROOT / "bot_state.json"
 STATE_VERSION = 3
-TF = 15
+TF = 60          # signalen en bewaking op uurcandles
+BACKTEST_PATH = ROOT / "data" / "backtest.json"
 
 
 def load_config():
@@ -42,6 +43,11 @@ def load_config():
         raise SystemExit("mode moet 'live' of 'paper' zijn")
     if cfg["profile"] not in cfg["profiles"]:
         raise SystemExit(f"Profiel '{cfg['profile']}' bestaat niet. Kies uit: {', '.join(cfg['profiles'])}")
+    tuned_path = ROOT / "data" / "tuned_params.json"
+    if cfg.get("backtest", {}).get("use_tuned_params") and tuned_path.exists():
+        for name, params in json.loads(tuned_path.read_text()).items():
+            if name in cfg["agents"]:
+                cfg["agents"][name].update(params)  # instellingen die de backtest heeft bewezen
     return cfg
 
 
@@ -166,7 +172,13 @@ def run(now_ts=None, exchange=None):
 
     strategies = build_agents(cfg["agents"])
     labels = {a.name: a.label for a in strategies}
-    learner = LearningAgent(state, cfg["learning"], cfg["promotion"], cfg["agents"])
+    backtest = {}
+    if BACKTEST_PATH.exists():
+        try:
+            backtest = json.loads(BACKTEST_PATH.read_text()).get("agents", {})
+        except Exception as e:
+            errors.append(f"Backtest-resultaten lezen mislukt: {e}")
+    learner = LearningAgent(state, cfg["learning"], cfg["promotion"], cfg["agents"], backtest, cfg["backtest"]["min_trades"])
     decider = DecisionAgent(strategies, **cfg["decision"])
     risk = RiskAgent(profile, cfg["min_order_eur"])
     paper = PaperExecutionAgent(cfg, TF, profile["cooldown_candles"])
@@ -193,27 +205,31 @@ def run(now_ts=None, exchange=None):
     except Exception as e:
         markets, prices = list(dict.fromkeys(list(cfg["universe"]["always_include"]) + list(held))), {}
         errors.append(f"Marktlijst ophalen mislukt ({e}), alleen vaste munten")
-    fast, slow, h4 = {}, {}, {}
+    fast, slow, h4list, h4 = {}, {}, {}, {}
     for m in markets:
         try:
-            c15 = data.candles(m, 15, now_ts)
-            if not DataAgent.is_fresh(c15, 15, now_ts):
+            c1 = data.candles(m, 60, now_ts)
+            if not DataAgent.is_fresh(c1, 60, now_ts):
                 raise RuntimeError("koersdata is verouderd")
-            fast[m] = c15
-            slow[m] = data.candles(m, 60, now_ts)
-            prices.setdefault(m, c15[-1]["close"])
+            c4 = data.candles(m, 240, now_ts)
+            fast[m], slow[m] = c1, c4
+            h4list[m] = h4_series(c4)
+            prices.setdefault(m, c1[-1]["close"])
         except Exception as e:
             errors.append(f"{m}: {e}")
-    new_4h = DataAgent.new_4h_close(state.get("last_4h_scan"), now_ts)
-    if new_4h:
-        lookback = cfg["agents"].get("trend4h", {}).get("lookback", 55)
-        for m in markets:
+    # Elke munt waarvan sinds de vorige beoordeling een 4-uurscandle gesloten is (ook na een gemiste run)
+    lookback = cfg["agents"].get("trend4h", {}).get("lookback", 55)
+    last4 = state.setdefault("last_4h_eval", {})
+    for m, c4 in slow.items():
+        if c4 and c4[-1]["ts"] > last4.get(m, 0):
             try:
-                h4[m] = snapshot_4h(data.candles(m, 240, now_ts, limit=lookback + 40), lookback)
+                h4[m] = snapshot_4h(c4, lookback)
+            except ValueError:
+                pass  # te nieuw op Kraken: nog niet genoeg historie
             except Exception as e:
                 errors.append(f"{m} (4 uur): {e}")
-        if h4:
-            state["last_4h_scan"] = now_ts
+    if h4:
+        state["last_4h_scan"] = now_ts
     for b in state["books"].values():
         if b:
             for m, p in b["positions"].items():
@@ -226,7 +242,7 @@ def run(now_ts=None, exchange=None):
             continue
         for m in list(book["positions"]):
             try:
-                res = execs[name].manage(book, m, fast.get(m, []), h4.get(m), learner, prices.get(m))
+                res = execs[name].manage(book, m, fast.get(m, []), h4list.get(m), learner, prices.get(m))
             except Exception as e:
                 errors.append(f"{m} ({'echt geld' if name == 'live' else 'schaduw'}): bewaken mislukt: {e}")
                 continue
@@ -287,16 +303,20 @@ def run(now_ts=None, exchange=None):
 
     # 6-7. Adviezen en beslissingen
     candidates = []
-    for m, c15 in fast.items():
+    for m, c15 in fast.items():  # c15 = uurcandles
         last_ts = c15[-1]["ts"]
         if state["last_candle_ts"].get(m) == last_ts and m not in h4:
             continue
         state["last_candle_ts"][m] = last_ts
         try:
-            ctx = {"m15": snapshot(c15, cfg), "h1": trend_snapshot(slow[m]), "h4": h4.get(m)}
+            ctx = {"sig": snapshot(c15, cfg), "trend": trend_snapshot(slow[m]), "h4": h4.get(m)}
+        except ValueError:
+            continue  # te nieuw op Kraken: nog niet genoeg historie
         except Exception as e:
             errors.append(f"{m}: {e}")
             continue
+        if m in h4:
+            last4[m] = h4[m]["ts"]
         signals = {a.name: a.analyse(ctx) for a in strategies}
         close_ts = last_ts + TF * 60
         notes = []
@@ -307,7 +327,7 @@ def run(now_ts=None, exchange=None):
             notes.append(f"{'Echt geld' if name == 'live' else 'Schaduw'}: {d['reason']}")
             if d["type"] == "exit":
                 try:
-                    res = execs[name].sell(book, m, ctx["m15"]["close"], close_ts, d["reason"], learner)
+                    res = execs[name].sell(book, m, ctx["sig"]["close"], close_ts, d["reason"], learner)
                     if name == "live":
                         persist(state)
                     if res.get("validated"):
@@ -329,7 +349,7 @@ def run(now_ts=None, exchange=None):
                 continue
             candidates.append((d, bname, m, ctx, last_ts))
             notes.append(f"Kandidaat voor {'echt geld' if bname == 'live' else 'schaduw'}: {d['reason']} ({d['calc']})")
-        evaluations[m] = {"ts": close_ts, "price": ctx["m15"]["close"],
+        evaluations[m] = {"ts": close_ts, "price": ctx["sig"]["close"],
                           "signals": {labels[n]: s.to_dict() for n, s in signals.items()},
                           "notes": notes or ["Geen actie"]}
 
@@ -339,7 +359,7 @@ def run(now_ts=None, exchange=None):
         if m in book["positions"]:
             evaluations[m]["notes"].append(f"{d['reason']}: overgeslagen, deze run al gekocht door een andere agent")
             continue
-        price = ctx["m15"]["close"]
+        price = ctx["sig"]["close"]
         stop, hard, extra = plan_stops(d["signal"], price, ctx, cfg["exits"], cfg["agents"].get(d["agent"], {}))
         equity = book_equity(book, prices)
         avail = book["cash"]
@@ -349,8 +369,14 @@ def run(now_ts=None, exchange=None):
             except Exception as e:
                 errors.append(f"Saldo ophalen mislukt: {e}")
                 continue
+        corr = None
+        for held_m in book["positions"]:
+            if held_m in slow and m in slow:
+                c = correlation(slow[m], slow[held_m])
+                if c is not None and (corr is None or c > corr[0]):
+                    corr = (c, held_m)
         ok, qty, risk_eur, why = risk.approve_entry(book, book["risk_status"], equity, book_exposure(book, prices),
-                                                    m, price, hard, avail, d["score"], last_ts)
+                                                    m, price, hard, avail, d["score"], last_ts, corr)
         plan = {"stop": stop, "hard_stop": hard, "risk_eur": round(risk_eur, 2), "calc": d["calc"], "risk": why}
         where = "echt geld" if bname == "live" else "schaduw"
         if not ok:
@@ -385,7 +411,8 @@ def run(now_ts=None, exchange=None):
                          "prices": {m: prices[m] for m in prices if any(b and m in b["positions"] for b in state["books"].values()) or m == cfg["benchmark_market"]}}
     state["narrative"] = MonitorAgent.narrative(state, cfg, regime_info, len(fast), events, bool(h4), errors, validate)
     monitor.record(state, now_ts, prices, prices.get(cfg["benchmark_market"]))
-    monitor.save(state, cfg, profile, prices, learner.summary(strategies), {"markets": markets})
+    monitor.save(state, cfg, profile, prices, learner.summary(strategies),
+                 {"markets": markets, "spark": {m: [c["close"] for c in fast[m][-48:]] for m in fast}})
 
     for line in state["narrative"]:
         print(line)

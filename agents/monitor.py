@@ -84,8 +84,8 @@ class MonitorAgent:
             if not ok:
                 lines.append(f"LET OP: je API-sleutel mist het recht '{name}'. Zet dit aan op Kraken.")
         lines.append(f"{n_markets} munten bekeken. Markt: {regime['label']}. {regime['reason']}.")
-        lines.append("Er is een nieuwe 4-uurscandle gesloten, dus de Trend-4u-agent heeft alle munten opnieuw beoordeeld."
-                     if new_4h else "Geen nieuwe 4-uurscandle: de Trend-4u-agent wacht, de korte-termijnagents kijken elke 15 minuten.")
+        lines.append("Er is een nieuwe 4-uurscandle gesloten, dus de Trend-4u-agent heeft de munten opnieuw beoordeeld."
+                     if new_4h else "Geen nieuwe 4-uurscandle: de Trend-4u-agent wacht, de andere agents kijken elk uur, de bewaking elk kwartier.")
         for e in events:
             where = "echt geld" if e.get("book") == "live" else "schaduw"
             if e["type"] == "entry":
