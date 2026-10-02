@@ -10,7 +10,7 @@
   },
   "profile": "assertief",
   "universe": {
-    "size": 15,
+    "size": 5,
     "always_include": [
       "BTC/EUR",
       "ETH/EUR"
@@ -80,7 +80,7 @@
     "trend4h": {
       "start": "live",
       "force": null,
-      "use_regime": false,
+      "use_regime": true,
       "lookback": 55,
       "rsi_min": 50,
       "initial_atr": 2.0,
@@ -169,8 +169,9 @@
     ],
     "pool_kraken_top": 40,
     "universe_sizes": [
-      15,
-      30
+      5,
+      8,
+      15
     ]
   }
 }

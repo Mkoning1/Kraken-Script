@@ -8,9 +8,9 @@ Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 
 | Agent | Taak |
 |---|---|
-| Data-agent | Kiest elke run de 15 EUR-munten met het meeste volume (plus BTC, ETH en alles waar je in zit) en haalt uur- en 4-uurscandles op. |
+| Data-agent | Kiest elke run de 5 EUR-munten met het meeste volume (plus BTC, ETH en alles waar je in zit) en haalt uur- en 4-uurscandles op. Waarom 5: in de eerlijke backtest werkte Trend-4u op de drukste munten veel beter dan op 15 of 30. |
 | Markt-agent | Stijgende, neutrale of dalende markt, op basis van BTC op 4 uur. |
-| **Trend-4u** | Je oorspronkelijke bot: koopt een 4-uursuitbraak boven het hoogste punt van de vorige periode (RSI boven 50). Verkoopt via de tweetraps trailing stop. Gemiste 4-uurscandles worden alsnog verwerkt. |
+| **Trend-4u** | Je oorspronkelijke bot: koopt een 4-uursuitbraak boven het hoogste punt van de vorige periode (RSI boven 50). Verkoopt via de tweetraps trailing stop. Koopt niet als BTC in een dalende trend zit. Gemiste 4-uurscandles worden alsnog verwerkt. |
 | Dip-koper | Koopt paniekdalingen op uurcandles in een stijgende munt, verkoopt bij herstel of na 12 uur. |
 | Uitbraak-agent | Koopt uitbraken boven het hoogste punt van de laatste 24 uur met extra volume. |
 | Momentum-agent | Koopt een versnelling (MACD kruist omhoog met volume) op uurcandles. |
@@ -44,12 +44,14 @@ kleinere daling (27%) dan met 2% (+104%, daling 40%), omdat de noodstop minder v
 ## Backtest en optimalisatie
 
 Elke zondagnacht (of handmatig via Actions, Backtest, Run workflow):
-1. De historie van de laatste twee jaar wordt bijgewerkt (uurcandles, opgeslagen in `data/history`).
+1. De historie van de laatste twee jaar wordt bijgewerkt voor ruim 50 munten (uurcandles, `data/history`). Elke dag worden,
+   net als live, de drukste munten van dat moment gekozen. Zo test de bot niet met munten waarvan we achteraf weten dat ze stegen.
 2. Elke agent speelt die periode na met dezelfde regels, kosten (0,40%) en een ruime slippage (0,15%).
 3. De eerste 60% wordt gebruikt om per agent een paar instellingen te proberen. De beste wordt getest op de laatste 40%,
    die hij nooit gezien heeft. Alleen als hij daar ook winst maakt, worden de nieuwe instellingen gebruikt (`data/tuned_params.json`).
 
-Resultaten staan onder Details en in het dossier van elke agent op de handelsvloer.
+Elk resultaat wordt ook berekend zonder de beste munt, zodat één uitschieter het beeld niet bepaalt.
+Ook wordt getest of 5, 8 of 15 munten het beste werkt. Resultaten staan onder Details en in het dossier van elke agent.
 
 ### Promotie naar echt geld
 - Backtest positief (minstens +0,1R per trade in de controleperiode): echt geld na 15 schaduwtrades met minstens +0,1R.
