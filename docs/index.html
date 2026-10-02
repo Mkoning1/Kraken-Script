@@ -3,365 +3,673 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kraken multi-agent trader</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<title>Kraken agents</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛰️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #EEF1F3; --ink: #1B2530; --muted: #5E6B78; --rule: #CBD3DA; --soft: #DDE3E8;
-  --agents: #1E4FA8; --hold: #8994A0; --gain: #1D7348; --loss: #A9322A; --warn: #9A6400;
-  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --void: #07101B;
+  --deck: #0C1826;
+  --steel: #8FB3D9;
+  --line: rgba(143, 179, 217, 0.16);
+  --text: #DCE8F5;
+  --muted: #7F95AD;
+  --buy: #5CF2B3;
+  --neg: #FF6B78;
+  --wait: #4A5D74;
+  --money: #FFB547;
+  --sans: "Saira", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond: "Saira Condensed", "Saira", system-ui, sans-serif;
   box-sizing: border-box;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #141A21; --ink: #E3E8ED; --muted: #95A1AD; --rule: #2F3944; --soft: #222B34;
-    --agents: #83A8F0; --hold: #6B7784; --gain: #5BC38C; --loss: #EF7F72; --warn: #E0B35A;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #141A21; --ink: #E3E8ED; --muted: #95A1AD; --rule: #2F3944; --soft: #222B34;
-  --agents: #83A8F0; --hold: #6B7784; --gain: #5BC38C; --loss: #EF7F72; --warn: #E0B35A;
-}
 *, *::before, *::after { box-sizing: inherit; }
-html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+html { background: var(--void); }
 body {
-  margin: 0; background: var(--bg); color: var(--ink);
-  font-family: var(--font); font-size: 16px; line-height: 1.5;
+  margin: 0; min-height: 100vh; color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.45;
   font-variant-numeric: tabular-nums;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(40, 90, 150, 0.18), transparent 70%),
+    var(--void);
 }
-main { max-width: 1120px; margin: 0 auto; padding: 32px 24px 64px; }
-h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 12px; }
-p { margin: 0; }
-.muted { color: var(--muted); }
-.gain { color: var(--gain); }
-.loss { color: var(--loss); }
+a { color: var(--steel); }
+a:focus-visible, [tabindex]:focus-visible, button:focus-visible { outline: 2px solid var(--money); outline-offset: 3px; }
+h2 { font-family: var(--cond); font-weight: 600; font-size: 1.05rem; letter-spacing: 0.02em; margin: 0 0 10px; color: var(--steel); }
 
-.intro { color: var(--muted); max-width: 70ch; }
-.intro strong { color: var(--ink); font-weight: 600; }
+/* Bovenbalk */
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 28px; padding: 14px 24px; border-bottom: 1px solid var(--line); }
+.brand { font-family: var(--cond); font-weight: 700; font-size: 1.35rem; letter-spacing: 0.03em; display: flex; align-items: center; gap: 10px; margin-right: auto; }
+.brand svg { width: 26px; height: 26px; }
+.mode { font-family: var(--cond); font-weight: 600; font-size: 0.95rem; padding: 3px 12px; border-radius: 2px; border: 1px solid currentColor; }
+.mode.live { color: var(--money); box-shadow: 0 0 18px rgba(255, 181, 71, 0.25) inset; }
+.mode.validate { color: var(--steel); }
+.kpi { display: flex; flex-direction: column; line-height: 1.15; }
+.kpi span:first-child { font-size: 0.78rem; color: var(--muted); }
+.kpi b { font-family: var(--cond); font-weight: 600; font-size: 1.25rem; }
+.kpi .money { color: var(--money); }
+.up { color: var(--buy); } .down { color: var(--neg); }
+.bar a { font-size: 0.9rem; }
 
-/* Vergelijking: het belangrijkste van de pagina */
-.ledger { margin: 28px 0 8px; display: grid; grid-template-columns: auto auto auto; column-gap: 32px; row-gap: 2px; justify-content: start; align-items: baseline; }
-.ledger .who { font-size: 1rem; color: var(--muted); display: flex; align-items: center; gap: 10px; }
-.ledger .amount { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; text-align: right; }
-.ledger .pct { font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 500; text-align: right; }
-.ledger .amount.dim { font-weight: 500; color: var(--muted); }
-.swatch { width: 22px; height: 0; border-top: 3px solid var(--agents); display: inline-block; }
-.swatch.hold { border-top: 3px dashed var(--hold); }
-.verdict { margin: 12px 0 0; max-width: 70ch; }
+/* Indeling */
+.deck { display: grid; grid-template-columns: 290px minmax(0, 1fr) 340px; gap: 0; min-height: calc(100vh - 70px); }
+.roster, .log { padding: 20px 22px; }
+.roster { border-right: 1px solid var(--line); }
+.log { border-left: 1px solid var(--line); }
 
-.chart { margin: 20px 0 40px; position: relative; }
-.chart svg { display: block; width: 100%; height: 280px; overflow: visible; }
-.chart .axis { fill: var(--muted); font-size: 12px; font-family: var(--font); }
-.chart .grid { stroke: var(--soft); stroke-width: 1; }
-.tip { position: absolute; top: 0; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 13px; padding: 6px 10px; border-radius: 4px; white-space: nowrap; transform: translateX(-50%); display: none; }
+/* Het team */
+.team { list-style: none; margin: 0; padding: 0; }
+.team li { position: relative; display: grid; grid-template-columns: 30px 1fr; gap: 2px 10px; padding: 9px 8px; border-left: 2px solid transparent; transition: background-color .3s, border-color .3s; cursor: default; }
+.team li[data-key] { cursor: pointer; }
+.team li.active { background: rgba(143, 179, 217, 0.08); border-left-color: var(--money); }
+.team li.selected { background: rgba(92, 242, 179, 0.07); border-left-color: var(--buy); }
+.team .glyph { grid-row: span 2; width: 26px; height: 26px; align-self: center; }
+.team .name { font-weight: 600; display: flex; justify-content: space-between; gap: 8px; }
+.team .now { font-size: 0.82rem; color: var(--muted); line-height: 1.35; }
+.team .work { position: absolute; right: 8px; top: 10px; font-size: 0.75rem; color: var(--money); font-weight: 500; opacity: 0; transition: opacity .3s; white-space: nowrap; }
+.team li.active .work { opacity: 1; }
+.chip { font-size: 0.72rem; font-weight: 500; padding: 0 6px; border: 1px solid var(--wait); color: var(--muted); border-radius: 2px; white-space: nowrap; align-self: center; }
+.chip.real { border-color: var(--money); color: var(--money); }
+.team li.sep { display: block; font-size: 0.8rem; color: var(--muted); padding: 14px 0 4px 8px; border: 0; }
 
-/* Risicolimieten: hoe dicht zit je bij de grens */
-.limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; padding: 20px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-bottom: 40px; }
-.limit p { font-size: 0.9375rem; }
-.bar { height: 6px; background: var(--soft); margin-top: 8px; position: relative; }
-.bar span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); }
-.bar.warn span { background: var(--warn); }
-.bar.full span { background: var(--loss); }
-.halt { background: var(--loss); color: #fff; padding: 14px 18px; margin: 24px 0 0; border-radius: 4px; max-width: 70ch; }
+/* Reactor */
+.reactor-wrap { position: sticky; top: 0; align-self: start; display: flex; flex-direction: column; align-items: center; padding: 18px 16px 12px; }
+#reactor { width: 100%; max-width: 860px; max-height: calc(100vh - 150px); height: auto; display: block; overflow: visible; }
+.caption { font-family: var(--cond); font-size: 1.2rem; font-weight: 500; text-align: center; min-height: 1.6em; margin: 4px 0 0; color: var(--text); }
+.caption .phase { color: var(--money); margin-right: 8px; }
+.hint { font-size: 0.8rem; color: var(--muted); text-align: center; margin: 2px 0 0; }
 
-.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-bottom: 40px; }
-@media (max-width: 820px) { .cols { grid-template-columns: 1fr; gap: 32px; } }
+.ring { fill: none; stroke: var(--line); }
+.tick { stroke: rgba(143, 179, 217, 0.28); }
+.coin circle.body { fill: #0E1D2E; stroke: rgba(143, 179, 217, 0.45); stroke-width: 1.5; transition: stroke .2s; }
+.coin text { fill: var(--text); font-family: var(--cond); font-weight: 600; font-size: 17px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.coin .price { fill: var(--muted); font-family: var(--cond); font-weight: 600; font-size: 17px; }
+.coin { cursor: pointer; }
+.coin.lit circle.body { stroke: var(--text); }
+.coin.sel circle.body { stroke: var(--money); stroke-width: 2.5; }
+.agent { cursor: pointer; }
+.agent polygon.body { fill: #0F2236; stroke: var(--steel); stroke-width: 1.5; }
+.agent.real polygon.body { stroke: var(--money); }
+.agent.shadow polygon.body { stroke-dasharray: 5 4; }
+.agent text { font-family: var(--cond); text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+.agent .t1 { fill: var(--text); font-weight: 600; font-size: 21px; }
+.agent .t2 { fill: var(--muted); font-size: 15px; font-family: var(--sans); }
+.agent.sel polygon.body { stroke-width: 3; }
+.core-label { fill: var(--text); font-family: var(--cond); font-weight: 600; font-size: 22px; text-anchor: middle; }
+.core-sub { fill: var(--muted); font-family: var(--sans); font-size: 14px; text-anchor: middle; }
+.regime-label { font-family: var(--cond); font-weight: 600; font-size: 16px; }
+.link { stroke-linecap: round; transition: opacity .25s; }
+.link.buy { stroke: var(--buy); stroke-width: 2.4; opacity: .9; stroke-dasharray: 7 9; animation: flow 1.1s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: 32; } }
+.spin { animation: spin 240s linear infinite; transform-origin: 500px 500px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.breathe { animation: breathe 4s ease-in-out infinite; transform-origin: 500px 500px; }
+@keyframes breathe { 50% { opacity: .55; transform: scale(1.08); } }
+.coin.lit circle.body { stroke: var(--text); stroke-width: 3; filter: url(#glow); }
+.link.sell { stroke: var(--neg); stroke-width: 1.2; opacity: .2; }
+.link.hold { stroke: var(--steel); stroke-width: 1; opacity: 0; }
+.dim .link { opacity: .04; }
+.dim .link.on { opacity: .9; }
+.dim .link.hold.on { opacity: .35; }
 
-.scroll { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
-th { text-align: left; font-weight: 500; color: var(--muted); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
-td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--soft); vertical-align: top; }
-td.num, th.num { text-align: right; white-space: nowrap; }
-.empty { color: var(--muted); padding: 12px 0; }
+/* Inspectiepaneel */
+.inspect { position: absolute; top: 16px; right: 16px; width: min(360px, calc(100% - 32px)); background: rgba(10, 22, 36, 0.94); border: 1px solid rgba(143, 179, 217, 0.35); padding: 14px 16px; backdrop-filter: blur(6px); z-index: 2; }
+.inspect h3 { margin: 0 0 2px; font-family: var(--cond); font-size: 1.3rem; font-weight: 600; }
+.inspect .sub { color: var(--muted); font-size: 0.85rem; margin: 0 0 10px; }
+.inspect ul { list-style: none; margin: 0; padding: 0; }
+.inspect li { padding: 6px 0; border-top: 1px solid var(--line); font-size: 0.86rem; }
+.inspect li b { font-weight: 600; }
+.inspect .close { position: absolute; top: 8px; right: 10px; background: none; border: 0; color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1; }
+.act-buy { color: var(--buy); } .act-sell { color: var(--neg); } .act-hold { color: var(--muted); }
 
-.market { padding: 14px 0; border-bottom: 1px solid var(--soft); }
-.market:first-of-type { padding-top: 0; }
-.market h3 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; display: flex; justify-content: space-between; gap: 12px; }
-.market h3 span { font-weight: 400; color: var(--muted); }
-.vote { display: grid; grid-template-columns: 7.5rem 5.5rem 1fr; gap: 8px; font-size: 0.9375rem; padding: 3px 0; }
-.vote .act { font-weight: 500; }
-.vote .buy { color: var(--gain); }
-.vote .sell { color: var(--loss); }
-.vote .hold { color: var(--muted); }
-.outcome { margin-top: 6px; font-size: 0.9375rem; }
-
-.events { list-style: none; margin: 0; padding: 0; }
-.events li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--soft); font-size: 0.9375rem; }
+/* Verslag en logboek */
+.story p { margin: 0 0 7px; font-size: 0.9rem; line-height: 1.45; }
+.story p.cursor::after { content: "▍"; color: var(--money); animation: blink 1s steps(1) infinite; }
+.story.flash { animation: flash 1.2s ease-out; }
+@keyframes flash { from { background: rgba(255, 181, 71, 0.10); } to { background: transparent; } }
+@keyframes blink { 50% { opacity: 0; } }
+.events { list-style: none; margin: 0 0 22px; padding: 0; }
+.events li { padding: 7px 0; border-top: 1px solid var(--line); font-size: 0.84rem; }
+.events .when { color: var(--muted); font-size: 0.78rem; }
 .events .what { font-weight: 600; }
+.events .real { color: var(--money); }
+.events .err { color: var(--neg); }
+.gauges { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.gauge { text-align: center; }
+.gauge svg { width: 100%; max-width: 110px; height: auto; }
+.gauge p { margin: 0; font-size: 0.75rem; color: var(--muted); line-height: 1.3; }
+.gauge b { display: block; font-family: var(--cond); font-size: 1.05rem; color: var(--text); }
 
-.errors li { color: var(--loss); }
-.context { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 16px 0 0; font-size: 0.9375rem; }
-.context strong { font-weight: 600; }
-.regime-dalend { color: var(--loss); }
-.regime-stijgend { color: var(--gain); }
-.grid td.act { white-space: nowrap; }
-.grid .buy { color: var(--gain); font-weight: 500; }
-.grid .sell { color: var(--loss); }
-.grid .hold { color: var(--muted); }
-.grid small { display: block; color: var(--muted); font-size: 0.8125rem; line-height: 1.35; max-width: 34ch; white-space: normal; }
-.tag { font-size: 0.8125rem; color: var(--muted); }
-.mode { display: inline-block; font-size: 0.875rem; font-weight: 600; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; }
-.mode.live { background: var(--loss); color: #fff; }
-.mode.validate { background: var(--warn); color: #fff; }
-.mode.paper { background: var(--soft); color: var(--ink); }
-.story { max-width: 75ch; margin: 20px 0 8px; padding: 14px 18px; border-left: 3px solid var(--agents); background: var(--soft); }
-.story p { margin: 0 0 6px; font-size: 0.9375rem; }
-.story p:last-child { margin-bottom: 0; }
-.book-title { font-size: 1.375rem; font-weight: 700; margin: 40px 0 0; }
-.status-live { color: var(--loss); font-weight: 600; }
-.status-schaduw { color: var(--muted); }
-.notes { margin: 0; padding-left: 18px; }
-.notes li { font-size: 0.8125rem; color: var(--muted); line-height: 1.4; }
-.pill { font-size: 0.75rem; padding: 1px 6px; border-radius: 3px; background: var(--soft); color: var(--muted); white-space: nowrap; }
-.pill.live { background: var(--loss); color: #fff; }
-footer { margin-top: 48px; color: var(--muted); font-size: 0.875rem; max-width: 70ch; }
-.notice { padding: 48px 0; max-width: 60ch; }
-.notice h1 { font-size: 1.5rem; margin: 0 0 8px; }
-@media (max-width: 560px) {
-  main { padding: 24px 16px 48px; }
-  .ledger { grid-template-columns: auto auto; column-gap: 16px; justify-content: start; }
-  .ledger .who { grid-column: 1 / -1; margin-top: 8px; }
-  .ledger .amount, .ledger .pct { text-align: left; }
-  .vote { grid-template-columns: 6.5rem 4.5rem 1fr; }
-  .events li { grid-template-columns: 1fr; gap: 2px; }
+/* Posities */
+.positions { padding: 18px 24px 28px; border-top: 1px solid var(--line); }
+.pos-row { display: flex; flex-wrap: wrap; gap: 14px; }
+.pos { min-width: 220px; padding: 12px 14px; border: 1px solid rgba(255, 181, 71, 0.45); background: rgba(255, 181, 71, 0.04); }
+.pos.shadow { border-color: var(--line); background: none; }
+.pos h3 { margin: 0; font-family: var(--cond); font-size: 1.15rem; font-weight: 600; display: flex; justify-content: space-between; gap: 12px; }
+.pos p { margin: 2px 0 0; font-size: 0.82rem; color: var(--muted); }
+.pos .val { font-family: var(--cond); font-size: 1.1rem; color: var(--text); }
+.empty { color: var(--muted); font-size: 0.9rem; margin: 0; }
+.notice { max-width: 60ch; margin: 80px auto; padding: 0 24px; }
+
+@media (max-width: 1100px) {
+  .deck { grid-template-columns: 1fr; }
+  .reactor-wrap { order: -1; position: static; }
+  #reactor { max-height: none; }
+  .roster { border-right: 0; border-top: 1px solid var(--line); }
+  .log { border-left: 0; border-top: 1px solid var(--line); }
+  .team { columns: 2; column-gap: 20px; }
+  .team li { break-inside: avoid; }
+}
+@media (max-width: 620px) {
+  .bar { padding: 12px 16px; gap: 8px 18px; }
+  .brand { width: 100%; }
+  .team { columns: 1; }
+  .coin text { font-size: 22px; }
+  .coin .price { display: none; }
+  .agent .t1 { font-size: 22px; }
+  .agent .t2 { font-size: 17px; }
+  .core-label { font-size: 28px; }
+  .core-sub { font-size: 19px; }
+  .regime-label { font-size: 22px; }
+  .inspect { position: static; width: 100%; margin-top: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .link.buy, .spin, .breathe { animation: none; }
+  .story p.cursor::after { animation: none; }
+  .story.flash { animation: none; }
 }
 </style>
 </head>
 <body>
-<main id="app"><p class="muted">Gegevens laden…</p></main>
+<header class="bar">
+  <div class="brand">
+    <svg viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="11" fill="none" stroke="#8FB3D9" stroke-width="1.5"/><circle cx="13" cy="13" r="5" fill="none" stroke="#FFB547" stroke-width="1.5"/><circle cx="13" cy="2" r="2" fill="#5CF2B3"/></svg>
+    Kraken agents
+  </div>
+  <span class="mode" id="mode">Laden…</span>
+  <div class="kpi"><span>Echt geld</span><b class="money" id="eq">–</b></div>
+  <div class="kpi"><span>Resultaat</span><b id="ret">–</b></div>
+  <div class="kpi"><span>BTC vasthouden</span><b id="bench">–</b></div>
+  <div class="kpi"><span>Markt</span><b id="regime">–</b></div>
+  <div class="kpi"><span>Volgende run</span><b id="nextrun">–</b></div>
+  <div class="kpi"><span>4-uurssluiting</span><b id="next4h">–</b></div>
+  <a href="details.html">Details en cijfers</a>
+</header>
+
+<main class="deck" id="deck">
+  <aside class="roster" aria-label="Het team">
+    <h2>Het team</h2>
+    <ol class="team" id="team"></ol>
+  </aside>
+
+  <section class="reactor-wrap" aria-label="De agents aan het werk">
+    <svg id="reactor" viewBox="-40 -40 1080 1080" role="img" aria-label="Weergave van de agents, de munten en hun adviezen"></svg>
+    <p class="caption" id="caption" aria-live="polite"></p>
+    <p class="hint">Klik op een agent of munt voor de redenering. Dit is een weergave van de laatste run.</p>
+    <div class="inspect" id="inspect" hidden></div>
+  </section>
+
+  <aside class="log" aria-label="Verslag">
+    <h2>Verslag van de laatste run</h2>
+    <div class="story" id="story"></div>
+    <h2 style="margin-top:20px">Logboek</h2>
+    <ul class="events" id="events"></ul>
+    <h2>Risico</h2>
+    <div class="gauges" id="gauges"></div>
+  </aside>
+</main>
+
+<section class="positions" aria-label="Open posities">
+  <h2>Open posities</h2>
+  <div class="pos-row" id="positions"></div>
+</section>
 
 <script>
-const ACTIONS = { buy: "kopen", sell: "negatief", hold: "afwachten" };
+const NS = "http://www.w3.org/2000/svg";
+const C = { cx: 500, cy: 500, coinR: 420, agentR: 238, coreR: 82, shieldR: 128 };
+const SHORT = { "Trend-4u": "Trend-4u", "Dip-koper": "Dip-koper", "Uitbraak-agent": "Uitbraak", "Momentum-agent": "Momentum", "Squeeze-agent": "Squeeze" };
+const ACT = { buy: "kopen", sell: "negatief", hold: "afwachten" };
 const TYPES = { entry: "Gekocht", exit: "Verkocht", blocked: "Tegengehouden", validated: "Gevalideerd", note: "Melding" };
-const BOOK = { live: "echt geld", schaduw: "schaduw" };
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const eur = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" });
-const eur0 = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 const num = (v, d = 2) => new Intl.NumberFormat("nl-NL", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
 const pct = v => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + num(Math.abs(v), 1) + "%";
-const signed = v => (v > 0 ? "+" : v < 0 ? "−" : "") + eur.format(Math.abs(v));
-const cls = v => v > 0 ? "gain" : v < 0 ? "loss" : "";
-const when = ts => new Date(ts * 1000).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-const day = ts => new Date(ts * 1000).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+const price = v => v == null ? "–" : v >= 100 ? eur.format(v) : v >= 1 ? "€ " + num(v, 3) : v >= 0.01 ? "€ " + num(v, 5) : "€ " + num(v, 8);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-const price = v => v == null ? "–" : v >= 100 ? eur.format(v) : v >= 1 ? "€ " + num(v, 4) : v >= 0.01 ? "€ " + num(v, 6) : "€ " + num(v, 8);
-let AG = {};
+const when = ts => new Date(ts * 1000).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const clock = ts => new Date(ts * 1000).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+const el = (tag, attrs = {}, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+const polar = (r, a) => [C.cx + r * Math.cos(a), C.cy + r * Math.sin(a)];
+const hexPoints = (x, y, r) => Array.from({ length: 6 }, (_, i) => { const a = Math.PI / 6 + i * Math.PI / 3; return `${(x + r * Math.cos(a)).toFixed(1)},${(y + r * Math.sin(a)).toFixed(1)}`; }).join(" ");
 
+let D = null, S = {}, lastGen = null, cycleStart = performance.now(), selection = null;
+
+/* ---------- data ---------- */
 async function load() {
   try {
     const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
     if (!res.ok) throw new Error(res.status);
-    render(await res.json());
+    const d = await res.json();
+    const fresh = d.generated_ts !== lastGen;
+    D = d; lastGen = d.generated_ts;
+    if (fresh) { build(); cycleStart = performance.now(); typeStory(); }
   } catch (e) {
-    document.getElementById("app").innerHTML = `<div class="notice"><h1>Nog geen gegevens</h1>
-      <p class="muted">De bot heeft nog niet gedraaid, of GitHub Pages werkt de site nog bij. Start een run via Actions, Trader, Run workflow.</p></div>`;
+    if (!D) document.getElementById("deck").innerHTML = `<div class="notice"><h2>Nog geen gegevens</h2><p>De bot heeft nog niet gedraaid of GitHub Pages werkt de site nog bij. Start een run via Actions, Trader, Run workflow.</p></div>`;
   }
 }
 
-function render(d) {
-  AG = Object.fromEntries(d.agents.map(a => [a.name, a.agent]));
-  const live = d.books.live, sh = d.books.schaduw;
-  const modeHtml = d.mode === "live"
-    ? (d.validate_only ? `<span class="mode validate">Validatiemodus: echt saldo, geen echte orders</span>` : `<span class="mode live">Echt geld: orders worden uitgevoerd op Kraken</span>`)
-    : `<span class="mode paper">Alleen papier</span>`;
-
-  document.getElementById("app").innerHTML = `
-    ${modeHtml}
-    <p class="intro">Laatste run: <strong>${when(d.generated_ts)}</strong>${d.last_run_ok ? "" : ", met meldingen (zie onderaan)"}.
-      Markt: <strong class="regime-${d.regime.label}">${d.regime.label}</strong>. Profiel: <strong>${esc(d.profile)}</strong>. ${d.markets.length} munten gevolgd.</p>
-
-    <div class="story" aria-label="Verslag van de laatste run">${d.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</div>
-
-    ${live ? bookSection("live", "Echt geld", live, d) : ""}
-
-    <section style="margin:40px 0">
-      <h2>Agents</h2>
-      <p class="muted" style="margin-bottom:12px;font-size:.9375rem">Nieuwe agents handelen eerst met schaduwgeld. Na genoeg trades met winst (na kosten) krijgen ze echt geld; wie met echt geld verliest, gaat terug naar de schaduw.</p>
-      ${agentsTable(d.agents)}
-    </section>
-
-    <section style="margin-bottom:40px">
-      <h2>Wat vindt elke agent per munt</h2>
-      ${evaluationGrid(d.evaluations, d.agents)}
-    </section>
-
-    <section style="margin-bottom:40px">
-      <h2>Logboek</h2>
-      ${eventsList(d.events)}
-    </section>
-
-    ${bookSection("schaduw", "Schaduwgeld (papier)", sh, d)}
-
-    ${d.legacy_trades.length ? `<section style="margin:40px 0"><h2>Historie van je oude bot</h2>${legacyTable(d.legacy_trades)}</section>` : ""}
-
-    ${d.errors.length ? `<section><h2>Meldingen</h2><ul class="events errors">${d.errors.map(e =>
-      `<li><span>${when(e.ts)}</span><span>${esc(e.message)}</span></li>`).join("")}</ul></section>` : ""}
-
-    <footer>Kosten (${num(d.fee_pct, 2)}% per order) zijn meegerekend. Resultaten uit het verleden zeggen weinig over de toekomst.</footer>
-  `;
-  if (live) drawChart("chart-live", live.equity_history, live.stats.start);
-  drawChart("chart-schaduw", sh.equity_history, sh.stats.start);
+function lastRunEvents() {
+  return D.events.filter(e => e.ts >= D.generated_ts - 20 * 60);
 }
 
-function bookSection(key, title, b, d) {
-  const s = b.stats, r = b.risk || {}, L = d.risk_limits;
-  const diff = s.benchmark_return_pct == null ? null : s.return_pct - s.benchmark_return_pct;
-  return `
-    <h2 class="book-title">${title}</h2>
-    <div class="ledger">
-      <div class="who"><i class="swatch"></i>Agents</div>
-      <div class="amount">${eur.format(s.equity)}</div>
-      <div class="pct ${cls(s.return_pct)}">${pct(s.return_pct)}</div>
-      <div class="who"><i class="swatch hold"></i>${esc(d.benchmark_market.split("/")[0])} vasthouden</div>
-      <div class="amount dim">${eur.format(s.start * (1 + (s.benchmark_return_pct || 0) / 100))}</div>
-      <div class="pct ${cls(s.benchmark_return_pct)}">${pct(s.benchmark_return_pct)}</div>
-    </div>
-    <p class="verdict">${key === "live" ? `Inleg ${eur.format(s.start)} (${String(d.budget_eur).toLowerCase() === "alles" ? "heel je Kraken-saldo" : "budget " + eur.format(d.budget_eur)}). ` : ""}Vrij: ${eur.format(b.cash)}, belegd: ${eur.format(b.exposure)}.
-      ${diff == null ? "" : diff >= 0 ? `${num(Math.abs(diff), 1)} procentpunt beter dan vasthouden.` : `${num(Math.abs(diff), 1)} procentpunt slechter dan vasthouden.`}</p>
-    ${r.halted ? `<p class="halt"><strong>Noodstop actief.</strong> ${esc(r.halt_reason)}. Zie de README om verder te gaan.</p>` : ""}
-    ${r.trading_enabled === false ? `<p class="halt">Nieuwe aankopen staan uit in config.json. Open posities worden wel bewaakt.</p>` : ""}
-    <div class="chart" id="chart-${key}"></div>
-    <section class="limits">
-      ${limitBar("Verlies vandaag", r.daily_loss_pct || 0, L.max_daily_loss_pct, "Boven de grens: vandaag geen nieuwe trades")}
-      ${limitBar("Onder de hoogste stand", r.drawdown_pct || 0, L.max_drawdown_pct, "Boven de grens: noodstop, alles verkopen")}
-      ${limitBar("Belegd", b.exposure / Math.max(s.equity, 1) * 100, L.max_exposure_pct, "Deel van het vermogen in munten")}
-      ${limitBar("Open posities", b.positions.length, L.max_open_positions, "Meer worden niet toegestaan", true)}
-    </section>
-    <h2>Open posities</h2>
-    ${positionsTable(b.positions, key)}
-    <h2 style="margin-top:32px">Afgesloten trades</h2>
-    <p class="muted" style="margin-bottom:12px;font-size:.9375rem">${s.trades} ${s.trades === 1 ? "trade" : "trades"}${s.win_rate_pct != null ? `, ${num(s.win_rate_pct, 0)}% met winst` : ""}${s.profit_factor != null ? `, winstfactor ${num(s.profit_factor, 2)} (boven 1 is winstgevend)` : ""}.
-      Resultaat ${signed(s.realized_pnl)}, waarvan ${eur.format(s.fees_paid)} kosten. Grootste daling: ${num(s.max_drawdown_pct, 1)}%.</p>
-    ${tradesTable(b.trades)}`;
+/* ---------- opbouw ---------- */
+function build() {
+  const live = D.books.live, st = live ? live.stats : null;
+  const mode = document.getElementById("mode");
+  if (D.mode === "live" && !D.validate_only) { mode.textContent = "Echt geld"; mode.className = "mode live"; }
+  else if (D.mode === "live") { mode.textContent = "Validatiemodus"; mode.className = "mode validate"; }
+  else { mode.textContent = "Papier"; mode.className = "mode validate"; }
+  document.getElementById("eq").textContent = st ? eur.format(st.equity) : "–";
+  const ret = document.getElementById("ret");
+  ret.textContent = st ? pct(st.return_pct) : "–"; ret.className = st && st.return_pct > 0 ? "up" : st && st.return_pct < 0 ? "down" : "";
+  const bench = document.getElementById("bench");
+  bench.textContent = st ? pct(st.benchmark_return_pct) : "–";
+  const rg = document.getElementById("regime");
+  rg.textContent = D.regime.label; rg.className = D.regime.label === "stijgend" ? "up" : D.regime.label === "dalend" ? "down" : "";
+
+  buildReactor();
+  buildTeam();
+  buildEvents();
+  buildGauges();
+  buildPositions();
+  if (selection) select(selection.type, selection.key, true);
+  if (REDUCED) staticView();
 }
 
-function limitBar(label, value, max, note, isCount = false) {
-  const ratio = Math.min(1, max ? value / max : 0);
-  const state = ratio >= 1 ? "full" : ratio >= 0.66 ? "warn" : "";
-  const txt = isCount ? `${value} van ${max}` : `${num(value, 1)}% van max ${num(max, 0)}%`;
-  return `<div class="limit"><p>${label}: <strong>${txt}</strong></p>
-    <div class="bar ${state}" role="img" aria-label="${label} ${txt}"><span style="width:${ratio * 100}%"></span></div>
-    <p class="muted" style="font-size:.8125rem;margin-top:6px">${note}</p></div>`;
-}
+function buildReactor() {
+  const svg = document.getElementById("reactor");
+  svg.innerHTML = "";
+  const defs = el("defs", {}, svg);
+  defs.innerHTML = `
+    <radialGradient id="coreGlow"><stop offset="0%" stop-color="#2C6AA8" stop-opacity=".55"/><stop offset="100%" stop-color="#2C6AA8" stop-opacity="0"/></radialGradient>
+    <linearGradient id="sweepGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#8FB3D9" stop-opacity="0"/><stop offset="100%" stop-color="#8FB3D9" stop-opacity=".22"/></linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
 
-function positionsTable(ps, key) {
-  if (!ps.length) return `<p class="empty">Geen open posities.</p>`;
-  return `<div class="scroll"><table><thead><tr><th>Munt</th><th>Agent</th><th>Waarom gekocht</th><th class="num">Inleg</th><th class="num">Nu</th><th class="num">Stop</th></tr></thead><tbody>
-    ${ps.map(p => `<tr><td><strong>${esc(p.market)}</strong><br><small class="muted">sinds ${when(p.entry_ts)}</small></td>
-      <td>${esc(AG[p.agent] || p.agent)}${p.exit_style === "two_stage" ? `<br><small class="muted">${p.is_runner ? "runner (6 ATR)" : "krap (2 ATR)"}</small>` : ""}</td>
-      <td><small class="muted">${esc(p.entry_reason)}${p.plan && p.plan.risk ? ". " + esc(p.plan.risk) : ""}</small></td>
-      <td class="num">${eur.format(p.entry_cost)}<br><small class="muted">${price(p.entry_price)}</small></td>
-      <td class="num ${cls(p.unrealized)}">${eur.format(p.value)}<br><small>${signed(p.unrealized)}</small></td>
-      <td class="num">${price(p.stop)}${p.exit_style === "two_stage" ? `<br><small class="muted">nood ${price(p.hard_stop)}</small>` : ""}
-        ${key === "live" ? `<br><small class="${p.stop_on_exchange ? "gain" : "loss"}">${p.stop_on_exchange ? "stop staat op Kraken" : "geen stop op Kraken"}</small>` : ""}</td></tr>`).join("")}
-  </tbody></table></div>`;
-}
-
-function agentsTable(as) {
-  return `<div class="scroll"><table><thead><tr><th>Agent</th><th>Geld</th><th class="num">Invloed</th><th class="num">Trades</th><th class="num">Met winst</th><th class="num">Echt</th><th class="num">Schaduw</th><th class="num">Gem. per trade</th></tr></thead><tbody>
-    ${as.map(a => `<tr><td>${esc(a.agent)}<br><small class="muted">${a.horizon === "lang" ? "4-uurscandles" : "15-minutencandles"}</small></td>
-      <td><span class="pill ${a.status === "live" ? "live" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span>${a.promotion_note ? `<br><small class="muted">${esc(a.promotion_note)}</small>` : ""}</td>
-      <td class="num">${num(a.weight, 2)}×</td><td class="num">${a.trades}</td>
-      <td class="num">${a.win_rate_pct != null ? a.win_rate_pct + "%" : "–"}</td>
-      <td class="num ${cls(a.pnl_live)}">${signed(a.pnl_live)}</td>
-      <td class="num ${cls(a.pnl_schaduw)}">${signed(a.pnl_schaduw)}</td>
-      <td class="num ${cls(a.expectancy_r ?? 0)}">${a.expectancy_r != null ? (a.expectancy_r > 0 ? "+" : "") + num(a.expectancy_r, 2) + " R" : "–"}</td></tr>`).join("")}
-  </tbody></table></div>
-  <p class="muted" style="margin-top:8px;font-size:.8125rem">R = resultaat gedeeld door het risico bij instap. −1 R: de stop werd precies geraakt. +3 R: drie keer het risico verdiend.</p>`;
-}
-
-function evaluationGrid(evals, agents) {
-  const markets = Object.keys(evals).sort((a, b) => evals[b].ts - evals[a].ts);
-  if (!markets.length) return `<p class="empty">Nog geen beoordelingen.</p>`;
-  const names = agents.map(a => a.agent);
-  return `<div class="scroll"><table class="grid"><thead><tr><th>Munt</th>${names.map(n => `<th>${esc(n)}</th>`).join("")}<th>Besluit</th></tr></thead><tbody>
-    ${markets.map(m => { const e = evals[m]; return `<tr>
-      <td><strong>${esc(m)}</strong><small>${price(e.price)}<br>${when(e.ts)}</small></td>
-      ${names.map(n => { const s = e.signals[n]; return s ? `<td class="act"><span class="${s.action}">${ACTIONS[s.action]}</span><small>${esc(s.reason)}</small></td>` : "<td>–</td>"; }).join("")}
-      <td><ul class="notes">${(e.notes || []).map(t => `<li>${esc(t)}</li>`).join("")}</ul></td>
-    </tr>`; }).join("")}
-  </tbody></table></div>`;
-}
-
-function eventsList(ev) {
-  if (!ev.length) return `<p class="empty">Nog niets gebeurd.</p>`;
-  return `<ul class="events">${ev.map(e => `<li>
-      <span class="muted">${when(e.ts)}${e.book ? `<br><span class="pill ${e.book === "live" ? "live" : ""}">${BOOK[e.book]}</span>` : ""}</span>
-      <span><span class="what">${TYPES[e.type] || esc(e.type)}${e.market ? " " + esc(e.market) : ""}</span>${e.price ? ` tegen ${price(e.price)}` : ""}${e.pnl != null ? `, <span class="${cls(e.pnl)}">${signed(e.pnl)}</span>` : ""}<br>
-      <span class="muted">${esc(e.reason)}</span></span></li>`).join("")}</ul>`;
-}
-
-function tradesTable(ts) {
-  if (!ts.length) return `<p class="empty">Nog geen afgesloten trades.</p>`;
-  return `<div class="scroll"><table><thead><tr><th>Munt</th><th>Agent</th><th>Gekocht</th><th>Verkocht</th><th class="num">Resultaat</th><th>Waarom verkocht</th></tr></thead><tbody>
-    ${ts.map(t => `<tr><td>${esc(t.market)}</td><td>${esc(AG[t.agent] || t.agent)}</td>
-      <td>${when(t.entry_ts)}<br><small class="muted">${price(t.entry_price)}</small></td>
-      <td>${when(t.exit_ts)}<br><small class="muted">${price(t.exit_price)}</small></td>
-      <td class="num ${cls(t.pnl)}">${signed(t.pnl)}<br><small>${pct(t.pnl_pct)}, ${t.r > 0 ? "+" : ""}${num(t.r, 1)} R</small></td>
-      <td class="muted">${esc(t.exit_reason)}</td></tr>`).join("")}
-  </tbody></table></div>`;
-}
-
-function legacyTable(ts) {
-  return `<div class="scroll"><table><thead><tr><th>Munt</th><th>Verkocht</th><th class="num">Instap</th><th class="num">Uitstap</th><th class="num">Resultaat</th></tr></thead><tbody>
-    ${ts.map(t => `<tr><td>${esc(t.symbol)}${t.was_runner ? ` <span class="pill">runner</span>` : ""}</td><td>${t.exit_time ? new Date(t.exit_time).toLocaleDateString("nl-NL", { day: "numeric", month: "short" }) : "–"}</td>
-      <td class="num">${price(t.entry_price)}</td><td class="num">${price(t.exit_price)}</td>
-      <td class="num ${cls(t.pnl_pct)}">${pct(t.pnl_pct)}</td></tr>`).join("")}
-  </tbody></table></div><p class="muted" style="margin-top:8px;font-size:.8125rem">Percentages zonder kosten, zoals je oude bot ze bijhield.</p>`;
-}
-
-function drawChart(id, hist, start) {
-  const box = document.getElementById(id);
-  if (!box) return;
-  if (hist.length < 2) { box.innerHTML = `<p class="empty">De grafiek verschijnt na de tweede run.</p>`; return; }
-  box.innerHTML = `<div class="tip"></div>`;
-  const tip = box.querySelector(".tip");
-  const W = Math.max(320, box.clientWidth), H = 240, P = { l: 72, r: 8, t: 12, b: 28 };
-  const vals = hist.flatMap(p => [p.equity, p.benchmark ?? p.equity]).concat(start);
-  let lo = Math.min(...vals), hi = Math.max(...vals);
-  const pad = (hi - lo) * 0.08 || Math.max(start, 1) * 0.01; lo -= pad; hi += pad;
-  const t0 = hist[0].ts, t1 = hist[hist.length - 1].ts;
-  const x = t => P.l + (t - t0) / (t1 - t0 || 1) * (W - P.l - P.r);
-  const y = v => P.t + (1 - (v - lo) / (hi - lo)) * (H - P.t - P.b);
-  const path = key => hist.filter(p => p[key] != null).map((p, i) => `${i ? "L" : "M"}${x(p.ts).toFixed(1)},${y(p[key]).toFixed(1)}`).join("");
-  const fmt = (hi - lo) < 20 ? eur : eur0;
-  let grid = "";
-  for (let i = 0; i <= 4; i++) {
-    const v = lo + (hi - lo) * i / 4;
-    grid += `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${P.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt.format(v)}</text>`;
+  // achtergrond: ringen, maatstreepjes, kruis
+  const bg = el("g", {}, svg);
+  const ticks = el("g", { class: "spin" }, svg);
+  [C.shieldR, C.agentR, 330, C.coinR, 470].forEach(r => el("circle", { cx: C.cx, cy: C.cy, r, class: "ring" }, bg));
+  for (let i = 0; i < 120; i++) {
+    const a = i / 120 * Math.PI * 2, long = i % 10 === 0;
+    const [x1, y1] = polar(470, a), [x2, y2] = polar(long ? 452 : 462, a);
+    el("line", { x1, y1, x2, y2, class: "tick", "stroke-width": long ? 1.6 : 1 }, ticks);
   }
-  const dates = [t0, (t0 + t1) / 2, t1].map((t, i) => `<text class="axis" x="${x(t)}" y="${H - 6}" text-anchor="${["start", "middle", "end"][i]}">${new Date(t * 1000).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}</text>`).join("");
-  box.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px" role="img" aria-label="Verloop van het vermogen">
-    ${grid}${dates}
-    <line x1="${P.l}" x2="${W - P.r}" y1="${y(start)}" y2="${y(start)}" stroke="var(--muted)" stroke-dasharray="2 4"/>
-    <path d="${path("benchmark")}" fill="none" stroke="var(--hold)" stroke-width="2" stroke-dasharray="6 5"/>
-    <path d="${path("equity")}" fill="none" stroke="var(--agents)" stroke-width="2.5"/>
-    <line class="cross" y1="${P.t}" y2="${H - P.b}" stroke="var(--muted)" visibility="hidden"/>
-    <rect class="hit" x="${P.l}" y="0" width="${W - P.l - P.r}" height="${H}" fill="transparent"/></svg>`);
-  const svg = box.querySelector("svg"), cross = svg.querySelector(".cross"), hit = svg.querySelector(".hit");
-  hit.addEventListener("pointermove", e => {
-    const rect = svg.getBoundingClientRect();
-    const t = t0 + ((e.clientX - rect.left) / rect.width * W - P.l) / (W - P.l - P.r) * (t1 - t0);
-    let best = hist[0];
-    for (const p of hist) if (Math.abs(p.ts - t) < Math.abs(best.ts - t)) best = p;
-    const cx = x(best.ts);
-    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.setAttribute("visibility", "visible");
-    tip.style.display = "block";
-    tip.style.left = Math.min(rect.width - 170, Math.max(170, cx / W * rect.width)) + "px";
-    tip.textContent = `${when(best.ts)}   Agents ${eur.format(best.equity)}` + (best.benchmark != null ? `   Vasthouden ${eur.format(best.benchmark)}` : "");
+  el("line", { x1: C.cx - 470, y1: C.cy, x2: C.cx + 470, y2: C.cy, class: "ring" }, bg);
+  el("line", { x1: C.cx, y1: C.cy - 470, x2: C.cx, y2: C.cy + 470, class: "ring" }, bg);
+
+  // Markt-agent: halo in de kleur van de marktfase
+  const regColor = D.regime.label === "stijgend" ? "var(--buy)" : D.regime.label === "dalend" ? "var(--neg)" : "var(--steel)";
+  el("circle", { cx: C.cx, cy: C.cy, r: 490, fill: "none", stroke: regColor, "stroke-width": 2, opacity: .45, "stroke-dasharray": "2 10" }, bg);
+  const rl = el("text", { x: C.cx, y: C.cy - 504, "text-anchor": "middle", class: "regime-label", fill: regColor }, bg);
+  rl.textContent = `Markt-agent: ${D.regime.label}`;
+
+  // Data-agent: radarstraal
+  S.sweep = el("path", { d: `M${C.cx},${C.cy} L${C.cx + 470},${C.cy} A470,470 0 0,0 ${polar(470, -0.55)[0]},${polar(470, -0.55)[1]} Z`, fill: "url(#sweepGrad)", opacity: REDUCED ? 0 : 1 }, svg);
+
+  // posities en agents
+  const agents = D.agents;
+  S.agentPos = {};
+  agents.forEach((a, i) => { const ang = -Math.PI / 2 + i * 2 * Math.PI / agents.length; S.agentPos[a.agent] = polar(C.agentR, ang); });
+  S.coinPos = {}; S.coinAng = {};
+  D.markets.forEach((m, i) => { const ang = -Math.PI / 2 + (i + 0.5) * 2 * Math.PI / D.markets.length; S.coinAng[m] = ang; S.coinPos[m] = polar(C.coinR, ang); });
+
+  // verbindingen agent -> munt, gekleurd naar advies
+  S.links = el("g", {}, svg);
+  S.linkEls = [];
+  for (const m of D.markets) {
+    const e = D.evaluations[m]; if (!e) continue;
+    for (const a of agents) {
+      const s = e.signals[a.agent]; if (!s) continue;
+      const [x1, y1] = S.agentPos[a.agent], [x2, y2] = S.coinPos[m];
+      const ln = el("line", { x1, y1, x2, y2, class: `link ${s.action}` }, S.links);
+      ln.dataset.agent = a.agent; ln.dataset.coin = m;
+      S.linkEls.push({ ln, agent: a.agent, coin: m, action: s.action });
+    }
+  }
+
+  // Uitvoer-agent: stralen naar munten met een order in de laatste run
+  S.beams = el("g", {}, svg);
+  S.beamEls = [];
+  const traded = {};
+  lastRunEvents().filter(e => ["entry", "exit", "validated"].includes(e.type) && S.coinPos[e.market])
+    .forEach(e => { traded[e.market] = traded[e.market] === "live" ? "live" : (e.book || "schaduw"); });
+  Object.entries(traded).forEach(([m, book]) => {
+    const [x, y] = S.coinPos[m], real = book === "live";
+    S.beamEls.push(el("line", { x1: C.cx, y1: C.cy, x2: x, y2: y, stroke: real ? "var(--money)" : "var(--steel)", "stroke-width": real ? 3.5 : 2,
+      "stroke-dasharray": real ? "none" : "6 6", opacity: 0, filter: real ? "url(#glow)" : "none", "stroke-linecap": "round" }, S.beams));
   });
-  hit.addEventListener("pointerleave", () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); });
+
+  // Risico-agent: schild rond de kern
+  S.shield = el("polygon", { points: hexPoints(C.cx, C.cy, C.shieldR), fill: "none", stroke: "var(--steel)", "stroke-width": 1.5, "stroke-dasharray": "8 6", opacity: .5 }, svg);
+  const sl = el("text", { x: C.cx, y: C.cy + C.shieldR + 22, "text-anchor": "middle", class: "core-sub" }, svg);
+  sl.textContent = "Risico-agent";
+
+  // Beslis-agent: kern
+  el("circle", { cx: C.cx, cy: C.cy, r: C.coreR * 1.9, fill: "url(#coreGlow)", class: "breathe" }, svg);
+  S.core = el("circle", { cx: C.cx, cy: C.cy, r: C.coreR, fill: "#0F2236", stroke: "var(--steel)", "stroke-width": 2 }, svg);
+  const buys = S.linkEls.filter(l => l.action === "buy").length;
+  const cl = el("text", { x: C.cx, y: C.cy - 4, class: "core-label" }, svg); cl.textContent = "Beslis-agent";
+  const cs = el("text", { x: C.cx, y: C.cy + 22, class: "core-sub" }, svg);
+  cs.textContent = buys === 1 ? "1 koopadvies" : `${buys} koopadviezen`;
+
+  // munten
+  const livePos = D.books.live ? Object.fromEntries(D.books.live.positions.map(p => [p.market, p])) : {};
+  const shPos = Object.fromEntries(D.books.schaduw.positions.map(p => [p.market, p]));
+  S.coinEls = {};
+  for (const m of D.markets) {
+    const [x, y] = S.coinPos[m];
+    const g = el("g", { class: "coin", tabindex: 0, role: "button", "aria-label": `${m}: bekijk de adviezen` }, svg);
+    if (livePos[m]) el("circle", { cx: x, cy: y, r: 37, fill: "none", stroke: "var(--money)", "stroke-width": 2.5, filter: "url(#glow)" }, g);
+    else if (shPos[m]) el("circle", { cx: x, cy: y, r: 37, fill: "none", stroke: "var(--steel)", "stroke-width": 1.5, "stroke-dasharray": "4 4" }, g);
+    el("circle", { cx: x, cy: y, r: 29, class: "body" }, g);
+    const t = el("text", { x, y }, g); t.textContent = m.split("/")[0];
+    const outward = polar(C.coinR + 50, S.coinAng[m]);
+    const p = el("text", { x: outward[0], y: outward[1], class: "price" }, g);
+    p.textContent = livePos[m] ? `${livePos[m].unrealized >= 0 ? "+" : "−"}${eur.format(Math.abs(livePos[m].unrealized))}` : "";
+    if (livePos[m]) p.setAttribute("style", `fill:${livePos[m].unrealized >= 0 ? "var(--buy)" : "var(--neg)"}`);
+    g.addEventListener("click", ev => { ev.stopPropagation(); select("coin", m); });
+    g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select("coin", m); } });
+    S.coinEls[m] = g;
+  }
+
+  // agents
+  S.agentEls = {};
+  for (const a of agents) {
+    const [x, y] = S.agentPos[a.agent];
+    const real = a.status === "live";
+    const g = el("g", { class: `agent ${real ? "real" : "shadow"}`, tabindex: 0, role: "button", "aria-label": `${a.agent}: bekijk de adviezen` }, svg);
+    const r = 56 + Math.max(-10, Math.min(14, (a.weight - 1) * 20));
+    const halo = el("polygon", { points: hexPoints(x, y, r + 10), fill: "none", stroke: real ? "var(--money)" : "var(--steel)", "stroke-width": 2, opacity: 0, filter: "url(#glow)" }, g);
+    el("polygon", { points: hexPoints(x, y, r), class: "body" }, g);
+    const t1 = el("text", { x, y: y - 9, class: "t1" }, g); t1.textContent = SHORT[a.agent] || a.agent;
+    const t2 = el("text", { x, y: y + 16, class: "t2" }, g); t2.textContent = `${real ? "echt geld" : "schaduw"}, ${num(a.weight, 2)}×`;
+    g.addEventListener("click", ev => { ev.stopPropagation(); select("agent", a.agent); });
+    g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select("agent", a.agent); } });
+    S.agentEls[a.agent] = { g, halo };
+  }
+
+  // deeltjes
+  S.particles = el("g", {}, svg);
+  S.p1 = S.linkEls.map(l => ({ l, c: el("circle", { r: 3.2, fill: l.action === "buy" ? "var(--buy)" : l.action === "sell" ? "var(--neg)" : "var(--steel)", opacity: 0 }, S.particles), delay: Math.random() * 1.6 }));
+  S.p2 = S.linkEls.filter(l => l.action === "buy").map(l => ({ l, c: el("circle", { r: 5, fill: "var(--buy)", opacity: 0, filter: "url(#glow)" }, S.particles), delay: Math.random() * 0.6 }));
+
+  svg.onclick = () => clearSelection();
 }
 
-let lastWidth = window.innerWidth;
-window.addEventListener("resize", () => { if (Math.abs(window.innerWidth - lastWidth) > 40) { lastWidth = window.innerWidth; load(); } });
+function teamRows() {
+  const live = D.books.live, ev = lastRunEvents(), errs = D.errors.filter(e => e.ts === D.generated_ts);
+  const buys = Object.values(D.evaluations).reduce((n, e) => n + Object.values(e.signals).filter(s => s.action === "buy").length, 0);
+  const entries = ev.filter(e => e.type === "entry"), exits = ev.filter(e => e.type === "exit"), blocked = ev.filter(e => e.type === "blocked");
+  const r = live ? live.risk || {} : {}, L = D.risk_limits;
+  const stops = live ? live.positions.filter(p => p.stop_on_exchange).length : 0;
+  return {
+    data: { name: "Data-agent", now: `${D.markets.length} munten gescand om ${clock(D.generated_ts)}${errs.length ? `, ${errs.length} melding(en)` : ""}`, glyph: "data" },
+    markt: { name: "Markt-agent", now: `Markt ${D.regime.label}. ${D.regime.reason}`, glyph: "markt" },
+    prestatie: { name: "Prestatie-agent", now: `${D.agents.filter(a => a.status === "live").length} van ${D.agents.length} strategie-agents handelen met echt geld`, glyph: "prestatie" },
+    beslis: { name: "Beslis-agent", now: buys ? `${buys} koopadvies${buys > 1 ? "en" : ""} gewogen` : "Geen koopadvies om te wegen", glyph: "beslis" },
+    risico: { name: "Risico-agent", now: r.halted ? `Noodstop actief: ${r.halt_reason}` : `Verlies vandaag ${num(r.daily_loss_pct || 0, 1)}% van ${L.max_daily_loss_pct}%${blocked.length ? `, ${blocked.length} tegengehouden` : ""}`, glyph: "risico" },
+    uitvoer: { name: "Uitvoer-agent", now: entries.length || exits.length ? `${entries.length} gekocht, ${exits.length} verkocht` : `Geen orders. ${stops} stop-loss${stops === 1 ? "" : "es"} op Kraken`, glyph: "uitvoer" },
+    monitor: { name: "Monitor-agent", now: `Verslag bijgewerkt om ${clock(D.generated_ts)}`, glyph: "monitor" },
+  };
+}
+
+function glyph(kind, color) {
+  const c = color || "#8FB3D9";
+  const shapes = {
+    data: `<circle cx="13" cy="13" r="10" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M13 13 L22 8" stroke="${c}" stroke-width="2"/>`,
+    markt: `<path d="M3 19 L9 12 L13 15 L22 6" fill="none" stroke="${c}" stroke-width="2"/>`,
+    prestatie: `<rect x="4" y="14" width="4" height="8" fill="${c}"/><rect x="11" y="9" width="4" height="13" fill="${c}"/><rect x="18" y="4" width="4" height="18" fill="${c}"/>`,
+    beslis: `<circle cx="13" cy="13" r="9" fill="none" stroke="${c}" stroke-width="2"/><circle cx="13" cy="13" r="3" fill="${c}"/>`,
+    risico: `<polygon points="${hexPoints(13, 13, 10).replace(/(\d+\.\d)/g, m => m)}" fill="none" stroke="${c}" stroke-width="2"/>`,
+    uitvoer: `<path d="M4 13 H20 M14 7 L20 13 L14 19" fill="none" stroke="${c}" stroke-width="2"/>`,
+    monitor: `<rect x="4" y="5" width="18" height="16" fill="none" stroke="${c}" stroke-width="1.5"/><path d="M8 10 H18 M8 14 H15" stroke="${c}" stroke-width="1.5"/>`,
+    strat: `<polygon points="${hexPoints(13, 13, 10)}" fill="none" stroke="${c}" stroke-width="2"/>`,
+  };
+  return `<svg class="glyph" viewBox="0 0 26 26" aria-hidden="true">${shapes[kind]}</svg>`;
+}
+
+function buildTeam() {
+  const rows = teamRows();
+  const strat = D.agents.map(a => {
+    const counts = { buy: 0, sell: 0, hold: 0 };
+    Object.values(D.evaluations).forEach(e => { const s = e.signals[a.agent]; if (s) counts[s.action]++; });
+    const real = a.status === "live";
+    const now = counts.buy ? `Wil kopen: ${Object.entries(D.evaluations).filter(([, e]) => e.signals[a.agent]?.action === "buy").map(([m]) => m.split("/")[0]).join(", ")}`
+      : `${counts.hold} munten afwachten, ${counts.sell} negatief`;
+    return `<li data-key="${esc(a.agent)}" data-phase="strategie" tabindex="0">
+      ${glyph("strat", real ? "#FFB547" : "#8FB3D9")}
+      <span class="name">${esc(a.agent)} <span class="chip ${real ? "real" : ""}">${real ? "echt geld" : "schaduw"}</span></span>
+      <span class="now">${esc(now)}${a.trades ? `. ${a.trades} trades, gem. ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r ?? 0, 2)}R` : ""}${a.promotion_note ? `. ${esc(a.promotion_note)}` : ""}</span></li>`;
+  }).join("");
+  const sys = ["data", "markt"].map(k => sysRow(k, rows[k])).join("") ;
+  const after = ["prestatie", "beslis", "risico", "uitvoer", "monitor"].map(k => sysRow(k, rows[k])).join("");
+  document.getElementById("team").innerHTML = sys + `<li class="sep" aria-hidden="true">Strategie-agents</li>` + strat + `<li class="sep" aria-hidden="true">Beslissen en uitvoeren</li>` + after;
+  document.querySelectorAll(".team li[data-key]").forEach(li => {
+    li.addEventListener("click", () => select("agent", li.dataset.key));
+    li.addEventListener("keydown", ev => { if (ev.key === "Enter") select("agent", li.dataset.key); });
+  });
+}
+function sysRow(k, r) {
+  return `<li data-phase="${k}">${glyph(r.glyph)}<span class="name">${r.name}<span class="work">aan het werk</span></span><span class="now">${esc(r.now)}</span></li>`;
+}
+
+function buildEvents() {
+  const errs = D.errors.filter(e => e.ts === D.generated_ts).slice(0, 3).map(e => `<li><span class="when">${when(e.ts)}</span><br><span class="err">${esc(e.message)}</span></li>`).join("");
+  const ev = D.events.slice(0, 12).map(e => `<li><span class="when">${when(e.ts)}${e.book === "live" ? ' <span class="real">echt geld</span>' : e.book === "schaduw" ? " schaduw" : ""}</span><br>
+    <span class="what">${TYPES[e.type] || esc(e.type)}${e.market ? " " + esc(e.market) : ""}</span>${e.pnl != null ? ` <span class="${e.pnl >= 0 ? "up" : "down"}">${e.pnl >= 0 ? "+" : "−"}${eur.format(Math.abs(e.pnl))}</span>` : ""}<br>
+    <span style="color:var(--muted)">${esc(e.reason)}</span></li>`).join("");
+  document.getElementById("events").innerHTML = errs + ev || `<li class="empty">Nog niets gebeurd.</li>`;
+}
+
+function arc(ratio, color) {
+  const r = 40, cx = 55, cy = 52, a0 = Math.PI, a1 = Math.PI + Math.PI * Math.min(1, ratio);
+  const p = a => [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  const [x0, y0] = p(a0), [x1, y1] = p(a1), [xe, ye] = p(2 * Math.PI);
+  return `<svg viewBox="0 0 110 62" aria-hidden="true"><path d="M${x0},${y0} A${r},${r} 0 0,1 ${xe},${ye}" fill="none" stroke="rgba(143,179,217,.18)" stroke-width="8"/>
+    ${ratio > 0 ? `<path d="M${x0},${y0} A${r},${r} 0 0,1 ${x1},${y1}" fill="none" stroke="${color}" stroke-width="8"/>` : ""}</svg>`;
+}
+function buildGauges() {
+  const live = D.books.live || D.books.schaduw, r = live.risk || {}, L = D.risk_limits, s = live.stats;
+  const g = (label, v, max, unit = "%") => {
+    const ratio = max ? v / max : 0;
+    const color = ratio >= 1 ? "var(--neg)" : ratio >= 0.66 ? "var(--money)" : "var(--steel)";
+    return `<div class="gauge">${arc(ratio, color)}<b>${num(v, 1)}${unit}</b><p>${label}<br>grens ${num(max, 0)}${unit}</p></div>`;
+  };
+  document.getElementById("gauges").innerHTML =
+    g("Verlies vandaag", r.daily_loss_pct || 0, L.max_daily_loss_pct) +
+    g("Onder de top", r.drawdown_pct || 0, L.max_drawdown_pct) +
+    g("Belegd", live.exposure / Math.max(s.equity, 1) * 100, L.max_exposure_pct);
+}
+
+function buildPositions() {
+  const live = D.books.live ? D.books.live.positions : [], sh = D.books.schaduw.positions;
+  const card = (p, real) => `<div class="pos ${real ? "" : "shadow"}"><h3>${esc(p.market)} <span class="${p.unrealized >= 0 ? "up" : "down"}">${p.unrealized >= 0 ? "+" : "−"}${eur.format(Math.abs(p.unrealized))}</span></h3>
+    <p><span class="val">${eur.format(p.value)}</span> ${real ? "echt geld" : "schaduw"}, ${esc(D.agents.find(a => a.name === p.agent)?.agent || p.agent)}</p>
+    <p>Stop ${price(p.stop)}${real ? (p.stop_on_exchange ? ", staat op Kraken" : ", nog niet op Kraken") : ""}${p.is_runner ? ", runner" : ""}</p></div>`;
+  const html = live.map(p => card(p, true)).join("") + sh.map(p => card(p, false)).join("");
+  document.getElementById("positions").innerHTML = html || `<p class="empty">Geen open posities. De agents wachten op een kans.</p>`;
+}
+
+/* ---------- verslag met typemachine ---------- */
+let typing = null;
+function typeStory() {
+  const box = document.getElementById("story");
+  const lines = D.narrative;
+  if (typing) clearInterval(typing);
+  if (REDUCED) { box.innerHTML = lines.map(l => `<p>${esc(l)}</p>`).join(""); return; }
+  box.innerHTML = ""; let li = 0, ci = 0, p = null;
+  typing = setInterval(() => {
+    if (li >= lines.length) { clearInterval(typing); if (p) p.classList.remove("cursor"); return; }
+    if (!p) { p = document.createElement("p"); p.className = "cursor"; box.appendChild(p); }
+    ci += 3; p.textContent = lines[li].slice(0, ci);
+    if (ci >= lines[li].length) { p.classList.remove("cursor"); p = null; li++; ci = 0; }
+  }, 18);
+}
+
+/* ---------- selectie en redenering ---------- */
+function select(type, key, keep) {
+  if (!keep && selection && selection.type === type && selection.key === key) return clearSelection();
+  selection = { type, key };
+  const svg = document.getElementById("reactor");
+  svg.classList.add("dim");
+  S.linkEls.forEach(l => l.ln.classList.toggle("on", type === "agent" ? l.agent === key : l.coin === key));
+  Object.entries(S.agentEls).forEach(([k, a]) => a.g.classList.toggle("sel", type === "agent" && k === key));
+  Object.entries(S.coinEls).forEach(([k, g]) => g.classList.toggle("sel", type === "coin" && k === key));
+  document.querySelectorAll(".team li[data-key]").forEach(li => li.classList.toggle("selected", type === "agent" && li.dataset.key === key));
+  const box = document.getElementById("inspect");
+  if (type === "coin") {
+    const e = D.evaluations[key];
+    const pos = (D.books.live?.positions || []).find(p => p.market === key);
+    box.innerHTML = `<button class="close" aria-label="Sluiten">×</button><h3>${esc(key)}</h3>
+      <p class="sub">${e ? `${price(e.price)}, beoordeeld ${when(e.ts)}` : "Nog niet beoordeeld"}${pos ? `. Open positie: ${eur.format(pos.value)}` : ""}</p>
+      <ul>${e ? Object.entries(e.signals).map(([a, s]) => `<li><b>${esc(a)}</b>: <span class="act-${s.action}">${ACT[s.action]}</span><br>${esc(s.reason)}</li>`).join("") : ""}
+      ${e ? (e.notes || []).map(n => `<li style="color:var(--muted)">${esc(n)}</li>`).join("") : ""}</ul>`;
+  } else {
+    const a = D.agents.find(x => x.agent === key);
+    const items = Object.entries(D.evaluations).map(([m, e]) => [m, e.signals[key]]).filter(([, s]) => s)
+      .sort((x, y) => ({ buy: 0, sell: 1, hold: 2 })[x[1].action] - ({ buy: 0, sell: 1, hold: 2 })[y[1].action]);
+    box.innerHTML = `<button class="close" aria-label="Sluiten">×</button><h3>${esc(key)}</h3>
+      <p class="sub">${a.status === "live" ? "Handelt met echt geld" : "Handelt met schaduwgeld"}. Invloed ${num(a.weight, 2)}×, ${a.trades} trades${a.expectancy_r != null ? `, gemiddeld ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r, 2)}R` : ""}.</p>
+      <ul>${items.map(([m, s]) => `<li><b>${esc(m)}</b>: <span class="act-${s.action}">${ACT[s.action]}</span><br>${esc(s.reason)}</li>`).join("")}</ul>`;
+  }
+  box.hidden = false;
+  box.querySelector(".close").onclick = ev => { ev.stopPropagation(); clearSelection(); };
+}
+function clearSelection() {
+  selection = null;
+  document.getElementById("reactor").classList.remove("dim");
+  S.linkEls?.forEach(l => l.ln.classList.remove("on"));
+  Object.values(S.agentEls || {}).forEach(a => a.g.classList.remove("sel"));
+  Object.values(S.coinEls || {}).forEach(g => g.classList.remove("sel"));
+  document.querySelectorAll(".team li").forEach(li => li.classList.remove("selected"));
+  document.getElementById("inspect").hidden = true;
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") clearSelection(); });
+
+/* ---------- de cyclus: agents aan het werk ---------- */
+const PHASES = [
+  { key: "data", until: 3.0 }, { key: "strategie", until: 6.5 }, { key: "beslis", until: 9.0 },
+  { key: "risico", until: 10.8 }, { key: "uitvoer", until: 12.6 }, { key: "monitor", until: 14.0 },
+];
+function captions() {
+  const ev = lastRunEvents();
+  const buys = S.linkEls.filter(l => l.action === "buy"), negs = S.linkEls.filter(l => l.action === "sell");
+  const ent = ev.filter(e => e.type === "entry"), ex = ev.filter(e => e.type === "exit"), val = ev.filter(e => e.type === "validated"), bl = ev.filter(e => e.type === "blocked");
+  const live = D.books.live, stops = live ? live.positions.filter(p => p.stop_on_exchange).length : 0;
+  return {
+    data: `Data-agent scant ${D.markets.length} munten op Kraken`,
+    strategie: `${D.agents.length} strategie-agents beoordelen elke munt: ${buys.length}× kopen, ${negs.length}× negatief`,
+    beslis: buys.length ? `Beslis-agent weegt ${buys.map(l => `${l.agent} op ${l.coin.split("/")[0]}`).join(", ")}` : "Beslis-agent: geen koopadvies, niets te beslissen",
+    risico: ent.length ? `Risico-agent keurt goed: ${ent.map(e => e.market.split("/")[0] + (e.book === "live" ? " (echt geld)" : " (schaduw)")).join(", ")}` : val.length ? `Risico-agent keurt goed: ${val.map(e => e.market.split("/")[0]).join(", ")} (validatie)` : bl.length ? `Risico-agent houdt ${bl.map(e => e.market.split("/")[0]).join(", ")} tegen` : "Risico-agent: limieten in orde, niets te keuren",
+    uitvoer: ent.length || ex.length ? `Uitvoer-agent ${[...ent.map(e => "koopt " + e.market.split("/")[0]), ...ex.map(e => "verkoopt " + e.market.split("/")[0])].map((t, i) => t + ([...ent, ...ex][i].book === "live" ? " op Kraken" : " op papier")).join(", ")}` : val.length ? `Uitvoer-agent laat Kraken de order keuren` : `Uitvoer-agent: geen orders, ${stops} stop-loss${stops === 1 ? "" : "es"} op Kraken bewaakt`,
+    monitor: "Monitor-agent schrijft het verslag",
+  };
+}
+const PHASE_NAME = { data: "Waarnemen", strategie: "Analyseren", beslis: "Beslissen", risico: "Controleren", uitvoer: "Uitvoeren", monitor: "Rapporteren" };
+
+function setActive(phase) {
+  document.querySelectorAll(".team li").forEach(li => li.classList.toggle("active", li.dataset.phase === phase));
+}
+
+let lastPhase = null;
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (!D || !S.linkEls) return;
+  const t = ((now - cycleStart) / 1000) % 14;
+  const phase = PHASES.find(p => t < p.until).key;
+  if (phase !== lastPhase) {
+    lastPhase = phase;
+    const cap = captions();
+    document.getElementById("caption").innerHTML = `<span class="phase">${PHASE_NAME[phase]}</span>${esc(cap[phase])}`;
+    setActive(phase);
+    if (phase === "monitor") { const s = document.getElementById("story"); s.classList.remove("flash"); void s.offsetWidth; s.classList.add("flash"); }
+  }
+
+  // Data-agent: radar
+  const sweepA = phase === "data" ? (t / 3) * Math.PI * 2 - Math.PI / 2 : null;
+  S.sweep.setAttribute("opacity", sweepA === null ? 0 : 1);
+  if (sweepA !== null) S.sweep.setAttribute("transform", `rotate(${sweepA * 180 / Math.PI} ${C.cx} ${C.cy})`);
+  for (const [m, g] of Object.entries(S.coinEls)) {
+    let lit = false;
+    if (sweepA !== null) { let dA = ((sweepA - S.coinAng[m]) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI); lit = dA < 0.6; }
+    g.classList.toggle("lit", lit);
+  }
+
+  // Strategie: deeltjes munt -> agent
+  const t1 = (t - 3) / 3.5;
+  S.p1.forEach(p => {
+    const k = (t1 * 3.5 - p.delay) / 1.6;
+    if (phase !== "strategie" || k < 0 || k > 1) { p.c.setAttribute("opacity", 0); return; }
+    const [ax, ay] = S.agentPos[p.l.agent], [cx, cy] = S.coinPos[p.l.coin];
+    p.c.setAttribute("cx", cx + (ax - cx) * k); p.c.setAttribute("cy", cy + (ay - cy) * k);
+    p.c.setAttribute("opacity", p.l.action === "hold" ? 0.35 : 0.9);
+  });
+  for (const [k, a] of Object.entries(S.agentEls)) {
+    const on = phase === "strategie" ? 0.35 + 0.35 * Math.sin(now / 160 + k.length) : 0;
+    a.halo.setAttribute("opacity", Math.max(0, on));
+  }
+
+  // Beslissen: koopadviezen naar de kern
+  const t2 = t - 6.5;
+  S.p2.forEach(p => {
+    const k = (t2 - p.delay) / 1.4;
+    if (phase !== "beslis" || k < 0 || k > 1) { p.c.setAttribute("opacity", 0); return; }
+    const [ax, ay] = S.agentPos[p.l.agent];
+    p.c.setAttribute("cx", ax + (C.cx - ax) * k); p.c.setAttribute("cy", ay + (C.cy - ay) * k); p.c.setAttribute("opacity", 1);
+  });
+  S.core.setAttribute("stroke", phase === "beslis" ? "var(--text)" : "var(--steel)");
+  S.core.setAttribute("stroke-width", phase === "beslis" ? 2 + 2 * Math.abs(Math.sin(now / 200)) : 2);
+
+  // Risico: schild
+  const ev = lastRunEvents();
+  const shieldColor = ev.some(e => e.type === "entry" || e.type === "validated") ? "var(--buy)" : ev.some(e => e.type === "blocked") ? "var(--money)" : "var(--steel)";
+  S.shield.setAttribute("stroke", phase === "risico" ? shieldColor : "var(--steel)");
+  S.shield.setAttribute("opacity", phase === "risico" ? 0.6 + 0.4 * Math.abs(Math.sin(now / 150)) : 0.45);
+  S.shield.setAttribute("stroke-width", phase === "risico" ? 3 : 1.5);
+  S.shield.setAttribute("transform", `rotate(${(now / 120) % 360} ${C.cx} ${C.cy})`);
+
+  // Uitvoeren: stralen
+  S.beamEls.forEach(b => b.setAttribute("opacity", phase === "uitvoer" ? 0.5 + 0.5 * Math.abs(Math.sin(now / 140)) : 0));
+}
+
+function staticView() {
+  // Zonder beweging: alles in eindstand, bijschriften als lijst
+  const cap = captions();
+  document.getElementById("caption").innerHTML = Object.entries(cap).map(([k, v]) => `<span class="phase">${PHASE_NAME[k]}</span>${esc(v)}`).join("<br>");
+}
+
+/* ---------- klokken ---------- */
+function tickClocks() {
+  const now = Date.now() / 1000;
+  const d = new Date(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
+  const slots = [3, 18, 33, 48];
+  let next = slots.find(x => x > m || (x === m && s === 0));
+  let mins = next !== undefined ? next - m : 60 - m + slots[0];
+  let secs = mins * 60 - s;
+  document.getElementById("nextrun").textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+  const n4 = Math.ceil(now / 14400) * 14400 - now;
+  const h = Math.floor(n4 / 3600), mm = Math.floor((n4 % 3600) / 60);
+  document.getElementById("next4h").textContent = `${h}:${String(mm).padStart(2, "0")}`;
+}
+
 load();
-setInterval(load, 5 * 60 * 1000);
+setInterval(load, 60 * 1000);
+setInterval(tickClocks, 1000); tickClocks();
+if (REDUCED) { const iv = setInterval(() => { if (D) { staticView(); clearInterval(iv); } }, 300); }
+else requestAnimationFrame(frame);
 </script>
 </body>
 </html>

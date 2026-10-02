@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kraken agents: details</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #EEF1F3; --ink: #1B2530; --muted: #5E6B78; --rule: #CBD3DA; --soft: #DDE3E8;
+  --agents: #1E4FA8; --hold: #8994A0; --gain: #1D7348; --loss: #A9322A; --warn: #9A6400;
+  --font: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141A21; --ink: #E3E8ED; --muted: #95A1AD; --rule: #2F3944; --soft: #222B34;
+    --agents: #83A8F0; --hold: #6B7784; --gain: #5BC38C; --loss: #EF7F72; --warn: #E0B35A;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141A21; --ink: #E3E8ED; --muted: #95A1AD; --rule: #2F3944; --soft: #222B34;
+  --agents: #83A8F0; --hold: #6B7784; --gain: #5BC38C; --loss: #EF7F72; --warn: #E0B35A;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: 16px; line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+main { max-width: 1120px; margin: 0 auto; padding: 32px 24px 64px; }
+h2 { font-size: 1.125rem; font-weight: 600; margin: 0 0 12px; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.gain { color: var(--gain); }
+.loss { color: var(--loss); }
+
+.intro { color: var(--muted); max-width: 70ch; }
+.intro strong { color: var(--ink); font-weight: 600; }
+
+/* Vergelijking: het belangrijkste van de pagina */
+.ledger { margin: 28px 0 8px; display: grid; grid-template-columns: auto auto auto; column-gap: 32px; row-gap: 2px; justify-content: start; align-items: baseline; }
+.ledger .who { font-size: 1rem; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+.ledger .amount { font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; text-align: right; }
+.ledger .pct { font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 500; text-align: right; }
+.ledger .amount.dim { font-weight: 500; color: var(--muted); }
+.swatch { width: 22px; height: 0; border-top: 3px solid var(--agents); display: inline-block; }
+.swatch.hold { border-top: 3px dashed var(--hold); }
+.verdict { margin: 12px 0 0; max-width: 70ch; }
+
+.chart { margin: 20px 0 40px; position: relative; }
+.chart svg { display: block; width: 100%; height: 280px; overflow: visible; }
+.chart .axis { fill: var(--muted); font-size: 12px; font-family: var(--font); }
+.chart .grid { stroke: var(--soft); stroke-width: 1; }
+.tip { position: absolute; top: 0; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 13px; padding: 6px 10px; border-radius: 4px; white-space: nowrap; transform: translateX(-50%); display: none; }
+
+/* Risicolimieten: hoe dicht zit je bij de grens */
+.limits { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; padding: 20px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); margin-bottom: 40px; }
+.limit p { font-size: 0.9375rem; }
+.bar { height: 6px; background: var(--soft); margin-top: 8px; position: relative; }
+.bar span { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ink); }
+.bar.warn span { background: var(--warn); }
+.bar.full span { background: var(--loss); }
+.halt { background: var(--loss); color: #fff; padding: 14px 18px; margin: 24px 0 0; border-radius: 4px; max-width: 70ch; }
+
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; margin-bottom: 40px; }
+@media (max-width: 820px) { .cols { grid-template-columns: 1fr; gap: 32px; } }
+
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+th { text-align: left; font-weight: 500; color: var(--muted); padding: 6px 12px 6px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--soft); vertical-align: top; }
+td.num, th.num { text-align: right; white-space: nowrap; }
+.empty { color: var(--muted); padding: 12px 0; }
+
+.market { padding: 14px 0; border-bottom: 1px solid var(--soft); }
+.market:first-of-type { padding-top: 0; }
+.market h3 { font-size: 1rem; font-weight: 600; margin: 0 0 4px; display: flex; justify-content: space-between; gap: 12px; }
+.market h3 span { font-weight: 400; color: var(--muted); }
+.vote { display: grid; grid-template-columns: 7.5rem 5.5rem 1fr; gap: 8px; font-size: 0.9375rem; padding: 3px 0; }
+.vote .act { font-weight: 500; }
+.vote .buy { color: var(--gain); }
+.vote .sell { color: var(--loss); }
+.vote .hold { color: var(--muted); }
+.outcome { margin-top: 6px; font-size: 0.9375rem; }
+
+.events { list-style: none; margin: 0; padding: 0; }
+.events li { display: grid; grid-template-columns: 8.5rem 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--soft); font-size: 0.9375rem; }
+.events .what { font-weight: 600; }
+
+.errors li { color: var(--loss); }
+.context { display: flex; flex-wrap: wrap; gap: 8px 32px; margin: 16px 0 0; font-size: 0.9375rem; }
+.context strong { font-weight: 600; }
+.regime-dalend { color: var(--loss); }
+.regime-stijgend { color: var(--gain); }
+.grid td.act { white-space: nowrap; }
+.grid .buy { color: var(--gain); font-weight: 500; }
+.grid .sell { color: var(--loss); }
+.grid .hold { color: var(--muted); }
+.grid small { display: block; color: var(--muted); font-size: 0.8125rem; line-height: 1.35; max-width: 34ch; white-space: normal; }
+.tag { font-size: 0.8125rem; color: var(--muted); }
+.mode { display: inline-block; font-size: 0.875rem; font-weight: 600; padding: 3px 10px; border-radius: 4px; margin-bottom: 12px; }
+.mode.live { background: var(--loss); color: #fff; }
+.mode.validate { background: var(--warn); color: #fff; }
+.mode.paper { background: var(--soft); color: var(--ink); }
+.story { max-width: 75ch; margin: 20px 0 8px; padding: 14px 18px; border-left: 3px solid var(--agents); background: var(--soft); }
+.story p { margin: 0 0 6px; font-size: 0.9375rem; }
+.story p:last-child { margin-bottom: 0; }
+.book-title { font-size: 1.375rem; font-weight: 700; margin: 40px 0 0; }
+.status-live { color: var(--loss); font-weight: 600; }
+.status-schaduw { color: var(--muted); }
+.notes { margin: 0; padding-left: 18px; }
+.notes li { font-size: 0.8125rem; color: var(--muted); line-height: 1.4; }
+.pill { font-size: 0.75rem; padding: 1px 6px; border-radius: 3px; background: var(--soft); color: var(--muted); white-space: nowrap; }
+.pill.live { background: var(--loss); color: #fff; }
+footer { margin-top: 48px; color: var(--muted); font-size: 0.875rem; max-width: 70ch; }
+.notice { padding: 48px 0; max-width: 60ch; }
+.notice h1 { font-size: 1.5rem; margin: 0 0 8px; }
+@media (max-width: 560px) {
+  main { padding: 24px 16px 48px; }
+  .ledger { grid-template-columns: auto auto; column-gap: 16px; justify-content: start; }
+  .ledger .who { grid-column: 1 / -1; margin-top: 8px; }
+  .ledger .amount, .ledger .pct { text-align: left; }
+  .vote { grid-template-columns: 6.5rem 4.5rem 1fr; }
+  .events li { grid-template-columns: 1fr; gap: 2px; }
+}
+</style>
+</head>
+<body>
+<main id="app"><p class="muted">Gegevens laden…</p></main>
+
+<script>
+const ACTIONS = { buy: "kopen", sell: "negatief", hold: "afwachten" };
+const TYPES = { entry: "Gekocht", exit: "Verkocht", blocked: "Tegengehouden", validated: "Gevalideerd", note: "Melding" };
+const BOOK = { live: "echt geld", schaduw: "schaduw" };
+
+const eur = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" });
+const eur0 = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+const num = (v, d = 2) => new Intl.NumberFormat("nl-NL", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+const pct = v => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + num(Math.abs(v), 1) + "%";
+const signed = v => (v > 0 ? "+" : v < 0 ? "−" : "") + eur.format(Math.abs(v));
+const cls = v => v > 0 ? "gain" : v < 0 ? "loss" : "";
+const when = ts => new Date(ts * 1000).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const day = ts => new Date(ts * 1000).toLocaleDateString("nl-NL", { day: "numeric", month: "short", year: "numeric" });
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const price = v => v == null ? "–" : v >= 100 ? eur.format(v) : v >= 1 ? "€ " + num(v, 4) : v >= 0.01 ? "€ " + num(v, 6) : "€ " + num(v, 8);
+let AG = {};
+
+async function load() {
+  try {
+    const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error(res.status);
+    render(await res.json());
+  } catch (e) {
+    document.getElementById("app").innerHTML = `<div class="notice"><h1>Nog geen gegevens</h1>
+      <p class="muted">De bot heeft nog niet gedraaid, of GitHub Pages werkt de site nog bij. Start een run via Actions, Trader, Run workflow.</p></div>`;
+  }
+}
+
+function render(d) {
+  AG = Object.fromEntries(d.agents.map(a => [a.name, a.agent]));
+  const live = d.books.live, sh = d.books.schaduw;
+  const modeHtml = d.mode === "live"
+    ? (d.validate_only ? `<span class="mode validate">Validatiemodus: echt saldo, geen echte orders</span>` : `<span class="mode live">Echt geld: orders worden uitgevoerd op Kraken</span>`)
+    : `<span class="mode paper">Alleen papier</span>`;
+
+  document.getElementById("app").innerHTML = `
+    <p style="margin:0 0 12px"><a href="index.html">Terug naar de live-weergave</a></p>
+    ${modeHtml}
+    <p class="intro">Laatste run: <strong>${when(d.generated_ts)}</strong>${d.last_run_ok ? "" : ", met meldingen (zie onderaan)"}.
+      Markt: <strong class="regime-${d.regime.label}">${d.regime.label}</strong>. Profiel: <strong>${esc(d.profile)}</strong>. ${d.markets.length} munten gevolgd.</p>
+
+    <div class="story" aria-label="Verslag van de laatste run">${d.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</div>
+
+    ${live ? bookSection("live", "Echt geld", live, d) : ""}
+
+    <section style="margin:40px 0">
+      <h2>Agents</h2>
+      <p class="muted" style="margin-bottom:12px;font-size:.9375rem">Nieuwe agents handelen eerst met schaduwgeld. Na genoeg trades met winst (na kosten) krijgen ze echt geld; wie met echt geld verliest, gaat terug naar de schaduw.</p>
+      ${agentsTable(d.agents)}
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2>Wat vindt elke agent per munt</h2>
+      ${evaluationGrid(d.evaluations, d.agents)}
+    </section>
+
+    <section style="margin-bottom:40px">
+      <h2>Logboek</h2>
+      ${eventsList(d.events)}
+    </section>
+
+    ${bookSection("schaduw", "Schaduwgeld (papier)", sh, d)}
+
+    ${d.legacy_trades.length ? `<section style="margin:40px 0"><h2>Historie van je oude bot</h2>${legacyTable(d.legacy_trades)}</section>` : ""}
+
+    ${d.errors.length ? `<section><h2>Meldingen</h2><ul class="events errors">${d.errors.map(e =>
+      `<li><span>${when(e.ts)}</span><span>${esc(e.message)}</span></li>`).join("")}</ul></section>` : ""}
+
+    <footer>Kosten (${num(d.fee_pct, 2)}% per order) zijn meegerekend. Resultaten uit het verleden zeggen weinig over de toekomst.</footer>
+  `;
+  if (live) drawChart("chart-live", live.equity_history, live.stats.start);
+  drawChart("chart-schaduw", sh.equity_history, sh.stats.start);
+}
+
+function bookSection(key, title, b, d) {
+  const s = b.stats, r = b.risk || {}, L = d.risk_limits;
+  const diff = s.benchmark_return_pct == null ? null : s.return_pct - s.benchmark_return_pct;
+  return `
+    <h2 class="book-title">${title}</h2>
+    <div class="ledger">
+      <div class="who"><i class="swatch"></i>Agents</div>
+      <div class="amount">${eur.format(s.equity)}</div>
+      <div class="pct ${cls(s.return_pct)}">${pct(s.return_pct)}</div>
+      <div class="who"><i class="swatch hold"></i>${esc(d.benchmark_market.split("/")[0])} vasthouden</div>
+      <div class="amount dim">${eur.format(s.start * (1 + (s.benchmark_return_pct || 0) / 100))}</div>
+      <div class="pct ${cls(s.benchmark_return_pct)}">${pct(s.benchmark_return_pct)}</div>
+    </div>
+    <p class="verdict">${key === "live" ? `Inleg ${eur.format(s.start)} (${String(d.budget_eur).toLowerCase() === "alles" ? "heel je Kraken-saldo" : "budget " + eur.format(d.budget_eur)}). ` : ""}Vrij: ${eur.format(b.cash)}, belegd: ${eur.format(b.exposure)}.
+      ${diff == null ? "" : diff >= 0 ? `${num(Math.abs(diff), 1)} procentpunt beter dan vasthouden.` : `${num(Math.abs(diff), 1)} procentpunt slechter dan vasthouden.`}</p>
+    ${r.halted ? `<p class="halt"><strong>Noodstop actief.</strong> ${esc(r.halt_reason)}. Zie de README om verder te gaan.</p>` : ""}
+    ${r.trading_enabled === false ? `<p class="halt">Nieuwe aankopen staan uit in config.json. Open posities worden wel bewaakt.</p>` : ""}
+    <div class="chart" id="chart-${key}"></div>
+    <section class="limits">
+      ${limitBar("Verlies vandaag", r.daily_loss_pct || 0, L.max_daily_loss_pct, "Boven de grens: vandaag geen nieuwe trades")}
+      ${limitBar("Onder de hoogste stand", r.drawdown_pct || 0, L.max_drawdown_pct, "Boven de grens: noodstop, alles verkopen")}
+      ${limitBar("Belegd", b.exposure / Math.max(s.equity, 1) * 100, L.max_exposure_pct, "Deel van het vermogen in munten")}
+      ${limitBar("Open posities", b.positions.length, L.max_open_positions, "Meer worden niet toegestaan", true)}
+    </section>
+    <h2>Open posities</h2>
+    ${positionsTable(b.positions, key)}
+    <h2 style="margin-top:32px">Afgesloten trades</h2>
+    <p class="muted" style="margin-bottom:12px;font-size:.9375rem">${s.trades} ${s.trades === 1 ? "trade" : "trades"}${s.win_rate_pct != null ? `, ${num(s.win_rate_pct, 0)}% met winst` : ""}${s.profit_factor != null ? `, winstfactor ${num(s.profit_factor, 2)} (boven 1 is winstgevend)` : ""}.
+      Resultaat ${signed(s.realized_pnl)}, waarvan ${eur.format(s.fees_paid)} kosten. Grootste daling: ${num(s.max_drawdown_pct, 1)}%.</p>
+    ${tradesTable(b.trades)}`;
+}
+
+function limitBar(label, value, max, note, isCount = false) {
+  const ratio = Math.min(1, max ? value / max : 0);
+  const state = ratio >= 1 ? "full" : ratio >= 0.66 ? "warn" : "";
+  const txt = isCount ? `${value} van ${max}` : `${num(value, 1)}% van max ${num(max, 0)}%`;
+  return `<div class="limit"><p>${label}: <strong>${txt}</strong></p>
+    <div class="bar ${state}" role="img" aria-label="${label} ${txt}"><span style="width:${ratio * 100}%"></span></div>
+    <p class="muted" style="font-size:.8125rem;margin-top:6px">${note}</p></div>`;
+}
+
+function positionsTable(ps, key) {
+  if (!ps.length) return `<p class="empty">Geen open posities.</p>`;
+  return `<div class="scroll"><table><thead><tr><th>Munt</th><th>Agent</th><th>Waarom gekocht</th><th class="num">Inleg</th><th class="num">Nu</th><th class="num">Stop</th></tr></thead><tbody>
+    ${ps.map(p => `<tr><td><strong>${esc(p.market)}</strong><br><small class="muted">sinds ${when(p.entry_ts)}</small></td>
+      <td>${esc(AG[p.agent] || p.agent)}${p.exit_style === "two_stage" ? `<br><small class="muted">${p.is_runner ? "runner (6 ATR)" : "krap (2 ATR)"}</small>` : ""}</td>
+      <td><small class="muted">${esc(p.entry_reason)}${p.plan && p.plan.risk ? ". " + esc(p.plan.risk) : ""}</small></td>
+      <td class="num">${eur.format(p.entry_cost)}<br><small class="muted">${price(p.entry_price)}</small></td>
+      <td class="num ${cls(p.unrealized)}">${eur.format(p.value)}<br><small>${signed(p.unrealized)}</small></td>
+      <td class="num">${price(p.stop)}${p.exit_style === "two_stage" ? `<br><small class="muted">nood ${price(p.hard_stop)}</small>` : ""}
+        ${key === "live" ? `<br><small class="${p.stop_on_exchange ? "gain" : "loss"}">${p.stop_on_exchange ? "stop staat op Kraken" : "geen stop op Kraken"}</small>` : ""}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+function agentsTable(as) {
+  return `<div class="scroll"><table><thead><tr><th>Agent</th><th>Geld</th><th class="num">Invloed</th><th class="num">Trades</th><th class="num">Met winst</th><th class="num">Echt</th><th class="num">Schaduw</th><th class="num">Gem. per trade</th></tr></thead><tbody>
+    ${as.map(a => `<tr><td>${esc(a.agent)}<br><small class="muted">${a.horizon === "lang" ? "4-uurscandles" : "15-minutencandles"}</small></td>
+      <td><span class="pill ${a.status === "live" ? "live" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span>${a.promotion_note ? `<br><small class="muted">${esc(a.promotion_note)}</small>` : ""}</td>
+      <td class="num">${num(a.weight, 2)}×</td><td class="num">${a.trades}</td>
+      <td class="num">${a.win_rate_pct != null ? a.win_rate_pct + "%" : "–"}</td>
+      <td class="num ${cls(a.pnl_live)}">${signed(a.pnl_live)}</td>
+      <td class="num ${cls(a.pnl_schaduw)}">${signed(a.pnl_schaduw)}</td>
+      <td class="num ${cls(a.expectancy_r ?? 0)}">${a.expectancy_r != null ? (a.expectancy_r > 0 ? "+" : "") + num(a.expectancy_r, 2) + " R" : "–"}</td></tr>`).join("")}
+  </tbody></table></div>
+  <p class="muted" style="margin-top:8px;font-size:.8125rem">R = resultaat gedeeld door het risico bij instap. −1 R: de stop werd precies geraakt. +3 R: drie keer het risico verdiend.</p>`;
+}
+
+function evaluationGrid(evals, agents) {
+  const markets = Object.keys(evals).sort((a, b) => evals[b].ts - evals[a].ts);
+  if (!markets.length) return `<p class="empty">Nog geen beoordelingen.</p>`;
+  const names = agents.map(a => a.agent);
+  return `<div class="scroll"><table class="grid"><thead><tr><th>Munt</th>${names.map(n => `<th>${esc(n)}</th>`).join("")}<th>Besluit</th></tr></thead><tbody>
+    ${markets.map(m => { const e = evals[m]; return `<tr>
+      <td><strong>${esc(m)}</strong><small>${price(e.price)}<br>${when(e.ts)}</small></td>
+      ${names.map(n => { const s = e.signals[n]; return s ? `<td class="act"><span class="${s.action}">${ACTIONS[s.action]}</span><small>${esc(s.reason)}</small></td>` : "<td>–</td>"; }).join("")}
+      <td><ul class="notes">${(e.notes || []).map(t => `<li>${esc(t)}</li>`).join("")}</ul></td>
+    </tr>`; }).join("")}
+  </tbody></table></div>`;
+}
+
+function eventsList(ev) {
+  if (!ev.length) return `<p class="empty">Nog niets gebeurd.</p>`;
+  return `<ul class="events">${ev.map(e => `<li>
+      <span class="muted">${when(e.ts)}${e.book ? `<br><span class="pill ${e.book === "live" ? "live" : ""}">${BOOK[e.book]}</span>` : ""}</span>
+      <span><span class="what">${TYPES[e.type] || esc(e.type)}${e.market ? " " + esc(e.market) : ""}</span>${e.price ? ` tegen ${price(e.price)}` : ""}${e.pnl != null ? `, <span class="${cls(e.pnl)}">${signed(e.pnl)}</span>` : ""}<br>
+      <span class="muted">${esc(e.reason)}</span></span></li>`).join("")}</ul>`;
+}
+
+function tradesTable(ts) {
+  if (!ts.length) return `<p class="empty">Nog geen afgesloten trades.</p>`;
+  return `<div class="scroll"><table><thead><tr><th>Munt</th><th>Agent</th><th>Gekocht</th><th>Verkocht</th><th class="num">Resultaat</th><th>Waarom verkocht</th></tr></thead><tbody>
+    ${ts.map(t => `<tr><td>${esc(t.market)}</td><td>${esc(AG[t.agent] || t.agent)}</td>
+      <td>${when(t.entry_ts)}<br><small class="muted">${price(t.entry_price)}</small></td>
+      <td>${when(t.exit_ts)}<br><small class="muted">${price(t.exit_price)}</small></td>
+      <td class="num ${cls(t.pnl)}">${signed(t.pnl)}<br><small>${pct(t.pnl_pct)}, ${t.r > 0 ? "+" : ""}${num(t.r, 1)} R</small></td>
+      <td class="muted">${esc(t.exit_reason)}</td></tr>`).join("")}
+  </tbody></table></div>`;
+}
+
+function legacyTable(ts) {
+  return `<div class="scroll"><table><thead><tr><th>Munt</th><th>Verkocht</th><th class="num">Instap</th><th class="num">Uitstap</th><th class="num">Resultaat</th></tr></thead><tbody>
+    ${ts.map(t => `<tr><td>${esc(t.symbol)}${t.was_runner ? ` <span class="pill">runner</span>` : ""}</td><td>${t.exit_time ? new Date(t.exit_time).toLocaleDateString("nl-NL", { day: "numeric", month: "short" }) : "–"}</td>
+      <td class="num">${price(t.entry_price)}</td><td class="num">${price(t.exit_price)}</td>
+      <td class="num ${cls(t.pnl_pct)}">${pct(t.pnl_pct)}</td></tr>`).join("")}
+  </tbody></table></div><p class="muted" style="margin-top:8px;font-size:.8125rem">Percentages zonder kosten, zoals je oude bot ze bijhield.</p>`;
+}
+
+function drawChart(id, hist, start) {
+  const box = document.getElementById(id);
+  if (!box) return;
+  if (hist.length < 2) { box.innerHTML = `<p class="empty">De grafiek verschijnt na de tweede run.</p>`; return; }
+  box.innerHTML = `<div class="tip"></div>`;
+  const tip = box.querySelector(".tip");
+  const W = Math.max(320, box.clientWidth), H = 240, P = { l: 72, r: 8, t: 12, b: 28 };
+  const vals = hist.flatMap(p => [p.equity, p.benchmark ?? p.equity]).concat(start);
+  let lo = Math.min(...vals), hi = Math.max(...vals);
+  const pad = (hi - lo) * 0.08 || Math.max(start, 1) * 0.01; lo -= pad; hi += pad;
+  const t0 = hist[0].ts, t1 = hist[hist.length - 1].ts;
+  const x = t => P.l + (t - t0) / (t1 - t0 || 1) * (W - P.l - P.r);
+  const y = v => P.t + (1 - (v - lo) / (hi - lo)) * (H - P.t - P.b);
+  const path = key => hist.filter(p => p[key] != null).map((p, i) => `${i ? "L" : "M"}${x(p.ts).toFixed(1)},${y(p[key]).toFixed(1)}`).join("");
+  const fmt = (hi - lo) < 20 ? eur : eur0;
+  let grid = "";
+  for (let i = 0; i <= 4; i++) {
+    const v = lo + (hi - lo) * i / 4;
+    grid += `<line class="grid" x1="${P.l}" x2="${W - P.r}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${P.l - 8}" y="${y(v) + 4}" text-anchor="end">${fmt.format(v)}</text>`;
+  }
+  const dates = [t0, (t0 + t1) / 2, t1].map((t, i) => `<text class="axis" x="${x(t)}" y="${H - 6}" text-anchor="${["start", "middle", "end"][i]}">${new Date(t * 1000).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}</text>`).join("");
+  box.insertAdjacentHTML("afterbegin", `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px" role="img" aria-label="Verloop van het vermogen">
+    ${grid}${dates}
+    <line x1="${P.l}" x2="${W - P.r}" y1="${y(start)}" y2="${y(start)}" stroke="var(--muted)" stroke-dasharray="2 4"/>
+    <path d="${path("benchmark")}" fill="none" stroke="var(--hold)" stroke-width="2" stroke-dasharray="6 5"/>
+    <path d="${path("equity")}" fill="none" stroke="var(--agents)" stroke-width="2.5"/>
+    <line class="cross" y1="${P.t}" y2="${H - P.b}" stroke="var(--muted)" visibility="hidden"/>
+    <rect class="hit" x="${P.l}" y="0" width="${W - P.l - P.r}" height="${H}" fill="transparent"/></svg>`);
+  const svg = box.querySelector("svg"), cross = svg.querySelector(".cross"), hit = svg.querySelector(".hit");
+  hit.addEventListener("pointermove", e => {
+    const rect = svg.getBoundingClientRect();
+    const t = t0 + ((e.clientX - rect.left) / rect.width * W - P.l) / (W - P.l - P.r) * (t1 - t0);
+    let best = hist[0];
+    for (const p of hist) if (Math.abs(p.ts - t) < Math.abs(best.ts - t)) best = p;
+    const cx = x(best.ts);
+    cross.setAttribute("x1", cx); cross.setAttribute("x2", cx); cross.setAttribute("visibility", "visible");
+    tip.style.display = "block";
+    tip.style.left = Math.min(rect.width - 170, Math.max(170, cx / W * rect.width)) + "px";
+    tip.textContent = `${when(best.ts)}   Agents ${eur.format(best.equity)}` + (best.benchmark != null ? `   Vasthouden ${eur.format(best.benchmark)}` : "");
+  });
+  hit.addEventListener("pointerleave", () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); });
+}
+
+let lastWidth = window.innerWidth;
+window.addEventListener("resize", () => { if (Math.abs(window.innerWidth - lastWidth) > 40) { lastWidth = window.innerWidth; load(); } });
+load();
+setInterval(load, 5 * 60 * 1000);
+</script>
+</body>
+</html>
