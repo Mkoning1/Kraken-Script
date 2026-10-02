@@ -396,7 +396,7 @@ def run(download=True, log=print):
                             "oos_return_pct": oo["return_pct"], "oos_trades": oo["trades"]}
             log(f"{n0} met {n} munten: leerperiode zonder beste munt {tr['robust_r']}R, controleperiode {oo['expectancy_r']}R, {oo['return_pct']}%")
         best_n = max(size_test, key=lambda n: size_test[n]["train_robust_r"])
-        if best_n != base_n and (size_test[best_n]["oos_expectancy_r"] or -1) > 0 \
+        if bt.get("auto_universe_size", False) and best_n != base_n and (size_test[best_n]["oos_expectancy_r"] or -1) > 0 \
                 and (size_test[best_n]["oos_expectancy_r"] or -1) >= (size_test[base_n]["oos_expectancy_r"] or -1):
             tuned["_universe_size"] = best_n
             log(f"Aantal munten wordt {best_n}: beter in de leerperiode en bevestigd in de controleperiode")

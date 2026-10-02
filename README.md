@@ -8,7 +8,7 @@ Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 
 | Agent | Taak |
 |---|---|
-| Data-agent | Kiest elke run de 5 EUR-munten met het meeste volume (plus BTC, ETH en alles waar je in zit) en haalt uur- en 4-uurscandles op. Waarom 5: in de eerlijke backtest werkte Trend-4u op de drukste munten veel beter dan op 15 of 30. |
+| Data-agent | Kiest elke run de 8 EUR-munten met het meeste volume (plus BTC, ETH en alles waar je in zit) en haalt uur- en 4-uurscandles op. Waarom 8: in de eerlijke backtest werkte Trend-4u op de drukste munten veel beter dan op 15 of 30 (8 munten: +24%, grootste daling 14,6%). |
 | Markt-agent | Stijgende, neutrale of dalende markt, op basis van BTC op 4 uur. |
 | **Trend-4u** | Je oorspronkelijke bot: koopt een 4-uursuitbraak boven het hoogste punt van de vorige periode (RSI boven 50). Verkoopt via de tweetraps trailing stop. Koopt niet als BTC in een dalende trend zit. Gemiste 4-uurscandles worden alsnog verwerkt. |
 | Dip-koper | Koopt paniekdalingen op uurcandles in een stijgende munt, verkoopt bij herstel of na 12 uur. |
@@ -51,7 +51,7 @@ Elke zondagnacht (of handmatig via Actions, Backtest, Run workflow):
    die hij nooit gezien heeft. Alleen als hij daar ook winst maakt, worden de nieuwe instellingen gebruikt (`data/tuned_params.json`).
 
 Elk resultaat wordt ook berekend zonder de beste munt, zodat één uitschieter het beeld niet bepaalt.
-Ook wordt getest of 5, 8 of 15 munten het beste werkt. Resultaten staan onder Details en in het dossier van elke agent.
+Ook wordt getest hoe 5, 8 en 15 munten het doen; het aantal blijft wat jij in `universe.size` zet. Resultaten staan onder Details en in het dossier van elke agent.
 
 ### Promotie naar echt geld
 - Backtest positief (minstens +0,1R per trade in de controleperiode): echt geld na 15 schaduwtrades met minstens +0,1R.

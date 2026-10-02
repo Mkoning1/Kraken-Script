@@ -10,7 +10,7 @@
   },
   "profile": "assertief",
   "universe": {
-    "size": 5,
+    "size": 8,
     "always_include": [
       "BTC/EUR",
       "ETH/EUR"
@@ -172,6 +172,7 @@
       5,
       8,
       15
-    ]
+    ],
+    "auto_universe_size": false
   }
 }
