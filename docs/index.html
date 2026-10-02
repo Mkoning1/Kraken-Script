@@ -316,6 +316,8 @@ function btHTML(b) {
     <dt>Gemiddeld per trade</dt><dd class="${(b.expectancy_r || 0) >= 0 ? "up" : "down"}">${r(b.expectancy_r)}</dd>
     <dt>Rendement (op € 1.000)</dt><dd class="${b.return_pct >= 0 ? "up" : "down"}">${pct(b.return_pct)}</dd>
     <dt>Grootste daling</dt><dd>${num(b.max_drawdown_pct, 1)}%</dd>
+    <dt>Beste munt</dt><dd>${esc((b.best_market || "–").split("/")[0])} (${r(b.best_market_r)} totaal)</dd>
+    <dt>Zonder die munt</dt><dd class="${(b.ex_best_return_pct || 0) >= 0 ? "up" : "down"}">${pct(b.ex_best_return_pct)}, gem. ${r(b.ex_best_expectancy_r)}</dd>
     <dt>Controleperiode (nooit gezien)</dt><dd class="${(b.oos_expectancy_r || 0) >= 0 ? "up" : "down"}">${r(b.oos_expectancy_r)} over ${b.oos_trades} trades</dd>
   </dl><p class="when" style="margin-top:6px">${b.tuned ? "Instellingen geoptimaliseerd en bevestigd in de controleperiode: " : "Standaardinstellingen: "}${Object.entries(b.params || {}).map(([k, v]) => `${PARAM[k] || k} ${v}`).join(", ")}.</p>`;
 }
@@ -342,6 +344,7 @@ function roomHTML(key) {
       <dt>Trades</dt><dd>${BT.team.trades}</dd><dt>Rendement</dt><dd class="${BT.team.return_pct >= 0 ? "up" : "down"}">${pct(BT.team.return_pct)}</dd>
       <dt>BTC vasthouden</dt><dd>${pct(BT.btc_return_pct)}</dd><dt>Grootste daling</dt><dd>${num(BT.team.max_drawdown_pct, 1)}%</dd>
       <dt>Noodstops</dt><dd>${BT.team.halts}</dd></dl>
+      ${BT.live_team ? `<p style="margin-top:8px">Alleen de agents met echt geld: <b class="${BT.live_team.return_pct >= 0 ? "up" : "down"}">${pct(BT.live_team.return_pct)}</b>, grootste daling ${num(BT.live_team.max_drawdown_pct, 1)}%, ${BT.live_team.halts} noodstop(s). Gekozen uit ${BT.pool_size} munten, elke dag de ${BT.universe_size} drukste van dat moment.</p>` : ""}
       <p class="when">Met kosten (${num(BT.fee_pct, 2)}% per order) en ${num(BT.slippage_pct, 2)}% slippage, profiel ${esc(BT.profile)}.</p></section>` : "") + `<section><h2>Het team</h2><ul class="list">${D.agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br>Invloed ${num(a.weight, 2)}×, ${a.trades} trades${a.expectancy_r != null ? `, gem. ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r, 2)}R` : ""}${a.promotion_note ? `. ${esc(a.promotion_note)}` : ""}</li>`).join("")}</ul></section>`;
   if (key === "beslis") { const b = buyList(); extra = `<section><h2>Op tafel</h2>${b.length ? `<ul class="list">${b.map(x => `<li><span class="dot" style="background:${TEAM[x.agent]}"></span><button class="link" data-analyst="${x.agent}|${esc(x.coin)}">${esc(x.label)}</button> op ${esc(base(x.coin))}, sterkte ${num(x.s.strength, 2)}<br>${esc(x.s.reason)}</li>`).join("")}</ul>` : `<p>Geen koopadviezen. Er valt niets te beslissen.</p>`}
     ${Object.entries(D.evaluations).flatMap(([m, e]) => (e.notes || []).filter(n => n.startsWith("Kandidaat") || n.startsWith("Risico") || n.startsWith("Uitvoer")).map(n => `<p class="when">${esc(base(m))}: ${esc(n)}</p>`)).join("")}</section>`; }

@@ -142,7 +142,35 @@ def new_book(capital):
             "halted": False, "halt_reason": None, "cooldown": {}}
 
 
-def simulate(coins, specs, cfg, profile, t0, t1, halts=False, capital=1000.0):
+def daily_volume(cd):
+    """Handelsvolume in de quote-munt per dag: {dag: volume}."""
+    out = {}
+    for t, c, v in zip(cd.ts, cd.c, cd.v):
+        d = t - t % 86400
+        out[d] = out.get(d, 0.0) + c * v
+    return out
+
+
+def universe_by_day(coins, size, always):
+    """Net als de live Data-agent: elke dag de munten met het meeste volume van dat moment (7 dagen terugkijkend).
+    Zo komt een munt pas in beeld als hij op dat moment druk verhandeld wordt, niet omdat we achteraf weten dat hij steeg."""
+    vols = {m: daily_volume(cd) for m, cd in coins.items()}
+    days = sorted({d for v in vols.values() for d in v})
+    uni = {}
+    for d in days:
+        ranked = []
+        for m, v in vols.items():
+            week = sum(v.get(d - k * 86400, 0.0) for k in range(1, 8))  # alleen dagen die al voorbij zijn
+            if week > 0 and v.get(d - 86400) is not None:
+                ranked.append((week, m))
+        ranked.sort(reverse=True)
+        chosen = {m for _, m in ranked[:size]}
+        chosen |= {m for m in always if m in coins}
+        uni[d] = chosen
+    return uni
+
+
+def simulate(coins, specs, cfg, profile, t0, t1, universe, halts=False, capital=1000.0, exclude=()):
     """Speel de periode t0-t1 uur voor uur na met de gegeven agents en instellingen."""
     agents, params_of = [], {}
     for name, params in specs:
@@ -167,19 +195,20 @@ def simulate(coins, specs, cfg, profile, t0, t1, halts=False, capital=1000.0):
     for t in range(t0 - t0 % H, t1, H):
         close_t = t + H
         new4 = close_t % H4 == 0
-        for m, cd in coins.items():
+        active = universe.get(t - t % 86400, set()) - set(exclude)
+        for m in list(book["positions"]):
+            cd = coins[m]
             i = cd.idx.get(t)
             if i is None:
                 continue
             last_price[m] = cd.c[i]
-            if m in book["positions"]:
-                h4l = []
-                if new4:
-                    j = cd.idx4.get(close_t - H4)
-                    if j is not None and cd.atr4[j]:
-                        h4l = [{"ts": cd.t4[j], "close": cd.c4[j], "atr": cd.atr4[j]}]
-                paper.manage(book, m, [{"ts": t, "open": cd.o[i], "high": cd.h[i], "low": cd.l[i], "close": cd.c[i]}],
-                             h4l, col, cd.c[i])
+            h4l = []
+            if new4:
+                j = cd.idx4.get(close_t - H4)
+                if j is not None and cd.atr4[j]:
+                    h4l = [{"ts": cd.t4[j], "close": cd.c4[j], "atr": cd.atr4[j]}]
+            paper.manage(book, m, [{"ts": t, "open": cd.o[i], "high": cd.h[i], "low": cd.l[i], "close": cd.c[i]}],
+                         h4l, col, cd.c[i])
         eq = equity()
         status, halt = risk.update(book, eq, close_t, True)
         if halt:
@@ -189,6 +218,7 @@ def simulate(coins, specs, cfg, profile, t0, t1, halts=False, capital=1000.0):
                     paper.sell(book, m, last_price[m], close_t, "Noodstop", col)
                 paused_until = close_t + 7 * 86400
             book["halted"] = False
+            book["halt_until"] = None
             book["peak_equity"] = equity()
         if t % 86400 == 0:
             curve.append((t, round(equity(), 2)))
@@ -198,10 +228,12 @@ def simulate(coins, specs, cfg, profile, t0, t1, halts=False, capital=1000.0):
         regime = regime_agent.assess(tr)[0] if tr else "neutraal"
         mult = cfg["regime_multiplier"][regime]
         cands = []
-        for m, cd in coins.items():
+        for m in active | set(book["positions"]):
+            cd = coins[m]
             i = cd.idx.get(t)
             if i is None:
                 continue
+            last_price[m] = cd.c[i]
             sig = cd.sig(i, lb, sq)
             trend = cd.trend(close_t) if sig else None
             if not trend:
@@ -218,6 +250,8 @@ def simulate(coins, specs, cfg, profile, t0, t1, halts=False, capital=1000.0):
                 d = decider.exit_check(signals, pos)
                 if d["type"] == "exit":
                     paper.sell(book, m, sig["close"], close_t, d["reason"], col)
+                continue
+            if m not in active:
                 continue
             for d in decider.entries(signals, weights, mult, regime):
                 if d["type"] == "entry":
@@ -242,12 +276,22 @@ def simulate(coins, specs, cfg, profile, t0, t1, halts=False, capital=1000.0):
     for _, v in curve + [(t1, final)]:
         peak = max(peak, v)
         mdd = max(mdd, (peak - v) / peak * 100 if peak else 0)
+    by_m = {}
+    for x in trades:
+        b = by_m.setdefault(x["market"], {"trades": 0, "r": 0.0})
+        b["trades"] += 1
+        b["r"] = round(b["r"] + x["r"], 3)
+    best = max(by_m, key=lambda m: by_m[m]["r"]) if by_m else None
+    rest = [x["r"] for x in trades if x["market"] != best]
     return {
         "trades": len(trades), "win_rate_pct": round(len(wins) / len(trades) * 100, 1) if trades else None,
         "expectancy_r": round(sum(rs) / len(rs), 3) if rs else None, "total_r": round(sum(rs), 2),
         "profit_factor": round(gw / gl, 2) if gl else None, "return_pct": round((final / capital - 1) * 100, 1),
         "max_drawdown_pct": round(mdd, 1), "fees": round(book["fees_paid"], 2), "halts": halts_n,
-        "curve": curve[::7],
+        "best_market": best, "best_market_r": by_m[best]["r"] if best else None,
+        "ex_best_expectancy_r": round(sum(rest) / len(rest), 3) if rest else None,
+        "robust_r": round(sum(rest), 2),
+        "by_market": by_m, "curve": curve[::7],
     }
 
 
@@ -255,17 +299,32 @@ def defaults_for(cfg, name):
     return {k: v for k, v in cfg["agents"][name].items() if k not in SKIP_KEYS}
 
 
+def build_pool(cfg, log):
+    """Munten om uit te kiezen: een vaste lijst van gevestigde munten plus de huidige drukste op Kraken."""
+    pool = list(cfg["universe"]["always_include"]) + [f"{b}/EUR" for b in cfg["backtest"]["pool_fixed"]]
+    try:
+        import ccxt
+        ex = ccxt.kraken({"enableRateLimit": True})
+        ex.load_markets()
+        tick = ex.fetch_tickers()
+        excl = set(cfg["universe"]["exclude_bases"])
+        ranked = sorted(((t.get("quoteVolume") or 0, s) for s, t in tick.items()
+                         if s.endswith("/EUR") and s.split("/")[0] not in excl and ex.markets.get(s, {}).get("spot", True)), reverse=True)
+        pool += [s for _, s in ranked[:cfg["backtest"]["pool_kraken_top"]]]
+    except Exception as e:
+        log(f"Kraken-lijst ophalen mislukt ({str(e)[:80]}), alleen de vaste lijst")
+    return list(dict.fromkeys(pool))
+
+
 def run(download=True, log=print):
     started = time.time()
     cfg = json.loads((ROOT / "config.json").read_text())
     profile = cfg["profiles"][cfg["profile"]]
     bt = cfg["backtest"]
-    dash = ROOT / "docs" / "data.json"
-    markets = json.loads(dash.read_text()).get("markets", []) if dash.exists() else []
-    markets = list(dict.fromkeys(list(cfg["universe"]["always_include"]) + markets))[:16]
     hist = HistoryAgent(ROOT / "data" / "history", log)
+    pool = build_pool(cfg, log) if download else [p.name + "/EUR" for p in (ROOT / "data" / "history").iterdir() if p.is_dir()]
     coins = {}
-    for m in markets:
+    for m in pool:
         base = m.split("/")[0]
         if download:
             try:
@@ -277,58 +336,95 @@ def run(download=True, log=print):
             coins[m] = CoinData(m, rows)
     if cfg["regime_market"] not in coins:
         raise SystemExit("Geen historie voor de marktmaatstaf (BTC); backtest kan niet draaien")
-    t1 = min(cd.ts[-1] for cd in coins.values()) + H
-    t0 = max(t1 - bt["days"] * 86400, min(cd.ts[0] for cd in coins.values()) + 40 * 86400)
+    t1 = coins[cfg["regime_market"]].ts[-1] + H
+    t0 = max(t1 - bt["days"] * 86400, coins[cfg["regime_market"]].ts[0] + 40 * 86400)
     split = t0 + int((t1 - t0) * bt["train_share"])
-    log(f"{len(coins)} munten, periode {time.strftime('%Y-%m-%d', time.gmtime(t0))} tot {time.strftime('%Y-%m-%d', time.gmtime(t1))}")
+    always = cfg["universe"]["always_include"]
+    sizes = bt.get("universe_sizes", [cfg["universe"]["size"]])
+    universes = {n: universe_by_day(coins, n, always) for n in sizes}
+    base_n = cfg["universe"]["size"] if cfg["universe"]["size"] in universes else sizes[0]
+    log(f"{len(coins)} munten in de pool, periode {time.strftime('%Y-%m-%d', time.gmtime(t0))} tot {time.strftime('%Y-%m-%d', time.gmtime(t1))}")
+
+    def score(r):  # robuust: de winst zonder de beste munt telt
+        return r["robust_r"] if r["trades"] >= 20 else None
 
     results, tuned = {}, {}
     for name in cfg["agents"]:
         if name not in AGENT_CLASSES or not cfg["agents"][name].get("enabled", True):
             continue
+        uni = universes[base_n]
         base_p = defaults_for(cfg, name)
-        full = simulate(coins, [(name, base_p)], cfg, profile, t0, t1)
-        base_oos = simulate(coins, [(name, base_p)], cfg, profile, split, t1)
+        base_oos = simulate(coins, [(name, base_p)], cfg, profile, split, t1, uni)
         best, best_score, tried = None, None, 0
         grid = GRIDS.get(name, {})
         for combo in itertools.product(*grid.values()):
             p = dict(base_p, **dict(zip(grid.keys(), combo)))
-            r = simulate(coins, [(name, p)], cfg, profile, t0, split)
+            r = simulate(coins, [(name, p)], cfg, profile, t0, split, uni)
             tried += 1
-            score = r["total_r"] if r["trades"] >= 20 else None
-            if score is not None and (best_score is None or score > best_score):
-                best, best_score = p, score
+            sc = score(r)
+            if sc is not None and (best_score is None or sc > best_score):
+                best, best_score = p, sc
         chosen, chosen_oos, adopted = base_p, base_oos, False
         if best and best != base_p:
-            oos = simulate(coins, [(name, best)], cfg, profile, split, t1)
+            oos = simulate(coins, [(name, best)], cfg, profile, split, t1, uni)
             if (oos["expectancy_r"] or -1) > 0 and oos["trades"] >= 10 and (oos["expectancy_r"] or -1) >= (base_oos["expectancy_r"] or -1):
                 chosen, chosen_oos, adopted = best, oos, True
                 tuned[name] = {k: best[k] for k in grid}
-        if adopted:
-            full = simulate(coins, [(name, chosen)], cfg, profile, t0, t1)
-        results[name] = {**{k: v for k, v in full.items() if k != "curve"},
+        full = simulate(coins, [(name, chosen)], cfg, profile, t0, t1, uni)
+        ex = simulate(coins, [(name, chosen)], cfg, profile, t0, t1, uni, exclude=[full["best_market"]]) if full["best_market"] else full
+        results[name] = {**{k: v for k, v in full.items() if k not in ("curve",)},
+                         "ex_best_return_pct": ex["return_pct"], "ex_best_trades": ex["trades"],
                          "oos_trades": chosen_oos["trades"], "oos_expectancy_r": chosen_oos["expectancy_r"],
-                         "oos_return_pct": chosen_oos["return_pct"], "default_oos_expectancy_r": base_oos["expectancy_r"],
-                         "tuned": adopted, "params": {k: chosen[k] for k in grid}, "tried": tried}
-        log(f"{name}: {full['trades']} trades, gem. {full['expectancy_r']}R, rendement {full['return_pct']}%, "
-            f"controleperiode {chosen_oos['expectancy_r']}R" + (" (nieuwe instellingen)" if adopted else ""))
+                         "oos_return_pct": chosen_oos["return_pct"], "oos_ex_best_expectancy_r": chosen_oos["ex_best_expectancy_r"],
+                         "default_oos_expectancy_r": base_oos["expectancy_r"],
+                         "tuned": adopted, "params": {k: chosen[k] for k in grid}, "tried": tried, "universe_size": base_n}
+        log(f"{name}: {full['trades']} trades, gem. {full['expectancy_r']}R, rendement {full['return_pct']}%; "
+            f"zonder beste munt ({full['best_market']}) {ex['return_pct']}%; controleperiode {chosen_oos['expectancy_r']}R"
+            + (" (nieuwe instellingen)" if adopted else ""))
 
+    # Meer of minder munten? Getest voor de agent(s) die met echt geld handelen.
+    size_test = {}
+    live_names = [n for n in results if cfg["agents"][n].get("start") == "live" or cfg["agents"][n].get("force") == "live"]
+    if len(sizes) > 1 and live_names:
+        n0 = live_names[0]
+        p0 = dict(defaults_for(cfg, n0), **tuned.get(n0, {}))
+        for n in sizes:
+            tr = simulate(coins, [(n0, p0)], cfg, profile, t0, split, universes[n])
+            oo = simulate(coins, [(n0, p0)], cfg, profile, split, t1, universes[n])
+            size_test[n] = {"train_robust_r": tr["robust_r"], "train_return_pct": tr["return_pct"],
+                            "oos_expectancy_r": oo["expectancy_r"], "oos_ex_best_expectancy_r": oo["ex_best_expectancy_r"],
+                            "oos_return_pct": oo["return_pct"], "oos_trades": oo["trades"]}
+            log(f"{n0} met {n} munten: leerperiode zonder beste munt {tr['robust_r']}R, controleperiode {oo['expectancy_r']}R, {oo['return_pct']}%")
+        best_n = max(size_test, key=lambda n: size_test[n]["train_robust_r"])
+        if best_n != base_n and (size_test[best_n]["oos_expectancy_r"] or -1) > 0 \
+                and (size_test[best_n]["oos_expectancy_r"] or -1) >= (size_test[base_n]["oos_expectancy_r"] or -1):
+            tuned["_universe_size"] = best_n
+            log(f"Aantal munten wordt {best_n}: beter in de leerperiode en bevestigd in de controleperiode")
+
+    team_n = tuned.get("_universe_size", base_n)
     team_specs = [(n, dict(defaults_for(cfg, n), **tuned.get(n, {}))) for n in results]
-    team = simulate(coins, team_specs, cfg, profile, t0, t1, halts=True)
+    team = simulate(coins, team_specs, cfg, profile, t0, t1, universes[team_n], halts=True)
+    live_only = simulate(coins, [(n, dict(defaults_for(cfg, n), **tuned.get(n, {}))) for n in live_names],
+                         cfg, profile, t0, t1, universes[team_n], halts=True) if live_names else None
     btc = coins[cfg["regime_market"]]
     i0 = next(i for i, t in enumerate(btc.ts) if t >= t0)
     out = {
         "generated_ts": int(time.time()), "seconds": round(time.time() - started),
-        "period": {"start": t0, "end": t1, "split": split}, "coins": list(coins),
+        "period": {"start": t0, "end": t1, "split": split}, "coins": list(coins), "pool_size": len(coins),
+        "universe_size": team_n, "size_test": size_test,
         "sources": hist.meta, "profile": cfg["profile"], "fee_pct": cfg["fee_pct"], "slippage_pct": bt["slippage_pct"],
-        "agents": results, "team": team, "btc_return_pct": round((btc.c[-1] / btc.c[i0] - 1) * 100, 1),
+        "agents": results, "team": {k: v for k, v in team.items() if k != "by_market"},
+        "live_team": {k: v for k, v in live_only.items() if k != "by_market"} if live_only else None,
+        "btc_return_pct": round((btc.c[-1] / btc.c[i0] - 1) * 100, 1),
     }
     (ROOT / "data").mkdir(exist_ok=True)
     (ROOT / "data" / "backtest.json").write_text(json.dumps(out, indent=1))
     (ROOT / "data" / "tuned_params.json").write_text(json.dumps(tuned, indent=1))
     (ROOT / "docs" / "backtest.json").write_text(json.dumps(out, separators=(",", ":")))
-    log(f"Team: {team['trades']} trades, rendement {team['return_pct']}%, grootste daling {team['max_drawdown_pct']}%, "
-        f"BTC vasthouden {out['btc_return_pct']}%. Klaar in {out['seconds']} s.")
+    if live_only:
+        log(f"Echt-geldteam ({', '.join(live_names)}): rendement {live_only['return_pct']}%, grootste daling {live_only['max_drawdown_pct']}%, "
+            f"{live_only['halts']} noodstop(s).")
+    log(f"Hele team: {team['trades']} trades, rendement {team['return_pct']}%. BTC vasthouden {out['btc_return_pct']}%. Klaar in {out['seconds']} s.")
     return out
 
 

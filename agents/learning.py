@@ -97,6 +97,9 @@ class LearningAgent:
             return "geen"
         if exp < 0:
             return "negatief"
+        ex_best = b.get("ex_best_expectancy_r")
+        if ex_best is not None and ex_best < 0:
+            return "neutraal"  # winst hangt aan één munt: geen snelle route naar echt geld
         return "positief" if exp >= self.p.get("backtest_min_r", 0.1) else "neutraal"
 
     def summary(self, agents):

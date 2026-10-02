@@ -46,7 +46,9 @@ def load_config():
     tuned_path = ROOT / "data" / "tuned_params.json"
     if cfg.get("backtest", {}).get("use_tuned_params") and tuned_path.exists():
         for name, params in json.loads(tuned_path.read_text()).items():
-            if name in cfg["agents"]:
+            if name == "_universe_size":
+                cfg["universe"]["size"] = int(params)  # aantal munten dat de backtest het beste vond
+            elif name in cfg["agents"]:
                 cfg["agents"][name].update(params)  # instellingen die de backtest heeft bewezen
     return cfg
 
