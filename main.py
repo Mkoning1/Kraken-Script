@@ -174,7 +174,8 @@ def run(now_ts=None, exchange=None):
     execs = {"live": live_exec, "schaduw": paper}
     if live_exec:
         live_exec.now = now_ts
-        if validate:
+        perms = state.get("permissions")
+        if validate or not perms or not all(perms.values()):  # opnieuw tot alle rechten in orde zijn
             try:
                 state["permissions"] = live_exec.check_permissions()
                 missing = [n for n, ok in state["permissions"].items() if not ok]
