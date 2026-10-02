@@ -288,7 +288,16 @@ class LiveExecutionAgent:
         min_amount = (m.get("limits", {}).get("amount") or {}).get("min") or 0
         min_cost = (m.get("limits", {}).get("cost") or {}).get("min") or 0
         if amount < min_amount or amount * price < min_cost:
-            return {"ok": False, "text": f"Onder het Kraken-minimum voor {market} (min {min_amount} stuks of {eur(min_cost)})"}
+            # Kleine rekening: afronden naar het Kraken-minimum als dat binnen de grenzen van de risico-agent past
+            need = max(min_amount, (min_cost / price) * 1.02 if price else 0)
+            bumped = float(self.ex.amount_to_precision(market, need * 1.001))
+            limit = (plan or {}).get("max_value", 0)
+            if bumped * price * (1 + self.fee) <= min(limit, self.free_eur() * 0.99):
+                risk_eur = risk_eur * bumped / max(qty, 1e-12)  # het risico groeit mee met de grotere order
+                amount = bumped
+                plan["note"] = f"afgerond naar het Kraken-minimum van {min_amount} {m['base']}"
+            else:
+                return {"ok": False, "text": f"Onder het Kraken-minimum voor {market} (min {min_amount} stuks), en afronden past niet binnen je limieten"}
         o = self.ex.create_order(market, "market", "buy", amount, None, self._params())
         if self.validate:
             test = {"qty": amount, "hard_stop": hard, "stop": stop, "exit_style": signal.exit_style, "market": market}
@@ -323,7 +332,8 @@ class LiveExecutionAgent:
         except Exception as e:
             self.errors.append(f"{market}: stop-loss plaatsen mislukt ({e}), volgende run opnieuw")
             stop_txt = "stop-loss order nog niet geplaatst (volgende run opnieuw)"
-        return {"ok": True, "text": f"Gekocht: {net_qty:g} {m['base']} tegen gemiddeld {px(avg)}, kosten {eur(fee_total)}; {stop_txt}"}
+        note = f" ({plan['note']})" if plan and plan.get("note") else ""
+        return {"ok": True, "text": f"Gekocht: {net_qty:g} {m['base']} tegen gemiddeld {px(avg)}{note}, kosten {eur(fee_total)}; {stop_txt}"}
 
     def sell(self, book, market, price, ts, reason, learner):
         pos = book["positions"][market]

@@ -377,7 +377,8 @@ def run(now_ts=None, exchange=None):
                     corr = (c, held_m)
         ok, qty, risk_eur, why = risk.approve_entry(book, book["risk_status"], equity, book_exposure(book, prices),
                                                     m, price, hard, avail, d["score"], last_ts, corr)
-        plan = {"stop": stop, "hard_stop": hard, "risk_eur": round(risk_eur, 2), "calc": d["calc"], "risk": why}
+        plan = {"stop": stop, "hard_stop": hard, "risk_eur": round(risk_eur, 2), "calc": d["calc"], "risk": why,
+                "max_value": equity * profile["max_position_pct"] / 100}
         where = "echt geld" if bname == "live" else "schaduw"
         if not ok:
             evaluations[m]["notes"].append(f"Risico-agent ({where}): {why}")

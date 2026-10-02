@@ -8,7 +8,8 @@
   Bijna alle crypto volgt BTC; drie sterk samenhangende posities zijn in de praktijk één grote gok.
 - Na een verliestrade: een paar candles afkoelen voor die munt.
 - Verlies vandaag boven max_daily_loss_pct: vandaag niets nieuws.
-- Vermogen max_drawdown_pct onder de hoogste stand: NOODSTOP, alles verkopen, stoppen.
+- Vermogen max_drawdown_pct onder de hoogste stand: NOODSTOP, alles verkopen, 7 dagen pauze.
+  Gaat de noodstop binnen 30 dagen twee keer af, dan stopt het handelen definitief tot jij ingrijpt.
 """
 from datetime import datetime, timezone
 
@@ -31,9 +32,23 @@ class RiskAgent:
         daily_loss = max(0.0, (start - equity) / start * 100) if start else 0.0
         drawdown = max(0.0, (book["peak_equity"] - equity) / book["peak_equity"] * 100) if book["peak_equity"] else 0.0
         trigger = False
+        until = book.get("halt_until")
+        if book["halted"] and until and now_ts >= until:
+            book["halted"], book["halt_reason"], book["halt_until"] = False, None, None
+            book["peak_equity"] = equity  # opnieuw beginnen te tellen vanaf de huidige stand
+            drawdown = 0.0
         if not book["halted"] and drawdown >= self.p["max_drawdown_pct"]:
+            hist = [t for t in book.get("halt_history", []) if now_ts - t < 30 * 86400] + [now_ts]
+            book["halt_history"] = hist
             book["halted"] = True
-            book["halt_reason"] = f"Vermogen {drawdown:.1f}% onder de hoogste stand (grens {self.p['max_drawdown_pct']}%)"
+            if len(hist) >= 2:
+                book["halt_until"] = None
+                book["halt_reason"] = (f"Vermogen {drawdown:.1f}% onder de hoogste stand, tweede keer binnen 30 dagen: "
+                                       f"definitief gestopt tot je ingrijpt")
+            else:
+                book["halt_until"] = now_ts + 7 * 86400
+                book["halt_reason"] = (f"Vermogen {drawdown:.1f}% onder de hoogste stand (grens {self.p['max_drawdown_pct']}%): "
+                                       f"alles verkocht, pauze tot {datetime.fromtimestamp(book['halt_until'], timezone.utc).strftime('%d-%m %H:%M')} UTC")
             trigger = True
         return {"daily_loss_pct": round(daily_loss, 2), "drawdown_pct": round(drawdown, 2),
                 "halted": book["halted"], "halt_reason": book.get("halt_reason"),

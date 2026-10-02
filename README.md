@@ -28,15 +28,18 @@ Standaard: `assertief`. Assertief op de markt, met een vangnet zodat je nooit al
 
 | | voorzichtig | normaal | **assertief** | agressief |
 |---|---|---|---|---|
-| Risico per trade | 1% | 1,5% | 2% | 2,5% |
+| Risico per trade | 1% | 1,5% | 1% | 2,5% |
 | Grootte per positie | 25% | 35% | 40% | 50% |
 | Max posities | 2 | 3 | 3 | 3 |
 | Max belegd | 50% | 75% | 90% | 100% |
 | Daglimiet verlies | 3% | 5% | 5% | 8% |
 | Noodstop (alles verkopen) | 15% | 20% | 20% | 30% |
 
-Nooit geleend geld. De noodstop gaat af als het vermogen 20% onder de hoogste stand komt; daarna wordt niet meer
-gehandeld tot jij `data/state.json` verwijdert (open posities dan eerst zelf verkopen).
+Nooit geleend geld. De noodstop gaat af als het vermogen 20% onder de hoogste stand komt: alles wordt verkocht en de bot
+pauzeert 7 dagen. Gaat hij binnen 30 dagen twee keer af, dan stopt het handelen definitief tot jij `data/state.json` verwijdert.
+
+Waarom 1% risico per trade bij assertief: in de backtest over twee jaar gaf Trend-4u met 1% meer rendement (+134%) en een
+kleinere daling (27%) dan met 2% (+104%, daling 40%), omdat de noodstop minder vaak afging.
 
 ## Backtest en optimalisatie
 
