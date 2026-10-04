@@ -1,10 +1,10 @@
 {
- "generated_ts": 1790941376,
- "seconds": 245,
+ "generated_ts": 1791107271,
+ "seconds": 103,
  "period": {
   "start": 1731326400,
-  "end": 1790938800,
-  "split": 1767093840
+  "end": 1791104400,
+  "split": 1767193200
  },
  "coins": [
   "BTC/EUR",
@@ -48,40 +48,47 @@
   "WIF/EUR",
   "SEI/EUR",
   "ZEC/EUR",
-  "HYPE/EUR",
-  "PUMP/EUR",
-  "TAO/EUR",
   "ZRO/EUR",
-  "ENA/EUR",
+  "PUMP/EUR",
+  "HYPE/EUR",
+  "TAO/EUR",
   "NIGHT/EUR",
   "MON/EUR",
-  "PAXG/EUR",
-  "ONDO/EUR",
-  "XDC/EUR",
-  "MOVR/EUR",
   "WLD/EUR",
-  "POL/EUR",
-  "VVV/EUR",
-  "KAS/EUR"
+  "XDC/EUR",
+  "STRK/EUR",
+  "ENA/EUR",
+  "ONDO/EUR",
+  "2Z/EUR",
+  "SPX/EUR",
+  "BNB/EUR"
  ],
- "pool_size": 56,
- "universe_size": 15,
+ "pool_size": 55,
+ "universe_size": 8,
  "size_test": {
-  "15": {
-   "train_robust_r": -17.34,
-   "train_return_pct": -10.0,
-   "oos_expectancy_r": 0.207,
-   "oos_ex_best_expectancy_r": 0.027,
-   "oos_return_pct": 21.5,
-   "oos_trades": 81
+  "5": {
+   "train_robust_r": 0.99,
+   "train_return_pct": 7.9,
+   "oos_expectancy_r": 0.419,
+   "oos_ex_best_expectancy_r": 0.037,
+   "oos_return_pct": 10.9,
+   "oos_trades": 44
   },
-  "30": {
-   "train_robust_r": -30.33,
-   "train_return_pct": -4.1,
-   "oos_expectancy_r": 0.073,
-   "oos_ex_best_expectancy_r": -0.024,
-   "oos_return_pct": 7.9,
-   "oos_trades": 97
+  "8": {
+   "train_robust_r": 2.39,
+   "train_return_pct": 8.7,
+   "oos_expectancy_r": 0.481,
+   "oos_ex_best_expectancy_r": 0.191,
+   "oos_return_pct": 16.8,
+   "oos_trades": 55
+  },
+  "15": {
+   "train_robust_r": -9.45,
+   "train_return_pct": 2.1,
+   "oos_expectancy_r": 0.145,
+   "oos_ex_best_expectancy_r": -0.091,
+   "oos_return_pct": 5.7,
+   "oos_trades": 72
   }
  },
  "sources": {
@@ -308,6 +315,22 @@
   "KAS": {
    "exchange": "kucoin",
    "symbol": "KAS/USDT"
+  },
+  "STRK": {
+   "exchange": "binance",
+   "symbol": "STRK/USDT"
+  },
+  "2Z": {
+   "exchange": "binance",
+   "symbol": "2Z/USDT"
+  },
+  "SPX": {
+   "exchange": "kucoin",
+   "symbol": "SPX/USDT"
+  },
+  "BNB": {
+   "exchange": "binance",
+   "symbol": "BNB/USDT"
   }
  },
  "profile": "assertief",
@@ -315,328 +338,204 @@
  "slippage_pct": 0.15,
  "agents": {
   "trend4h": {
-   "trades": 191,
-   "win_rate_pct": 22.0,
-   "expectancy_r": 0.011,
-   "total_r": 2.16,
-   "profit_factor": 0.94,
-   "return_pct": 3.4,
-   "max_drawdown_pct": 28.1,
-   "fees": 167.9,
+   "trades": 126,
+   "win_rate_pct": 30.2,
+   "expectancy_r": 0.291,
+   "total_r": 36.65,
+   "profit_factor": 1.53,
+   "return_pct": 27.0,
+   "max_drawdown_pct": 17.1,
+   "fees": 144.44,
    "halts": 0,
-   "best_market": "ZEC/EUR",
-   "best_market_r": 9.877,
-   "ex_best_expectancy_r": -0.045,
-   "robust_r": -7.72,
+   "best_market": "UNI/EUR",
+   "best_market_r": 16.501,
+   "ex_best_expectancy_r": 0.164,
+   "robust_r": 20.15,
    "by_market": {
-    "SOL/EUR": {
-     "trades": 11,
-     "r": 6.807
-    },
-    "PEPE/EUR": {
-     "trades": 5,
-     "r": 3.116
-    },
-    "HBAR/EUR": {
-     "trades": 5,
-     "r": -1.589
-    },
-    "ETH/EUR": {
-     "trades": 12,
-     "r": 5.108
+    "BTC/EUR": {
+     "trades": 20,
+     "r": -5.81
     },
     "DOGE/EUR": {
-     "trades": 4,
-     "r": 4.598
+     "trades": 2,
+     "r": 0.522
     },
-    "SUI/EUR": {
-     "trades": 4,
-     "r": -1.429
-    },
-    "ENA/EUR": {
-     "trades": 4,
-     "r": -1.784
-    },
-    "BTC/EUR": {
-     "trades": 14,
-     "r": -6.172
+    "SOL/EUR": {
+     "trades": 10,
+     "r": 2.625
     },
     "XRP/EUR": {
-     "trades": 15,
-     "r": -3.143
+     "trades": 14,
+     "r": 11.014
     },
-    "TAO/EUR": {
-     "trades": 11,
-     "r": 5.512
-    },
-    "FET/EUR": {
+    "STRK/EUR": {
      "trades": 1,
-     "r": -0.775
+     "r": -0.444
     },
-    "ADA/EUR": {
-     "trades": 6,
-     "r": -5.076
-    },
-    "XLM/EUR": {
-     "trades": 1,
-     "r": -0.408
-    },
-    "ONDO/EUR": {
-     "trades": 1,
-     "r": -0.42
-    },
-    "HYPE/EUR": {
-     "trades": 15,
-     "r": 9.103
-    },
-    "LTC/EUR": {
-     "trades": 9,
-     "r": -5.193
+    "ETH/EUR": {
+     "trades": 23,
+     "r": -0.046
     },
     "SHIB/EUR": {
-     "trades": 4,
-     "r": -3.119
-    },
-    "NEAR/EUR": {
-     "trades": 5,
-     "r": -1.273
-    },
-    "AVAX/EUR": {
-     "trades": 7,
-     "r": -6.196
-    },
-    "LINK/EUR": {
-     "trades": 11,
-     "r": 8.187
-    },
-    "SEI/EUR": {
-     "trades": 4,
-     "r": -4.654
-    },
-    "PUMP/EUR": {
      "trades": 1,
-     "r": -0.353
+     "r": -0.11
+    },
+    "BNB/EUR": {
+     "trades": 15,
+     "r": -5.997
+    },
+    "SUI/EUR": {
+     "trades": 5,
+     "r": 0.595
+    },
+    "HYPE/EUR": {
+     "trades": 5,
+     "r": -1.822
+    },
+    "ADA/EUR": {
+     "trades": 3,
+     "r": 3.541
     },
     "ZEC/EUR": {
-     "trades": 20,
-     "r": 9.877
+     "trades": 9,
+     "r": 15.741
     },
-    "ICP/EUR": {
-     "trades": 1,
-     "r": -0.697
+    "AVAX/EUR": {
+     "trades": 2,
+     "r": -1.909
     },
-    "UNI/EUR": {
+    "TAO/EUR": {
      "trades": 6,
-     "r": 1.758
+     "r": -2.009
     },
-    "TRX/EUR": {
-     "trades": 3,
-     "r": -2.49
-    },
-    "ZRO/EUR": {
-     "trades": 1,
-     "r": -0.638
-    },
-    "PAXG/EUR": {
-     "trades": 1,
-     "r": -2.224
+    "AAVE/EUR": {
+     "trades": 2,
+     "r": -1.991
     },
     "DOT/EUR": {
      "trades": 2,
-     "r": -0.831
+     "r": -1.696
     },
-    "NIGHT/EUR": {
-     "trades": 1,
-     "r": -0.343
+    "NEAR/EUR": {
+     "trades": 3,
+     "r": 7.946
     },
-    "ATOM/EUR": {
-     "trades": 4,
-     "r": -3.107
-    },
-    "BCH/EUR": {
-     "trades": 1,
-     "r": -1.098
-    },
-    "AAVE/EUR": {
-     "trades": 1,
-     "r": 1.1
+    "UNI/EUR": {
+     "trades": 3,
+     "r": 16.501
     }
    },
-   "ex_best_return_pct": -2.5,
-   "ex_best_trades": 178,
-   "oos_trades": 81,
-   "oos_expectancy_r": 0.207,
-   "oos_return_pct": 21.5,
-   "oos_ex_best_expectancy_r": 0.027,
-   "default_oos_expectancy_r": 0.207,
-   "tuned": false,
+   "ex_best_return_pct": 14.0,
+   "ex_best_trades": 126,
+   "oos_trades": 55,
+   "oos_expectancy_r": 0.481,
+   "oos_return_pct": 16.8,
+   "oos_ex_best_expectancy_r": 0.191,
+   "default_oos_expectancy_r": 0.345,
+   "tuned": true,
    "params": {
-    "lookback": 55,
-    "initial_atr": 2.0,
-    "runner_atr": 6.0
+    "lookback": 30,
+    "initial_atr": 2.5,
+    "runner_atr": 4.0
    },
    "tried": 12,
-   "universe_size": 15
+   "universe_size": 8
   },
   "mean_reversion": {
-   "trades": 268,
-   "win_rate_pct": 27.6,
-   "expectancy_r": -0.436,
-   "total_r": -116.89,
-   "profit_factor": 0.32,
-   "return_pct": -54.1,
-   "max_drawdown_pct": 56.2,
-   "fees": 394.01,
+   "trades": 192,
+   "win_rate_pct": 26.6,
+   "expectancy_r": -0.416,
+   "total_r": -79.81,
+   "profit_factor": 0.31,
+   "return_pct": -40.9,
+   "max_drawdown_pct": 42.5,
+   "fees": 338.65,
    "halts": 0,
-   "best_market": "ENA/EUR",
-   "best_market_r": 2.323,
-   "ex_best_expectancy_r": -0.448,
-   "robust_r": -119.22,
+   "best_market": "ADA/EUR",
+   "best_market_r": 0.375,
+   "ex_best_expectancy_r": -0.433,
+   "robust_r": -80.18,
    "by_market": {
-    "ENA/EUR": {
-     "trades": 2,
-     "r": 2.323
-    },
     "XRP/EUR": {
-     "trades": 20,
-     "r": -11.132
+     "trades": 23,
+     "r": -11.122
     },
     "SOL/EUR": {
-     "trades": 18,
-     "r": -10.025
-    },
-    "SUI/EUR": {
-     "trades": 18,
-     "r": -7.775
+     "trades": 19,
+     "r": -10.152
     },
     "BTC/EUR": {
-     "trades": 35,
-     "r": -16.832
+     "trades": 39,
+     "r": -18.065
     },
-    "PEPE/EUR": {
-     "trades": 9,
-     "r": -0.309
+    "BNB/EUR": {
+     "trades": 25,
+     "r": -8.954
     },
     "DOGE/EUR": {
-     "trades": 16,
-     "r": -2.19
+     "trades": 12,
+     "r": -0.487
     },
-    "ALGO/EUR": {
-     "trades": 2,
-     "r": -0.318
-    },
-    "FET/EUR": {
-     "trades": 5,
-     "r": -4.448
-    },
-    "TRX/EUR": {
-     "trades": 4,
-     "r": -1.954
-    },
-    "ADA/EUR": {
-     "trades": 8,
-     "r": -0.452
+    "STRK/EUR": {
+     "trades": 1,
+     "r": -1.305
     },
     "SHIB/EUR": {
-     "trades": 4,
-     "r": -2.765
-    },
-    "TAO/EUR": {
-     "trades": 10,
-     "r": -2.198
+     "trades": 2,
+     "r": -1.293
     },
     "ETH/EUR": {
-     "trades": 25,
-     "r": -14.208
+     "trades": 27,
+     "r": -15.566
     },
-    "AAVE/EUR": {
-     "trades": 9,
-     "r": -7.055
+    "SUI/EUR": {
+     "trades": 12,
+     "r": -1.616
     },
-    "LINK/EUR": {
-     "trades": 11,
-     "r": -8.529
-    },
-    "ONDO/EUR": {
-     "trades": 5,
-     "r": 1.847
-    },
-    "XLM/EUR": {
-     "trades": 2,
-     "r": 0.222
-    },
-    "NEAR/EUR": {
-     "trades": 6,
-     "r": -1.119
-    },
-    "KAS/EUR": {
-     "trades": 1,
-     "r": 0.151
-    },
-    "AVAX/EUR": {
-     "trades": 6,
-     "r": -6.617
+    "ADA/EUR": {
+     "trades": 7,
+     "r": 0.375
     },
     "HYPE/EUR": {
-     "trades": 10,
-     "r": -7.853
+     "trades": 3,
+     "r": -0.468
     },
-    "WIF/EUR": {
-     "trades": 2,
-     "r": -1.876
-    },
-    "SEI/EUR": {
-     "trades": 4,
-     "r": 0.711
-    },
-    "HBAR/EUR": {
-     "trades": 2,
-     "r": -0.388
-    },
-    "LTC/EUR": {
-     "trades": 5,
-     "r": -3.173
-    },
-    "UNI/EUR": {
-     "trades": 7,
-     "r": -5.088
-    },
-    "PUMP/EUR": {
+    "AVAX/EUR": {
      "trades": 1,
-     "r": -0.547
-    },
-    "FIL/EUR": {
-     "trades": 4,
-     "r": -0.741
+     "r": -1.473
     },
     "ZEC/EUR": {
-     "trades": 8,
-     "r": -2.37
+     "trades": 10,
+     "r": -2.259
     },
-    "ATOM/EUR": {
-     "trades": 3,
-     "r": -0.65
+    "TAO/EUR": {
+     "trades": 4,
+     "r": -1.983
+    },
+    "NEAR/EUR": {
+     "trades": 2,
+     "r": -1.661
     },
     "DOT/EUR": {
-     "trades": 3,
-     "r": -1.026
-    },
-    "ICP/EUR": {
-     "trades": 1,
-     "r": -1.084
-    },
-    "ARB/EUR": {
      "trades": 2,
-     "r": 0.563
+     "r": -0.609
+    },
+    "AAVE/EUR": {
+     "trades": 1,
+     "r": -0.677
+    },
+    "UNI/EUR": {
+     "trades": 2,
+     "r": -2.503
     }
    },
-   "ex_best_return_pct": -54.8,
-   "ex_best_trades": 266,
-   "oos_trades": 117,
-   "oos_expectancy_r": -0.471,
-   "oos_return_pct": -30.0,
-   "oos_ex_best_expectancy_r": -0.485,
-   "default_oos_expectancy_r": -0.471,
+   "ex_best_return_pct": -40.5,
+   "ex_best_trades": 188,
+   "oos_trades": 78,
+   "oos_expectancy_r": -0.435,
+   "oos_return_pct": -20.0,
+   "oos_ex_best_expectancy_r": -0.439,
+   "default_oos_expectancy_r": -0.435,
    "tuned": false,
    "params": {
     "rsi_buy": 28,
@@ -644,167 +543,123 @@
     "max_candles": 12
    },
    "tried": 12,
-   "universe_size": 15
+   "universe_size": 8
   },
   "breakout": {
-   "trades": 540,
-   "win_rate_pct": 25.6,
-   "expectancy_r": -0.156,
-   "total_r": -84.15,
-   "profit_factor": 0.72,
-   "return_pct": -49.3,
-   "max_drawdown_pct": 56.7,
-   "fees": 638.05,
+   "trades": 433,
+   "win_rate_pct": 25.4,
+   "expectancy_r": -0.196,
+   "total_r": -84.78,
+   "profit_factor": 0.65,
+   "return_pct": -50.6,
+   "max_drawdown_pct": 52.2,
+   "fees": 633.75,
    "halts": 0,
    "best_market": "ADA/EUR",
-   "best_market_r": 6.163,
-   "ex_best_expectancy_r": -0.173,
-   "robust_r": -90.31,
+   "best_market_r": 9.383,
+   "ex_best_expectancy_r": -0.223,
+   "robust_r": -94.16,
    "by_market": {
     "BTC/EUR": {
-     "trades": 68,
-     "r": -23.114
+     "trades": 76,
+     "r": -25.265
     },
     "DOGE/EUR": {
-     "trades": 21,
-     "r": -11.309
-    },
-    "ENA/EUR": {
-     "trades": 8,
-     "r": -0.33
-    },
-    "NEAR/EUR": {
-     "trades": 23,
-     "r": -0.861
-    },
-    "PEPE/EUR": {
      "trades": 16,
-     "r": 1.875
-    },
-    "WIF/EUR": {
-     "trades": 5,
-     "r": 1.378
-    },
-    "XRP/EUR": {
-     "trades": 32,
-     "r": 4.148
-    },
-    "SUI/EUR": {
-     "trades": 25,
-     "r": -4.716
-    },
-    "BONK/EUR": {
-     "trades": 3,
-     "r": -1.22
-    },
-    "ADA/EUR": {
-     "trades": 18,
-     "r": 6.163
-    },
-    "SOL/EUR": {
-     "trades": 28,
-     "r": -0.962
+     "r": -4.753
     },
     "ETH/EUR": {
-     "trades": 56,
-     "r": -9.503
-    },
-    "FET/EUR": {
-     "trades": 11,
-     "r": -1.67
-    },
-    "XLM/EUR": {
-     "trades": 6,
-     "r": -1.387
-    },
-    "DOT/EUR": {
-     "trades": 7,
-     "r": 0.783
-    },
-    "TAO/EUR": {
-     "trades": 22,
-     "r": -10.396
-    },
-    "HBAR/EUR": {
-     "trades": 10,
-     "r": 5.378
+     "trades": 71,
+     "r": -12.892
     },
     "SHIB/EUR": {
-     "trades": 6,
-     "r": -1.857
+     "trades": 4,
+     "r": -2.214
     },
-    "ALGO/EUR": {
-     "trades": 2,
-     "r": -2.206
+    "PEPE/EUR": {
+     "trades": 3,
+     "r": -2.949
     },
-    "LINK/EUR": {
-     "trades": 29,
-     "r": -12.987
+    "XRP/EUR": {
+     "trades": 40,
+     "r": 2.904
     },
-    "TRX/EUR": {
-     "trades": 10,
-     "r": -8.233
+    "SUI/EUR": {
+     "trades": 13,
+     "r": 0.68
+    },
+    "BNB/EUR": {
+     "trades": 80,
+     "r": -33.272
+    },
+    "SOL/EUR": {
+     "trades": 34,
+     "r": -11.632
+    },
+    "STRK/EUR": {
+     "trades": 4,
+     "r": -1.218
     },
     "HYPE/EUR": {
-     "trades": 35,
-     "r": -5.927
+     "trades": 17,
+     "r": 2.31
     },
-    "ONDO/EUR": {
-     "trades": 5,
-     "r": 2.111
+    "TAO/EUR": {
+     "trades": 9,
+     "r": -5.282
     },
-    "AVAX/EUR": {
-     "trades": 19,
-     "r": -1.4
+    "ADA/EUR": {
+     "trades": 10,
+     "r": 9.383
     },
-    "KAS/EUR": {
+    "XLM/EUR": {
      "trades": 1,
-     "r": 0.262
+     "r": -1.166
     },
     "LTC/EUR": {
-     "trades": 15,
-     "r": -5.561
+     "trades": 1,
+     "r": -1.233
     },
-    "SEI/EUR": {
-     "trades": 12,
-     "r": 1.544
+    "ENA/EUR": {
+     "trades": 3,
+     "r": 0.944
     },
-    "UNI/EUR": {
-     "trades": 10,
-     "r": -3.132
-    },
-    "PUMP/EUR": {
+    "LINK/EUR": {
      "trades": 2,
-     "r": 0.488
+     "r": -1.623
+    },
+    "AVAX/EUR": {
+     "trades": 3,
+     "r": -3.665
     },
     "ZEC/EUR": {
-     "trades": 22,
-     "r": -1.21
+     "trades": 26,
+     "r": 8.511
+    },
+    "DOT/EUR": {
+     "trades": 1,
+     "r": -1.311
+    },
+    "NEAR/EUR": {
+     "trades": 13,
+     "r": -1.07
     },
     "AAVE/EUR": {
-     "trades": 7,
-     "r": -0.362
-    },
-    "FIL/EUR": {
-     "trades": 3,
-     "r": 0.056
-    },
-    "ATOM/EUR": {
-     "trades": 1,
-     "r": 1.153
-    },
-    "ARB/EUR": {
      "trades": 2,
-     "r": -1.134
+     "r": -0.687
+    },
+    "UNI/EUR": {
+     "trades": 4,
+     "r": 0.728
     }
    },
-   "ex_best_return_pct": -49.5,
-   "ex_best_trades": 538,
-   "oos_trades": 203,
-   "oos_expectancy_r": -0.143,
-   "oos_return_pct": -21.8,
-   "oos_ex_best_expectancy_r": -0.169,
-   "default_oos_expectancy_r": -0.143,
+   "ex_best_return_pct": -50.6,
+   "ex_best_trades": 431,
+   "oos_trades": 168,
+   "oos_expectancy_r": -0.269,
+   "oos_return_pct": -30.0,
+   "oos_ex_best_expectancy_r": -0.348,
+   "default_oos_expectancy_r": -0.269,
    "tuned": false,
    "params": {
     "lookback": 24,
@@ -812,1168 +667,1064 @@
     "stop_atr": 2.5
    },
    "tried": 12,
-   "universe_size": 15
+   "universe_size": 8
   },
   "momentum": {
-   "trades": 454,
-   "win_rate_pct": 21.6,
-   "expectancy_r": -0.36,
-   "total_r": -163.49,
-   "profit_factor": 0.51,
-   "return_pct": -67.9,
-   "max_drawdown_pct": 69.4,
-   "fees": 589.03,
+   "trades": 322,
+   "win_rate_pct": 20.2,
+   "expectancy_r": -0.364,
+   "total_r": -117.11,
+   "profit_factor": 0.46,
+   "return_pct": -56.0,
+   "max_drawdown_pct": 57.2,
+   "fees": 518.39,
    "halts": 0,
-   "best_market": "XLM/EUR",
-   "best_market_r": 5.989,
-   "ex_best_expectancy_r": -0.383,
-   "robust_r": -169.47,
+   "best_market": "UNI/EUR",
+   "best_market_r": 3.169,
+   "ex_best_expectancy_r": -0.375,
+   "robust_r": -120.28,
    "by_market": {
     "BTC/EUR": {
-     "trades": 56,
-     "r": -27.424
+     "trades": 62,
+     "r": -33.397
+    },
+    "BNB/EUR": {
+     "trades": 47,
+     "r": -20.3
     },
     "DOGE/EUR": {
-     "trades": 29,
-     "r": -6.009
-    },
-    "SHIB/EUR": {
-     "trades": 5,
-     "r": 0.366
-    },
-    "NEAR/EUR": {
-     "trades": 12,
-     "r": -7.863
+     "trades": 14,
+     "r": 2.438
     },
     "XRP/EUR": {
-     "trades": 25,
-     "r": -7.289
+     "trades": 33,
+     "r": -10.654
     },
-    "PEPE/EUR": {
-     "trades": 22,
-     "r": -7.347
-    },
-    "ADA/EUR": {
-     "trades": 17,
-     "r": -4.578
-    },
-    "BONK/EUR": {
-     "trades": 3,
-     "r": -1.524
+    "SHIB/EUR": {
+     "trades": 4,
+     "r": 0.052
     },
     "SOL/EUR": {
-     "trades": 39,
-     "r": -14.091
-    },
-    "WIF/EUR": {
-     "trades": 9,
-     "r": -2.946
-    },
-    "APT/EUR": {
-     "trades": 1,
-     "r": -0.843
+     "trades": 38,
+     "r": -14.139
     },
     "ETH/EUR": {
-     "trades": 48,
-     "r": -11.544
+     "trades": 53,
+     "r": -12.817
     },
-    "XLM/EUR": {
-     "trades": 11,
-     "r": 5.989
-    },
-    "SUI/EUR": {
-     "trades": 22,
-     "r": -7.493
-    },
-    "FET/EUR": {
-     "trades": 14,
-     "r": -6.981
-    },
-    "DOT/EUR": {
+    "PEPE/EUR": {
      "trades": 4,
-     "r": 0.992
+     "r": -2.947
     },
-    "ALGO/EUR": {
-     "trades": 3,
-     "r": -1.465
-    },
-    "LINK/EUR": {
-     "trades": 18,
-     "r": -12.96
-    },
-    "ENA/EUR": {
-     "trades": 10,
-     "r": -1.995
-    },
-    "TAO/EUR": {
-     "trades": 15,
-     "r": -7.967
-    },
-    "AAVE/EUR": {
-     "trades": 6,
-     "r": -0.807
-    },
-    "HBAR/EUR": {
-     "trades": 4,
-     "r": -3.572
+    "STRK/EUR": {
+     "trades": 1,
+     "r": 0.038
     },
     "HYPE/EUR": {
-     "trades": 13,
-     "r": -7.556
+     "trades": 11,
+     "r": -4.161
     },
-    "ONDO/EUR": {
-     "trades": 4,
-     "r": -0.288
+    "SUI/EUR": {
+     "trades": 14,
+     "r": -9.486
+    },
+    "TAO/EUR": {
+     "trades": 7,
+     "r": -4.435
+    },
+    "ADA/EUR": {
+     "trades": 7,
+     "r": 0.583
+    },
+    "XLM/EUR": {
+     "trades": 1,
+     "r": -1.126
+    },
+    "ENA/EUR": {
+     "trades": 3,
+     "r": -0.963
     },
     "AVAX/EUR": {
-     "trades": 15,
-     "r": -6.391
-    },
-    "LTC/EUR": {
-     "trades": 15,
-     "r": -13.127
-    },
-    "SEI/EUR": {
-     "trades": 8,
-     "r": -1.614
-    },
-    "UNI/EUR": {
-     "trades": 7,
-     "r": -1.01
-    },
-    "PUMP/EUR": {
-     "trades": 2,
-     "r": -2.193
-    },
-    "TRX/EUR": {
      "trades": 3,
-     "r": -0.154
-    },
-    "ICP/EUR": {
-     "trades": 1,
-     "r": -0.723
+     "r": -3.41
     },
     "ZEC/EUR": {
-     "trades": 11,
-     "r": -1.372
+     "trades": 13,
+     "r": -2.172
     },
-    "FIL/EUR": {
+    "AAVE/EUR": {
      "trades": 1,
-     "r": -1.202
+     "r": -0.859
     },
-    "ARB/EUR": {
+    "NEAR/EUR": {
+     "trades": 5,
+     "r": -2.529
+    },
+    "UNI/EUR": {
      "trades": 1,
-     "r": -0.503
+     "r": 3.169
     }
    },
-   "ex_best_return_pct": -69.1,
-   "ex_best_trades": 446,
-   "oos_trades": 156,
-   "oos_expectancy_r": -0.49,
-   "oos_return_pct": -40.1,
-   "oos_ex_best_expectancy_r": -0.509,
-   "default_oos_expectancy_r": -0.49,
+   "ex_best_return_pct": -56.9,
+   "ex_best_trades": 321,
+   "oos_trades": 112,
+   "oos_expectancy_r": -0.517,
+   "oos_return_pct": -32.7,
+   "oos_ex_best_expectancy_r": -0.551,
+   "default_oos_expectancy_r": -0.517,
    "tuned": false,
    "params": {
     "volume_mult": 1.5,
     "stop_atr": 2.0
    },
    "tried": 6,
-   "universe_size": 15
+   "universe_size": 8
   },
   "squeeze": {
-   "trades": 445,
-   "win_rate_pct": 22.9,
-   "expectancy_r": -0.362,
-   "total_r": -160.93,
-   "profit_factor": 0.45,
-   "return_pct": -71.2,
-   "max_drawdown_pct": 71.3,
-   "fees": 506.28,
+   "trades": 313,
+   "win_rate_pct": 18.5,
+   "expectancy_r": -0.405,
+   "total_r": -126.82,
+   "profit_factor": 0.47,
+   "return_pct": -57.1,
+   "max_drawdown_pct": 57.1,
+   "fees": 471.94,
    "halts": 0,
    "best_market": "ZEC/EUR",
-   "best_market_r": 10.439,
-   "ex_best_expectancy_r": -0.398,
-   "robust_r": -171.37,
+   "best_market_r": 7.198,
+   "ex_best_expectancy_r": -0.454,
+   "robust_r": -134.02,
    "by_market": {
     "SOL/EUR": {
-     "trades": 29,
-     "r": -12.744
-    },
-    "WIF/EUR": {
-     "trades": 11,
-     "r": 4.618
-    },
-    "ENA/EUR": {
-     "trades": 6,
-     "r": -1.629
-    },
-    "APT/EUR": {
-     "trades": 2,
-     "r": -1.649
+     "trades": 36,
+     "r": -18.207
     },
     "SHIB/EUR": {
-     "trades": 10,
-     "r": -7.175
+     "trades": 8,
+     "r": -5.193
+    },
+    "BNB/EUR": {
+     "trades": 45,
+     "r": -23.032
     },
     "PEPE/EUR": {
-     "trades": 18,
-     "r": -12.742
-    },
-    "SUI/EUR": {
-     "trades": 25,
-     "r": -19.03
+     "trades": 5,
+     "r": -3.3
     },
     "DOGE/EUR": {
-     "trades": 18,
-     "r": -8.066
+     "trades": 9,
+     "r": -0.175
     },
     "XRP/EUR": {
-     "trades": 23,
-     "r": -2.677
-    },
-    "ADA/EUR": {
-     "trades": 16,
-     "r": -17.114
+     "trades": 38,
+     "r": -9.105
     },
     "ETH/EUR": {
-     "trades": 32,
-     "r": -2.26
+     "trades": 39,
+     "r": -6.631
     },
-    "HBAR/EUR": {
-     "trades": 9,
-     "r": -1.774
-    },
-    "XLM/EUR": {
-     "trades": 5,
-     "r": -1.325
-    },
-    "DOT/EUR": {
-     "trades": 8,
-     "r": -7.215
-    },
-    "FET/EUR": {
-     "trades": 8,
-     "r": 0.204
+    "STRK/EUR": {
+     "trades": 2,
+     "r": 2.111
     },
     "BTC/EUR": {
      "trades": 33,
-     "r": -20.335
+     "r": -21.49
     },
-    "LINK/EUR": {
-     "trades": 20,
-     "r": 2.41
-    },
-    "AAVE/EUR": {
-     "trades": 8,
-     "r": -4.127
-    },
-    "TAO/EUR": {
-     "trades": 20,
-     "r": -4.747
+    "SUI/EUR": {
+     "trades": 9,
+     "r": -9.158
     },
     "HYPE/EUR": {
-     "trades": 32,
-     "r": -10.37
+     "trades": 16,
+     "r": -3.649
     },
-    "ONDO/EUR": {
-     "trades": 2,
-     "r": -0.447
+    "TAO/EUR": {
+     "trades": 10,
+     "r": -3.127
     },
     "LTC/EUR": {
-     "trades": 29,
-     "r": -23.348
+     "trades": 3,
+     "r": -3.608
     },
-    "NEAR/EUR": {
-     "trades": 25,
-     "r": -15.524
-    },
-    "KAS/EUR": {
-     "trades": 1,
-     "r": 0.94
-    },
-    "AVAX/EUR": {
-     "trades": 8,
-     "r": -4.594
+    "ADA/EUR": {
+     "trades": 9,
+     "r": -7.286
     },
     "SEI/EUR": {
-     "trades": 5,
-     "r": -1.625
+     "trades": 1,
+     "r": -1.271
     },
-    "UNI/EUR": {
-     "trades": 15,
-     "r": 1.557
-    },
-    "WLD/EUR": {
+    "ENA/EUR": {
      "trades": 2,
-     "r": -2.31
+     "r": -0.813
     },
     "ZEC/EUR": {
-     "trades": 14,
-     "r": 10.439
+     "trades": 18,
+     "r": 7.198
     },
-    "TRX/EUR": {
-     "trades": 2,
-     "r": -1.503
-    },
-    "ICP/EUR": {
-     "trades": 2,
-     "r": -1.867
-    },
-    "ATOM/EUR": {
-     "trades": 2,
-     "r": -2.303
-    },
-    "FIL/EUR": {
-     "trades": 2,
-     "r": -0.907
-    },
-    "ARB/EUR": {
+    "DOT/EUR": {
      "trades": 3,
-     "r": 8.296
+     "r": -2.119
+    },
+    "NEAR/EUR": {
+     "trades": 15,
+     "r": -13.951
+    },
+    "AVAX/EUR": {
+     "trades": 4,
+     "r": -3.478
+    },
+    "AAVE/EUR": {
+     "trades": 3,
+     "r": -1.912
+    },
+    "UNI/EUR": {
+     "trades": 5,
+     "r": 1.371
     }
    },
-   "ex_best_return_pct": -74.3,
-   "ex_best_trades": 441,
-   "oos_trades": 176,
-   "oos_expectancy_r": -0.259,
-   "oos_return_pct": -34.1,
-   "oos_ex_best_expectancy_r": -0.354,
-   "default_oos_expectancy_r": -0.259,
+   "ex_best_return_pct": -60.2,
+   "ex_best_trades": 296,
+   "oos_trades": 130,
+   "oos_expectancy_r": -0.367,
+   "oos_return_pct": -26.6,
+   "oos_ex_best_expectancy_r": -0.497,
+   "default_oos_expectancy_r": -0.367,
    "tuned": false,
    "params": {
     "squeeze_pct": 10,
     "stop_atr": 2.0
    },
    "tried": 6,
-   "universe_size": 15
+   "universe_size": 8
   }
  },
  "team": {
-  "trades": 629,
-  "win_rate_pct": 23.8,
-  "expectancy_r": -0.237,
-  "total_r": -149.32,
-  "profit_factor": 0.61,
-  "return_pct": -65.5,
-  "max_drawdown_pct": 77.1,
-  "fees": 672.39,
-  "halts": 7,
+  "trades": 597,
+  "win_rate_pct": 22.4,
+  "expectancy_r": -0.309,
+  "total_r": -184.38,
+  "profit_factor": 0.55,
+  "return_pct": -73.5,
+  "max_drawdown_pct": 77.4,
+  "fees": 692.63,
+  "halts": 6,
   "best_market": "ZEC/EUR",
-  "best_market_r": 14.405,
-  "ex_best_expectancy_r": -0.273,
-  "robust_r": -163.72,
+  "best_market_r": 7.102,
+  "ex_best_expectancy_r": -0.341,
+  "robust_r": -191.48,
   "curve": [
    [
     1731369600,
-    1027.36
+    1030.16
    ],
    [
     1731974400,
-    1028.59
+    1030.58
    ],
    [
     1732579200,
-    1031.49
+    1044.96
    ],
    [
     1733184000,
-    1171.96
+    1142.63
    ],
    [
     1733788800,
-    1081.74
+    1045.95
    ],
    [
     1734393600,
-    1051.26
+    972.06
    ],
    [
     1734998400,
-    948.61
+    922.94
    ],
    [
     1735603200,
-    922.37
+    878.78
    ],
    [
     1736208000,
-    900.77
+    897.57
    ],
    [
     1736812800,
-    832.48
+    828.63
    ],
    [
     1737417600,
-    855.34
+    809.86
    ],
    [
     1738022400,
-    746.06
-   ],
-   [
-    1738627200,
-    746.06
-   ],
-   [
-    1739232000,
     741.25
    ],
    [
+    1738627200,
+    735.88
+   ],
+   [
+    1739232000,
+    735.88
+   ],
+   [
     1739836800,
-    727.22
+    735.88
    ],
    [
     1740441600,
-    712.94
+    714.53
    ],
    [
     1741046400,
-    698.72
+    714.53
    ],
    [
     1741651200,
-    696.65
+    714.53
    ],
    [
     1742256000,
-    695.98
+    714.53
    ],
    [
     1742860800,
-    692.18
+    708.48
    ],
    [
     1743465600,
-    664.4
+    692.26
    ],
    [
     1744070400,
-    657.57
+    685.15
    ],
    [
     1744675200,
-    659.46
+    680.02
    ],
    [
     1745280000,
-    642.1
+    655.86
    ],
    [
     1745884800,
-    673.69
+    673.7
    ],
    [
     1746489600,
-    673.68
+    634.8
    ],
    [
     1747094400,
-    702.73
+    656.53
    ],
    [
     1747699200,
-    700.64
+    627.91
    ],
    [
     1748304000,
-    719.29
+    612.2
    ],
    [
     1748908800,
-    683.17
+    604.86
    ],
    [
     1749513600,
-    659.42
+    585.96
    ],
    [
     1750118400,
-    628.43
+    572.9
    ],
    [
     1750723200,
-    597.39
+    564.95
    ],
    [
     1751328000,
-    584.01
+    534.01
    ],
    [
     1751932800,
-    584.3
+    525.79
    ],
    [
     1752537600,
-    649.44
+    583.87
    ],
    [
     1753142400,
-    646.41
+    587.78
    ],
    [
     1753747200,
-    617.35
+    568.45
    ],
    [
     1754352000,
-    610.09
+    553.59
    ],
    [
     1754956800,
-    600.9
+    574.64
    ],
    [
     1755561600,
-    558.19
+    559.31
    ],
    [
     1756166400,
-    549.24
+    544.46
    ],
    [
     1756771200,
-    547.22
+    544.46
    ],
    [
     1757376000,
-    554.56
+    544.46
    ],
    [
     1757980800,
-    564.23
+    535.71
    ],
    [
     1758585600,
-    528.93
+    496.22
    ],
    [
     1759190400,
-    528.93
+    494.99
    ],
    [
     1759795200,
-    528.3
+    500.07
    ],
    [
     1760400000,
-    504.85
+    491.35
    ],
    [
     1761004800,
-    501.86
+    491.35
    ],
    [
     1761609600,
-    505.68
+    493.9
    ],
    [
     1762214400,
-    492.94
+    493.89
    ],
    [
     1762819200,
-    485.47
+    493.89
    ],
    [
     1763424000,
-    484.37
+    493.89
    ],
    [
     1764028800,
-    484.37
+    493.89
    ],
    [
     1764633600,
-    484.37
+    493.89
    ],
    [
     1765238400,
-    481.72
+    493.89
    ],
    [
     1765843200,
-    476.28
+    493.89
    ],
    [
     1766448000,
-    478.07
+    493.89
    ],
    [
     1767052800,
-    477.41
+    479.65
    ],
    [
     1767657600,
-    514.16
+    484.54
    ],
    [
     1768262400,
-    453.02
+    443.41
    ],
    [
     1768867200,
-    423.25
+    417.85
    ],
    [
     1769472000,
-    423.25
+    413.04
    ],
    [
     1770076800,
-    422.69
+    413.04
    ],
    [
     1770681600,
-    418.57
+    413.04
    ],
    [
     1771286400,
-    414.22
+    413.04
    ],
    [
     1771891200,
-    414.22
+    413.04
    ],
    [
     1772496000,
-    409.46
+    413.04
    ],
    [
     1773100800,
-    404.1
+    406.36
    ],
    [
     1773705600,
-    416.68
+    400.88
    ],
    [
     1774310400,
-    401.12
+    387.33
    ],
    [
     1774915200,
-    398.62
+    387.33
    ],
    [
     1775520000,
-    387.76
+    379.59
    ],
    [
     1776124800,
-    396.18
+    372.46
    ],
    [
     1776729600,
-    366.38
+    348.73
    ],
    [
     1777334400,
-    346.06
+    328.04
    ],
    [
     1777939200,
-    342.61
+    326.13
    ],
    [
     1778544000,
-    369.17
+    341.34
    ],
    [
     1779148800,
-    340.34
+    317.17
    ],
    [
     1779753600,
-    361.14
+    317.14
    ],
    [
     1780358400,
-    364.36
+    315.68
    ],
    [
     1780963200,
-    336.89
+    315.68
    ],
    [
     1781568000,
-    339.87
+    315.68
    ],
    [
     1782172800,
-    329.03
+    315.68
    ],
    [
     1782777600,
-    328.39
+    315.68
    ],
    [
     1783382400,
-    334.38
+    315.68
    ],
    [
     1783987200,
-    324.68
+    305.74
    ],
    [
     1784592000,
-    306.22
+    290.66
    ],
    [
     1785196800,
-    299.13
+    281.0
    ],
    [
     1785801600,
-    297.18
+    275.12
    ],
    [
     1786406400,
-    273.05
+    263.84
    ],
    [
     1787011200,
-    272.14
+    260.27
    ],
    [
     1787616000,
-    318.91
+    305.62
    ],
    [
     1788220800,
-    308.43
+    279.46
    ],
    [
     1788825600,
-    320.15
+    277.98
    ],
    [
     1789430400,
-    305.34
+    270.88
    ],
    [
     1790035200,
-    341.17
+    278.6
    ],
    [
     1790640000,
-    340.05
+    280.62
    ]
   ]
  },
  "live_team": {
-  "trades": 189,
-  "win_rate_pct": 22.2,
-  "expectancy_r": 0.014,
-  "total_r": 2.72,
-  "profit_factor": 0.95,
-  "return_pct": 3.8,
-  "max_drawdown_pct": 27.8,
-  "fees": 167.01,
-  "halts": 1,
-  "best_market": "ZEC/EUR",
-  "best_market_r": 9.877,
-  "ex_best_expectancy_r": -0.042,
-  "robust_r": -7.15,
+  "trades": 126,
+  "win_rate_pct": 30.2,
+  "expectancy_r": 0.291,
+  "total_r": 36.65,
+  "profit_factor": 1.53,
+  "return_pct": 27.0,
+  "max_drawdown_pct": 17.1,
+  "fees": 144.44,
+  "halts": 0,
+  "best_market": "UNI/EUR",
+  "best_market_r": 16.501,
+  "ex_best_expectancy_r": 0.164,
+  "robust_r": 20.15,
   "curve": [
    [
     1731369600,
-    1015.75
+    1013.5
    ],
    [
     1731974400,
-    1017.36
+    1023.65
    ],
    [
     1732579200,
-    1020.0
+    1027.96
    ],
    [
     1733184000,
-    1037.62
+    1071.38
    ],
    [
     1733788800,
-    1033.21
+    1046.09
    ],
    [
     1734393600,
-    1035.98
+    1043.93
    ],
    [
     1734998400,
-    1005.66
+    1017.85
    ],
    [
     1735603200,
-    1001.7
+    1016.18
    ],
    [
     1736208000,
-    1009.22
+    1031.78
    ],
    [
     1736812800,
-    956.21
+    1010.47
    ],
    [
     1737417600,
-    954.22
+    1033.24
    ],
    [
     1738022400,
-    956.78
+    1036.82
    ],
    [
     1738627200,
-    946.65
+    1013.92
    ],
    [
     1739232000,
-    946.65
+    1013.92
    ],
    [
     1739836800,
-    928.73
+    1013.92
    ],
    [
     1740441600,
-    925.29
+    1013.92
    ],
    [
     1741046400,
-    906.84
+    1013.92
    ],
    [
     1741651200,
-    904.15
+    1013.92
    ],
    [
     1742256000,
-    903.29
+    1013.92
    ],
    [
     1742860800,
-    898.36
+    1009.78
    ],
    [
     1743465600,
-    862.29
+    996.95
    ],
    [
     1744070400,
-    862.29
+    990.09
    ],
    [
     1744675200,
-    864.76
+    982.68
    ],
    [
     1745280000,
-    857.83
+    983.19
    ],
    [
     1745884800,
-    897.8
+    1016.86
    ],
    [
     1746489600,
-    886.78
+    1004.94
    ],
    [
     1747094400,
-    924.93
+    1057.13
    ],
    [
     1747699200,
-    918.61
+    1060.8
    ],
    [
     1748304000,
-    954.62
+    1081.87
    ],
    [
     1748908800,
-    937.49
+    1050.4
    ],
    [
     1749513600,
-    950.36
+    1048.89
    ],
    [
     1750118400,
-    947.3
+    1030.54
    ],
    [
     1750723200,
-    918.54
+    1015.35
    ],
    [
     1751328000,
-    898.04
+    1012.69
    ],
    [
     1751932800,
-    865.26
+    973.59
    ],
    [
     1752537600,
-    925.79
+    1070.96
    ],
    [
     1753142400,
-    1037.01
+    1191.27
    ],
    [
     1753747200,
-    1006.43
+    1139.73
    ],
    [
     1754352000,
-    992.6
+    1114.55
    ],
    [
     1754956800,
-    1016.84
+    1142.86
    ],
    [
     1755561600,
-    992.35
+    1150.61
    ],
    [
     1756166400,
-    968.06
+    1138.85
    ],
    [
     1756771200,
-    964.5
+    1142.51
    ],
    [
     1757376000,
-    977.44
+    1142.51
    ],
    [
     1757980800,
-    1005.94
+    1147.98
    ],
    [
     1758585600,
-    995.79
+    1160.53
    ],
    [
     1759190400,
-    995.79
+    1157.91
    ],
    [
     1759795200,
-    1014.81
+    1184.71
    ],
    [
     1760400000,
-    947.49
+    1147.77
    ],
    [
     1761004800,
-    941.89
+    1144.88
    ],
    [
     1761609600,
-    949.06
+    1136.44
    ],
    [
     1762214400,
-    925.15
+    1119.38
    ],
    [
     1762819200,
-    911.13
+    1119.38
    ],
    [
     1763424000,
-    909.08
+    1119.38
    ],
    [
     1764028800,
-    909.08
+    1119.38
    ],
    [
     1764633600,
-    909.08
+    1119.38
    ],
    [
     1765238400,
-    904.1
+    1119.38
    ],
    [
     1765843200,
-    893.9
+    1119.38
    ],
    [
     1766448000,
-    897.24
+    1119.38
    ],
    [
     1767052800,
-    900.65
+    1087.1
    ],
    [
     1767657600,
-    970.04
+    1143.48
    ],
    [
     1768262400,
-    915.08
+    1111.53
    ],
    [
     1768867200,
-    884.73
+    1113.31
    ],
    [
     1769472000,
-    880.26
+    1113.31
    ],
    [
     1770076800,
-    879.09
+    1113.31
    ],
    [
     1770681600,
-    870.53
+    1113.31
    ],
    [
     1771286400,
-    861.49
+    1113.31
    ],
    [
     1771891200,
-    861.49
+    1113.31
    ],
    [
     1772496000,
-    844.46
+    1113.31
    ],
    [
     1773100800,
-    844.28
+    1095.3
    ],
    [
     1773705600,
-    877.26
+    1110.78
    ],
    [
     1774310400,
-    863.59
+    1085.47
    ],
    [
     1774915200,
-    864.87
+    1080.57
    ],
    [
     1775520000,
-    843.15
+    1080.57
    ],
    [
     1776124800,
-    873.83
+    1081.59
    ],
    [
     1776729600,
-    853.0
+    1063.13
    ],
    [
     1777334400,
-    844.42
+    1044.1
    ],
    [
     1777939200,
-    855.29
+    1051.63
    ],
    [
     1778544000,
-    905.16
+    1097.92
    ],
    [
     1779148800,
-    862.03
+    1056.84
    ],
    [
     1779753600,
-    911.34
+    1080.39
    ],
    [
     1780358400,
-    932.86
+    1064.57
    ],
    [
     1780963200,
-    859.6
+    1064.57
    ],
    [
     1781568000,
-    865.77
+    1064.57
    ],
    [
     1782172800,
-    838.16
+    1064.57
    ],
    [
     1782777600,
-    836.53
+    1064.57
    ],
    [
     1783382400,
-    851.77
+    1064.57
    ],
    [
     1783987200,
-    827.49
+    1057.39
    ],
    [
     1784592000,
-    818.95
+    1050.91
    ],
    [
     1785196800,
-    781.66
+    1018.27
    ],
    [
     1785801600,
-    781.73
+    1006.35
    ],
    [
     1786406400,
-    756.75
+    989.42
    ],
    [
     1787011200,
-    766.41
+    987.93
    ],
    [
     1787616000,
-    939.67
+    1136.87
    ],
    [
     1788220800,
-    943.78
+    1141.78
    ],
    [
     1788825600,
-    1023.45
+    1260.5
    ],
    [
     1789430400,
-    978.04
+    1196.3
    ],
    [
     1790035200,
-    1035.52
+    1267.26
    ],
    [
     1790640000,
-    1038.06
+    1278.54
    ]
   ]
  },
- "btc_return_pct": 5.0
+ "btc_return_pct": 3.6
 }

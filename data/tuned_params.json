@@ -1,1 +1,7 @@
-{}
+{
+ "trend4h": {
+  "lookback": 30,
+  "initial_atr": 2.5,
+  "runner_atr": 4.0
+ }
+}
