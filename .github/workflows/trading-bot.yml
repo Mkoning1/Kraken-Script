@@ -28,7 +28,7 @@ jobs:
       - name: Installeren
         run: pip install -r requirements.txt
 
-      - name: Bot aan het werk (elk kwartier, bijna 6 uur lang)
+      - name: Bot aan het werk (elke 5 minuten, bijna 6 uur lang)
         env:
           KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
           KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
