@@ -147,7 +147,7 @@ button { font: inherit; }
 <header class="bar">
   <span class="brand">Kraken agents</span>
   <nav class="tabs" aria-label="Weergave">
-    <a href="index.html" aria-current="page">Handelsvloer</a>
+    <a href="index.html" aria-current="page">HQ</a>
     <a href="trades.html">Trades</a>
     <a href="details.html">Details</a>
     <a href="opportunities.html">Opportunities</a>
@@ -583,7 +583,7 @@ function buildCompact() {
   const lp = Object.fromEntries((D.books.live?.positions || []).map(p => [p.market, p]));
   el.innerHTML = `<p class="when">Op je pc zie je de volledige handelsvloer in 3D. Laatste run ${clock(D.generated_ts)}.</p>
     <section class="cashp" style="margin-top:12px">${moneyHTML()}</section>
-    <h2>Handelsvloer</h2><div class="desks-c">${D.markets.map(m => { const e = D.evaluations[m]; return `<button data-coin="${esc(m)}" class="${lp[m] ? "real" : ""}"><span class="t">${esc(base(m))}${lp[m] ? `<span class="${lp[m].unrealized >= 0 ? "up" : "down"}">${signed(lp[m].unrealized)}</span>` : ""}</span><span class="p" data-px="${esc(m)}">${price(LIVE.px[m] ?? e?.price)}</span>
+    <h2>HQ</h2><div class="desks-c">${D.markets.map(m => { const e = D.evaluations[m]; return `<button data-coin="${esc(m)}" class="${lp[m] ? "real" : ""}"><span class="t">${esc(base(m))}${lp[m] ? `<span class="${lp[m].unrealized >= 0 ? "up" : "down"}">${signed(lp[m].unrealized)}</span>` : ""}</span><span class="p" data-px="${esc(m)}">${price(LIVE.px[m] ?? e?.price)}</span>
       <span class="screens">${D.agents.map(a => { const s = e?.signals[a.agent]; return `<i title="${esc(a.agent)}" style="background:${SIGNAL[s?.action || "hold"]};border-color:${TEAM[a.name]}"></i>`; }).join("")}</span></button>`; }).join("")}</div>
     <h2>Afdelingen</h2><div class="rooms-c">${ROOMS.map(r => `<button data-room="${r.key}"><b><span class="dot" style="background:${r.color}"></span>${r.label}</b><span>${esc(roomStatus(r.key))}</span></button>`).join("")}</div>
     <h2>Team</h2><p class="when">${D.agents.map(a => `<span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}`).join("&nbsp;&nbsp; ")}</p>`;
