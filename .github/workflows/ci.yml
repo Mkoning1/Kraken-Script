@@ -28,14 +28,25 @@ jobs:
       - name: Dashboard JavaScript syntax
         run: |
           python - <<'PY'
+          import gzip
           import re
+          import subprocess
           from pathlib import Path
-          for name in ("docs/index.html", "docs/trades.html", "docs/details.html", "docs/opportunities.html"):
+
+          pages = ("docs/index.html", "docs/trades.html", "docs/details.html", "docs/opportunities.html")
+          for name in pages:
               text = Path(name).read_text()
               scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
               if not scripts:
                   raise SystemExit(f"geen JavaScript gevonden in {name}")
               Path("/tmp/dashboard.mjs").write_text("\n".join(scripts))
-              import subprocess
               subprocess.run(["node", "--check", "/tmp/dashboard.mjs"], check=True)
+
+          with gzip.open("docs/hq.html.gz", "rt", encoding="utf-8") as fh:
+              text = fh.read()
+          scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
+          if not scripts:
+              raise SystemExit("geen JavaScript gevonden in docs/hq.html.gz")
+          Path("/tmp/hq.mjs").write_text("\n".join(scripts))
+          subprocess.run(["node", "--check", "/tmp/hq.mjs"], check=True)
           PY
