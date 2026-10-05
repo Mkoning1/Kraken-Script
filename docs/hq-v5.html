@@ -324,73 +324,94 @@ function routeWaypointsfunction routeWaypoints(fromKey,toKey){
  return pts;
 }
 function createScene(){
- renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;stage.appendChild(renderer.domElement);
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.16;stage.appendChild(renderer.domElement);
  labelRenderer=new CSS2DRenderer();labelRenderer.setSize(innerWidth,innerHeight);labelRenderer.domElement.className="l2d";labelRenderer.domElement.style.cssText="position:absolute;inset:0;pointer-events:none";stage.appendChild(labelRenderer.domElement);
- scene=new THREE.Scene();scene.background=new THREE.Color("#140D33");scene.fog=new THREE.Fog("#140D33",125,220);
- const a=innerWidth/innerHeight,F=72;camera=new THREE.OrthographicCamera(-F*a/2,F*a/2,F/2,-F/2,.1,400);
- controls=new OrbitControls(camera,renderer.domElement);controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};controls.screenSpacePanning=true;controls.enableDamping=true;controls.dampingFactor=.1;controls.minZoom=.18;controls.maxZoom=3.8;controls.minPolarAngle=.35;controls.maxPolarAngle=1.38;
- scene.add(new THREE.HemisphereLight("#e6ddff","#241750",1.15));const sun=new THREE.DirectionalLight("#fff",1.55);sun.position.set(45,95,65);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-75,right:75,top:85,bottom:-45,near:1,far:240});scene.add(sun);
- // base / nighttime city silhouette
- box(scene,116,.7,92,mat("#1d153e"),0,-.55,20,false);
- for(let i=-6;i<=6;i++){const h=5+Math.abs(i%3)*4;box(scene,6,h,8,mat("#17112f"),i*10,-.5+h/2,76+(i%2)*5,false)}
- FLOORS.forEach(buildFloor);buildShaft();resetView();setupPicking();window.addEventListener("resize",resize);renderer.setAnimationLoop(frame);document.getElementById("loading").style.display="none";
+ scene=new THREE.Scene();scene.background=new THREE.Color("#140D33");scene.fog=new THREE.Fog("#140D33",145,235);
+ const a=innerWidth/innerHeight,F=76;camera=new THREE.OrthographicCamera(-F*a/2,F*a/2,F/2,-F/2,.1,420);
+ controls=new OrbitControls(camera,renderer.domElement);controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};controls.screenSpacePanning=true;controls.enableDamping=true;controls.dampingFactor=.09;controls.minZoom=.16;controls.maxZoom=4.2;controls.minPolarAngle=.3;controls.maxPolarAngle=1.4;
+ scene.add(new THREE.HemisphereLight("#e6ddff","#241750",1.2));const sun=new THREE.DirectionalLight("#fff",1.6);sun.position.set(48,92,68);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-90,right:90,top:95,bottom:-55,near:1,far:260});scene.add(sun);
+ // nette campusgrond; de oude zwarte skylineblokken zijn bewust verwijderd.
+ box(scene,136,.7,112,mat("#1d153e"),4,-.55,17,false);
+ FLOORS.forEach(buildFloor);buildShaft();buildMinimap();resetView();setupPicking();window.addEventListener("resize",resize);renderer.setAnimationLoop(frame);document.getElementById("loading").style.display="none";
 }
 function resetView(){
- selected=null;document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.remove("active"));Object.values(labelsByFloor).forEach(l=>l.element.classList.remove("active"));
- camera.position.set(92,82,108);controls.target.set(0,0,19);camera.zoom=Math.max(.48,Math.min(.66,innerWidth/1800));camera.updateProjectionMatrix();controls.update();showOverview();
+ selected=null;followCourier=false;document.getElementById("follow").classList.remove("on");controls.enabled=true;
+ document.querySelectorAll(".floor-nav button,.map-room").forEach(b=>b.classList.remove("active"));Object.values(labelsByFloor).forEach(l=>l.element.classList.remove("active"));
+ setCamGoal([98,86,120],[2,0,17],Math.max(.46,Math.min(.62,innerWidth/1900)));showOverview();
 }
-function focusFloor(key){
- const f=BYKEY[key];if(!f)return;selected=key;document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));Object.entries(labelsByFloor).forEach(([k,l])=>l.element.classList.toggle("active",k===key));
- controls.target.set(f.x,1.4,f.z);camera.position.set(f.x+22,18,f.z+27);camera.zoom=f.trade?1.28:1.65;camera.updateProjectionMatrix();controls.update();showFloor(key);
+function focusFloor(key,fromAuto=false){
+ const f=BYKEY[key];if(!f)return;selected=key;if(!fromAuto){followCourier=false;document.getElementById("follow").classList.remove("on")}controls.enabled=!followCourier;
+ document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));document.querySelectorAll(".map-room").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));Object.entries(labelsByFloor).forEach(([k,l])=>l.element.classList.toggle("active",k===key));
+ const off=f.face===1?24:-24;setCamGoal([f.x+20,16,f.z+off],[f.x,1.35,f.z],f.trade?1.32:1.7);showFloor(key);
 }
-function resize(){const a=innerWidth/innerHeight,F=72;Object.assign(camera,{left:-F*a/2,right:F*a/2,top:F/2,bottom:-F/2});camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
+function setPreset(name){
+ followCourier=false;document.getElementById("follow").classList.remove("on");selected=null;controls.enabled=true;
+ if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
+ else if(name==="management")setCamGoal([60,46,77],[0,0,27],.9);
+ else if(name==="trade")focusFloor("trade");
+ else if(name==="owner")focusFloor("owner");
+ else resetView();
+}
+function resize(){const a=innerWidth/innerHeight,F=76;Object.assign(camera,{left:-F*a/2,right:F*a/2,top:F/2,bottom:-F/2});camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
 function setupPicking(){
- const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();let down;
+ const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),hover=document.getElementById("hoverOffice");let down;
+ const hitAt=e=>{const r=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));ray.setFromCamera(mouse,camera);return ray.intersectObjects(clickables,false)[0]};
  renderer.domElement.addEventListener("pointerdown",e=>down={x:e.clientX,y:e.clientY});
- renderer.domElement.addEventListener("pointerup",e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>7||e.button!==0)return;const r=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));ray.setFromCamera(mouse,camera);const h=ray.intersectObjects(clickables,false)[0];if(h?.object?.userData?.floor)focusFloor(h.object.userData.floor)});
+ renderer.domElement.addEventListener("pointermove",e=>{const h=hitAt(e),key=h?.object?.userData?.floor;if(key){hovered=key;renderer.domElement.style.cursor="pointer";const f=BYKEY[key];hover.style.display="block";hover.style.left=(e.clientX+14)+"px";hover.style.top=(e.clientY+12)+"px";hover.innerHTML="<b>"+esc(f.no+" · "+f.name)+"</b><small>"+esc(statusText(key))+"</small>"}else{hovered=null;renderer.domElement.style.cursor="default";hover.style.display="none"}});
+ renderer.domElement.addEventListener("pointerleave",()=>{hover.style.display="none";renderer.domElement.style.cursor="default"});
+ renderer.domElement.addEventListener("pointerup",e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>7||e.button!==0)return;const h=hitAt(e);if(h?.object?.userData?.floor)focusFloor(h.object.userData.floor)});
 }
 function buildNav(){
  const nav=document.getElementById("floornav");nav.innerHTML=FLOORS.map(f=>`<button data-floor="${f.key}"><span class="n">${f.no}</span><b>${esc(f.name)}</b><i class="s"></i></button>`).join("");
  nav.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>focusFloor(b.dataset.floor)));
 }
+function buildMinimap(){
+ const root=document.getElementById("maparea"),xmin=-66,xmax=68,zmin=-38,zmax=67;
+ root.innerHTML='<span class="map-line h" style="left:8%;right:8%;top:69%"></span><span class="map-line h" style="left:8%;right:4%;top:28%"></span><span class="map-line v" style="top:28%;bottom:31%;left:49%"></span>';
+ for(const f of FLOORS){const x=(f.x-xmin)/(xmax-xmin)*100,z=100-(f.z-zmin)/(zmax-zmin)*100,w=f.trade?18:(f.w?9:7),h=f.trade?13:8;const b=document.createElement("button");b.className="map-room"+(f.trade?" trade":"")+(f.key==="owner"?" owner":"");b.dataset.floor=f.key;b.title=f.no+" · "+f.name;b.style.cssText=`left:${x-w/2}%;top:${z-h/2}%;width:${w}%;height:${h}%;background:${f.color}`;b.addEventListener("click",()=>focusFloor(f.key));root.appendChild(b)}
+}
 function floorHot(key){
- if(!D)return false;const s=latestScan?.desks||{},ev=(D.events||[]).filter(e=>e.ts>=D.generated_ts-1200);
- if(key==="data"||key==="ops")return true;if(key==="fast")return !!s.fast;if(key==="swing")return !!s.swing;if(key==="trend")return !!s.trend;if(key==="market")return true;if(key==="equity")return !!EQ;
+ if(!D)return false;const ds=latestScan?.desks||{},ev=(D.events||[]).filter(e=>e.ts>=D.generated_ts-1200);
+ if(key==="data"||key==="ops"||key==="market"||key==="performance"||key==="owner")return true;
+ if(key==="fast")return !!ds.fast;if(key==="swing")return !!ds.swing;if(key==="trend")return !!ds.trend;if(key==="equity")return !!EQ&&hkOpen();
  if(key==="risk")return ev.some(e=>e.type==="blocked"||e.type==="entry");if(key==="execution"||key==="trade")return ev.some(e=>["entry","exit","validated"].includes(e.type))||!!D.books?.live?.positions?.length;
- if(key==="capital")return !!D.books?.live;if(key==="directie")return buyList().length>0;if(key==="performance")return true;return false;
+ if(key==="capital")return !!D.books?.live;if(key==="directie")return buyList().length>0;return false;
 }
 function buyList(){
- if(!D)return[];const out=[];for(const [m,e] of Object.entries(D.evaluations||{})){for(const a of D.agents||[]){const s=e.signals?.[a.agent];if(s?.action==="buy")out.push({market:m,agent:a.agent});}}return out;
+ if(!D)return[];const out=[];for(const [m,e] of Object.entries(D.evaluations||{})){for(const a of D.agents||[]){const sg=e.signals?.[a.agent];if(sg?.action==="buy")out.push({market:m,agent:a.agent})}}return out;
 }
+function latestEvent(types=[]){return (D?.events||[]).filter(e=>e.ts>=D.generated_ts-1800&&(!types.length||types.includes(e.type))).sort((a,b)=>(b.ts||0)-(a.ts||0))[0]}
 function statusText(key){
- if(!D)return"Data laden…";const live=D.books?.live,s=latestScan?.desks||{},ev=(D.events||[]).filter(e=>e.ts>=D.generated_ts-1200),buys=buyList();
+ if(!D)return"Data laden…";const live=D.books?.live,ds=latestScan?.desks||{},ev=(D.events||[]).filter(e=>e.ts>=D.generated_ts-1200),buys=buyList(),st=live?.stats;
  const map={
-  data:`${D.scanner?.eligible_count||0} markten gezien · ${D.scanner?.pool_count||0} gerankt · ${(D.scanner?.active_discovery_markets||[]).length} discovery`,
-  market:`Markt is ${D.regime?.label||"onbekend"}.`,
-  fast:s.fast?"Nieuwe 15m-candle: Fast Desk is aan het werk.":"Wacht op volgende gesloten 15m-candle.",
-  swing:s.swing?"Nieuwe 1u-candle: Swing Desk is aan het werk.":"Wacht op volgende gesloten 1u-candle.",
-  trend:s.trend?"Nieuwe 4u-candle: Trend Desk is aan het werk.":"Wacht op volgende gesloten 4u-candle.",
-  equity:EQ?.candidates?.length?`Research actief · beste kandidaat ${EQ.candidates[0].name} ${num(EQ.candidates[0].score,0)}/100`:"Wacht op equity research.",
-  performance:`${(D.agents||[]).filter(a=>a.status==="live").length} van ${(D.agents||[]).length} strategieën mogen echt geld gebruiken.`,
+  data:`${D.scanner?.eligible_count||0} gezien · ${D.scanner?.pool_count||0} gerankt · ${(D.scanner?.active_discovery_markets||[]).length} discovery`,
+  market:`Markt: ${D.regime?.label||"onbekend"}`,
+  fast:ds.fast?"Nieuwe 15m-candle wordt beoordeeld.":"Wacht op volgende 15m-candle.",
+  swing:ds.swing?"Nieuwe 1u-candle wordt beoordeeld.":"Wacht op volgende 1u-candle.",
+  trend:ds.trend?"Nieuwe 4u-candle wordt beoordeeld.":"Wacht op volgende 4u-candle.",
+  equity:EQ?.candidates?.length?`${hkOpen()?"HK-sessie open":"HK-sessie dicht"} · beste ${EQ.candidates[0].name} ${num(EQ.candidates[0].score,0)}/100`:"Geen equityscan geladen.",
+  performance:`${(D.agents||[]).filter(a=>a.status==="live").length}/${(D.agents||[]).length} strategieën live`,
   directie:buys.length?`${buys.length} koopadvies${buys.length===1?"":"en"} op tafel.`:"Geen koopadvies op tafel.",
-  risk:live?.risk?.halted?"NOODSTOP ACTIEF":`${num(live?.risk?.daily_loss_pct||0,1)}% dagverlies · max ${D.risk_limits?.max_open_positions||0} posities.`,
-  capital:live?`${eur.format(live.cash)} vrij · ${eur.format(live.exposure)} belegd · budget ALLES`:"Geen live kapitaalboek.",
-  execution:ev.some(e=>["entry","exit"].includes(e.type))?"Orderactiviteit in de laatste run.":`${live?.positions?.filter(p=>p.stop_on_exchange).length||0} exchange-stops bewaakt.`,
-  trade:live?.positions?.length?`${live.positions.length} live positie${live.positions.length===1?"":"s"} · ${eur.format(live.exposure)} exposure`:"Geen live positie; tradefloor monitort.",
-  ops:`Scanlog ${D.scan_history?.length||0} runs · laatste run ${clock(D.generated_ts)}`
+  risk:live?.risk?.halted?"NOODSTOP ACTIEF":latestEvent(["blocked"])?`Laatste blokkade: ${latestEvent(["blocked"]).market||"trade"}`:`Dagverlies ${num(live?.risk?.daily_loss_pct||0,1)}%`,
+  capital:live?`${eur.format(live.cash)} vrij · ${eur.format(live.exposure)} belegd`:"Geen live kapitaalboek.",
+  execution:latestEvent(["entry","exit","validated"])?`Laatste order: ${latestEvent(["entry","exit","validated"]).type.toUpperCase()} ${latestEvent(["entry","exit","validated"]).market||""}`:`${live?.positions?.filter(p=>p.stop_on_exchange).length||0} stops bewaakt`,
+  trade:live?.positions?.length?`${live.positions.length} open · ${eur.format(live.exposure)} exposure`:"Geen live positie; monitoring loopt.",
+  ops:D.errors?.length?`${D.errors.length} melding(en) · laatste run ${clock(D.generated_ts)}`:`Systemen groen · ${D.scan_history?.length||0} scans`,
+  owner:st?`${eur.format(st.equity)} vermogen · vandaag ${pct(st.today_pct||0)} · ${live?.positions?.length||0} open`:"Managementoverzicht wordt geladen."
  };return map[key]||"Actief.";
 }
 function showFloor(key){
- const f=BYKEY[key],live=D?.books?.live;const hot=floorHot(key);const deptAgents=(D?.agents||[]).filter(a=>f.key==="fast"?a.horizon==="fast":f.key==="swing"?a.horizon==="swing":f.key==="trend"?a.horizon==="trend":false);
+ const f=BYKEY[key],live=D?.books?.live,hot=floorHot(key),deptAgents=(D?.agents||[]).filter(a=>f.key==="fast"?a.horizon==="fast":f.key==="swing"?a.horizon==="swing":f.key==="trend"?a.horizon==="trend":false);
  document.getElementById("detail").innerHTML=`<h1>${esc(f.no+" · "+f.name)}</h1><p class="sub">${esc(f.desc)}</p><div class="status"><b>${hot?"Afdeling actief":"Normale bezetting"}</b>${esc(statusText(key))}</div>
  <div class="grid"><div class="mini"><small>Medewerkers</small><b>${f.staff}${f.trade?" + runners":""}</b></div><div class="mini"><small>Activiteit</small><b>${hot?"HOOG":"NORMAAL"}</b></div></div>
- ${deptAgents.length?`<p><b>Strategieën hier:</b></p><ul>${deptAgents.map(a=>`<li>${esc(a.agent)} · ${a.status==="live"?"echt geld":"schaduw"} · ${a.trades} trades</li>`).join("")}</ul>`:""}
- ${key==="capital"&&live?`<div class="grid"><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div><p><b>Budgetregel:</b> ALLES. Risk bepaalt de werkelijke inzet per trade.</p>`:""}
+ ${deptAgents.length?`<p><b>Strategieën:</b></p><ul>${deptAgents.map(a=>`<li>${esc(a.agent)} · ${a.status==="live"?"echt geld":"schaduw"} · ${a.trades} trades</li>`).join("")}</ul>`:""}
+ ${key==="capital"&&live?`<div class="grid"><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div><p><b>Budget:</b> ALLES; Risk bepaalt de daadwerkelijke inzet.</p>`:""}
  ${key==="trade"&&live?`<p><b>Open posities:</b></p><ul>${live.positions.length?live.positions.map(p=>`<li>${esc(p.market)} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}</li>`).join(""):"<li>Geen open posities.</li>"}</ul>`:""}
- <p><b>Wat je in 3D ziet:</b> medewerkers typen, overleggen en lopen. Bij echte activiteit verhoogt dit kantoor zijn tempo; belangrijke rapportages worden zichtbaar door de gangen naar de volgende afdeling gebracht.</p>`;
+ ${key==="owner"&&live?`<div class="grid"><div class="mini"><small>Vermogen</small><b>${eur.format(live.stats?.equity||0)}</b></div><div class="mini"><small>Open</small><b>${live.positions?.length||0}</b></div><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div>`:""}
+ <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
 }
-function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">De oude 3D-stijl, nu als kantoorcampus met losse afdelingen.</p><div class="status"><b>Kantooroverzicht</b>Klik een kantoor links of direct in de 3D-scene. Medewerkers blijven werken terwijl dossiers fysiek door de gangen naar de volgende afdeling gaan.</div><p>Analyse zit in de onderste vleugel, management aan de overkant en Execution/Operations rond de aparte grote tradefloor.</p><p>De witte rapporteur met het gouden dossier volgt automatisch de echte botflow.</p>`}
-function updateUI(){
+function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">Een levende 3D tradingcampus in plaats van een technisch schema.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
+function updateUI(){function updateUI(){
  if(!D)return;const live=D.books?.live,st=live?.stats;document.getElementById("mode").textContent=D.mode==="live"&&!D.validate_only?"ECHT GELD":"PAPIER";document.getElementById("equity").textContent=st?eur.format(st.equity):"–";document.getElementById("cash").textContent=live?eur.format(live.cash):"–";document.getElementById("exposure").textContent=live?eur.format(live.exposure):"–";document.getElementById("moneytotal").textContent=st?eur.format(st.equity):"–";document.getElementById("moneyfree").textContent=live?eur.format(live.cash):"–";document.getElementById("moneyused").textContent=live?eur.format(live.exposure):"–";
  document.querySelectorAll(".floor-nav button").forEach(b=>{const f=BYKEY[b.dataset.floor],i=b.querySelector(".s"),hot=floorHot(f.key);i.className="s"+(f.trade&&hot?" trade":hot?" hot":"")});
  if(selected)showFloor(selected);
