@@ -24,9 +24,16 @@ Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 
 ## Opportunity scanner en efficiency
 
-Elke kwartier-run haalt één ticker-snapshot op voor de brede Kraken-markt. De zware uur- en 4-uurscandles worden alleen opnieuw opgehaald wanneer er een nieuwe uurcandle is gesloten. Het actieve handelsuniversum blijft gedurende dat uur stabiel. Daardoor kan de bot veel breder zoeken zonder vier keer per uur dezelfde OHLCV-data op te vragen.
+De worker loopt iedere **5 minuten**. Iedere ronde haalt de Data-agent één brede ticker-snapshot op, zodat prijzen, spreads, volumeversnelling, open posities en stops snel opnieuw worden gecontroleerd zonder voor honderden munten zware candledata op te halen.
 
-De live-kern blijft gebaseerd op de liquiditeitsselectie die al in de backtest is gebruikt. De opportunity scanner voegt maximaal vier extra markten toe op basis van liquiditeit, positief 24-uursmomentum, dagrange en spread. Die discovery-markten handelen standaard uitsluitend met schaduwgeld; zo verzamelen ze bewijs zonder het live-risico te vergroten.
+De discovery-ranking wordt iedere **15 minuten** vernieuwd. Maximaal **100 liquide EUR-markten** gaan door de goedkope ranking op liquiditeit, positief 24-uursmomentum, dagrange en spread. De bewezen kern blijft acht markten; maximaal **zes discovery-markten** worden toegevoegd. Discovery-markten blijven standaard schaduw-only.
+
+Daarna werken drie onafhankelijke desks:
+- **Fast desk — 15m:** Momentum, Squeeze en Snelle uitbraak. Gericht op vroege versnelling en kortere bewegingen.
+- **Swing desk — 1u:** Dip-koper en normale Uitbraak, met een 4u-trendfilter.
+- **Trend desk — 4u:** Trend-4u voor grotere uitbraken en runners.
+
+Iedere positie bewaart het timeframe waarop hij is geopend. Daardoor tellen time-outs, trailing stops en cooldowns in de juiste candles in plaats van alsof alle strategieën hetzelfde tempo hebben. Zware 15m-, 1u- en 4u-OHLCV-data wordt alleen opgehaald wanneer de bijbehorende desk aan de beurt is.
 
 ## China/Hongkong equity desk
 
@@ -39,7 +46,7 @@ Het dashboard heeft drie views:
 - **Details**: risico, agents, backtests, crypto-radar en equity research.
 - **Opportunities**: cross-market ranglijst, China/HK-components, equity-paperportfolio en crypto discovery in één scherm.
 
-De Equity Scout draait op weekdagen vier keer per dag via `.github/workflows/equity-scout.yml`. De live Kraken-trader blijft zijn bestaande eigen workflow en frequentie gebruiken.
+De Equity Scout controleert koersmomentum op weekdagen ieder uur rond de Hongkong-sessie via `.github/workflows/equity-scout.yml`. Fundamentals blijven 24 uur gecachet. De live Kraken-trader blijft volledig in zijn eigen workflow draaien.
 
 ## Risicoprofiel
 
@@ -47,10 +54,10 @@ Standaard: `assertief`. Assertief op de markt, met een vangnet zodat je nooit al
 
 | | voorzichtig | normaal | **assertief** | agressief |
 |---|---|---|---|---|
-| Risico per trade | 1% | 1,5% | 1% | 2,5% |
-| Grootte per positie | 25% | 35% | 40% | 50% |
-| Max posities | 2 | 3 | 3 | 3 |
-| Max belegd | 50% | 75% | 90% | 100% |
+| Risico per trade | 1% | 1,5% | 1,25% | 2,5% |
+| Grootte per positie | 25% | 35% | 45% | 50% |
+| Max posities | 2 | 3 | 4 | 3 |
+| Max belegd | 50% | 75% | 95% | 100% |
 | Daglimiet verlies | 3% | 5% | 5% | 8% |
 | Noodstop (alles verkopen) | 15% | 20% | 20% | 30% |
 
