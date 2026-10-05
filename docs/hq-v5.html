@@ -275,7 +275,7 @@ function buildFloor(f){
  const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
  return g;
 }
-function iColorfunction iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
+function iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
 function officeDoor(f){
  const D=f.d||(f.trade?22:13.5),front=(D/2)+1.4;
  return {x:f.x,z:f.z+(f.face===1?front:-front),lane:f.lane};
@@ -311,7 +311,7 @@ function buildShaft(){
  // couriers: parallelle dossiers
  createCourier("#ffffff","#d8d0ff",0);createCourier("#6fd6b4","#5cf2b3",1);createCourier("#ffb547","#ffb547",2);
 }
-function routeWaypointsfunction routeWaypoints(fromKey,toKey){
+function routeWaypoints(fromKey,toKey){
  const a=officeDoor(BYKEY[fromKey]),b=officeDoor(BYKEY[toKey]),pts=[];
  pts.push(new THREE.Vector3(a.x,.16,a.z));
  pts.push(new THREE.Vector3(a.x,.16,a.lane));
@@ -411,54 +411,84 @@ function showFloor(key){
  <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
 }
 function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">Een levende 3D tradingcampus in plaats van een technisch schema.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
-function updateUI(){function updateUI(){
+function setBoard(key,text){if(wallboards[key])wallboards[key].textContent=text}
+function updateClocks(){
+ const fmt=z=>new Intl.DateTimeFormat("nl-NL",{timeZone:z,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
+ setBoard("clockAMS","AMS "+fmt("Europe/Amsterdam"));setBoard("clockNY","NYC "+fmt("America/New_York"));setBoard("clockHK","HONG KONG "+fmt("Asia/Hong_Kong"));
+}
+function updateWallboards(){
+ if(!D)return;const live=D.books?.live,st=live?.stats,buys=buyList(),top=D.scanner?.candidates?.[0],agents=[...(D.agents||[])].sort((a,b)=>(b.expectancy_r??-99)-(a.expectancy_r??-99));
+ setBoard("data",`SCAN ${D.scanner?.eligible_count||0} → ${D.scanner?.pool_count||0} → ${D.markets?.length||0}`);
+ setBoard("dataTop",top?`TOP ${top.market} · ${num((top.score||0)*100,0)}/100`:"TOP RADAR —");
+ setBoard("market",`MARKT ${String(D.regime?.label||"onbekend").toUpperCase()}`);
+ setBoard("fast",latestScan?.desks?.fast?`FAST ACTIEF · ${buys.filter(x=>(D.agents||[]).find(a=>a.agent===x.agent)?.horizon==="fast").length} koop`:"FAST · WACHT 15M");
+ setBoard("swing",latestScan?.desks?.swing?"SWING · NIEUWE 1U":"SWING · WACHT 1U");
+ setBoard("trend",latestScan?.desks?.trend?"TREND · NIEUWE 4U":"TREND · WACHT 4U");
+ setBoard("equity",EQ?.candidates?.[0]?`HK · ${EQ.candidates[0].name} ${num(EQ.candidates[0].score,0)}/100`:"HK RESEARCH —");
+ setBoard("equityPaper",EQ?.paper?`PAPER ${pct(EQ.paper.return_pct||0)}`:"PAPER —");
+ setBoard("performance",agents.length?`#1 ${agents[0].agent} · ${agents[0].expectancy_r==null?"–":num(agents[0].expectancy_r,2)+"R"}`:"AGENT RANKING —");
+ setBoard("directie",buys.length?`BOARD · ${buys.length} ADVIES${buys.length===1?"":"ZEN"}`:"BOARD · GEEN ADVIES");
+ const blocked=latestEvent(["blocked"]),approved=latestEvent(["entry","validated"]);
+ const riskText=live?.risk?.halted?"RISK · NOODSTOP":blocked&&(!approved||blocked.ts>=approved.ts)?`BLOCKED · ${blocked.market||"TRADE"}`:approved?`APPROVED · ${approved.market||"TRADE"}`:"RISK · OK";
+ setBoard("risk",riskText);setBoard("corridorRisk",riskText);
+ setBoard("capital",live?`TREASURY · ${eur.format(st?.equity||0)}`:"TREASURY —");setBoard("corridorCash",live?`VRIJ ${eur.format(live.cash)}`:"KAPITAAL —");
+ const oe=latestEvent(["entry","exit","validated"]);setBoard("execution",oe?`${oe.type.toUpperCase()} · ${oe.market||""}`:"ORDER QUEUE · RUSTIG");
+ setBoard("ops",D.errors?.length?`SYSTEM · ${D.errors.length} MELDING(EN)`:"SYSTEM · ALL GREEN");
+ setBoard("owner",live?`EQUITY ${eur.format(st?.equity||0)} · OPEN ${live.positions?.length||0}`:"OWNER VIEW —");
+ setBoard("trade",live?.positions?.length?`LIVE · ${live.positions.length} OPEN · ${eur.format(live.exposure)}`:"LIVE POSITIONS · GEEN");
+ setBoard("corridorMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
+ const pos=live?.positions||[];tradePositionBoards.forEach((el,i)=>{const p=pos[i];el.textContent=p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`;el.style.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff"});
+ const eq=st?.equity||0,cash=live?.cash||0,expo=live?.exposure||0,vals={cash:eq?cash/eq:0,exposure:eq?expo/eq:0,room:eq?Math.max(0,1-expo/eq):1};
+ for(const b of capitalBars){const ratio=Math.max(.04,Math.min(1,vals[b.type]??0));b.mesh.scale.y=ratio;b.mesh.position.y=b.baseY+(b.maxH*ratio)/2}
+ const riskLight=floorGroups.risk?.userData.riskLight;if(riskLight)riskLight.material.color.set(live?.risk?.halted?"#ff3344":blocked&&(!approved||blocked.ts>=approved.ts)?"#ff6b78":"#5cf2b3");
+ const orderLight=floorGroups.execution?.userData.orderLight;if(orderLight)orderLight.material.color.set(oe?"#ffb547":"#5cf2b3");
+ const opsLight=floorGroups.ops?.userData.opsLight;if(opsLight)opsLight.material.color.set(D.errors?.length?"#ffb547":"#5cf2b3");
+ const fastLight=floorGroups.fast?.userData.alert;if(fastLight)fastLight.material.color.set(latestScan?.desks?.fast?"#ffb547":"#5a527a");
+ updateClocks();
+}
+function updateUI(){
  if(!D)return;const live=D.books?.live,st=live?.stats;document.getElementById("mode").textContent=D.mode==="live"&&!D.validate_only?"ECHT GELD":"PAPIER";document.getElementById("equity").textContent=st?eur.format(st.equity):"–";document.getElementById("cash").textContent=live?eur.format(live.cash):"–";document.getElementById("exposure").textContent=live?eur.format(live.exposure):"–";document.getElementById("moneytotal").textContent=st?eur.format(st.equity):"–";document.getElementById("moneyfree").textContent=live?eur.format(live.cash):"–";document.getElementById("moneyused").textContent=live?eur.format(live.exposure):"–";
- document.querySelectorAll(".floor-nav button").forEach(b=>{const f=BYKEY[b.dataset.floor],i=b.querySelector(".s"),hot=floorHot(f.key);i.className="s"+(f.trade&&hot?" trade":hot?" hot":"")});
+ document.querySelectorAll(".floor-nav button").forEach(b=>{const ff=BYKEY[b.dataset.floor],i=b.querySelector(".s"),hot=floorHot(ff.key);i.className="s"+(ff.trade&&hot?" trade":hot?" hot":"")});document.querySelectorAll(".map-room").forEach(b=>{b.style.opacity=floorHot(b.dataset.floor)?"1":".62"});
+ updateWallboards();
+ const e=latestEvent(["entry","exit","blocked"]);if(e){const k=`${e.ts}:${e.type}:${e.market||""}`;if(k!==lastSoundEvent){if(e.type==="entry")tone(880,.12,.04);else if(e.type==="exit")tone(520,.11,.035);else tone(220,.14,.035);lastSoundEvent=k}}
  if(selected)showFloor(selected);
 }
 function routeForScan(){
- const s=latestScan?.desks||{},r=["data","market"];if(s.fast)r.push("fast");if(s.swing)r.push("swing");if(s.trend)r.push("trend");if(EQ)r.push("equity");r.push("performance","directie","risk","capital","execution");if(D?.books?.live?.positions?.length||lastRunOrder())r.push("trade");r.push("ops");return r;
+ const ds=latestScan?.desks||{},r=["data","market"];if(ds.fast)r.push("fast");if(ds.swing)r.push("swing");if(ds.trend)r.push("trend");if(EQ)r.push("equity");r.push("performance","directie","risk","capital","execution");if(D?.books?.live?.positions?.length||lastRunOrder())r.push("trade");r.push("ops","owner");return r;
 }
 function lastRunOrder(){return (D?.events||[]).some(e=>e.ts>=D.generated_ts-1200&&["entry","exit","validated"].includes(e.type))}
-function startRoute(){
- courierRoute=routeForScan();routeIndex=0;courierPath=[];courierPathIndex=0;courierPause=0;
- if(courierRoute.length&&courier){const d=officeDoor(BYKEY[courierRoute[0]]);courier.position.set(d.x,.16,d.z);setNextCourierTarget();}
+function setCourierTarget(c){
+ if(!courierRoute.length)return;const from=courierRoute[c.routeIndex%courierRoute.length],to=courierRoute[(c.routeIndex+1)%courierRoute.length];
+ c.path=routeWaypoints(from,to);c.pathIndex=1;c.pause=0;c.from=from;c.to=to;c.routeIndex=(c.routeIndex+1)%courierRoute.length;
+ if(c.index===0)document.getElementById("caption").innerHTML=`<b>Dossier onderweg</b>${esc(BYKEY[from].name)} → ${esc(BYKEY[to].name)}`;
 }
-function setNextCourierTarget(){
- if(!courierRoute.length)return;
- const from=courierRoute[routeIndex%courierRoute.length],to=courierRoute[(routeIndex+1)%courierRoute.length];
- courierPath=routeWaypoints(from,to);courierPathIndex=1;courierPause=0;routeIndex=(routeIndex+1)%courierRoute.length;
- document.getElementById("caption").innerHTML=`<b>Dossier onderweg</b>${esc(BYKEY[from].name)} → ${esc(BYKEY[to].name)}`;
+function startRoute(){
+ courierRoute=routeForScan();if(!courierRoute.length)return;
+ const blocked=!!latestEvent(["blocked"]),order=lastRunOrder(),buys=buyList().length>0,cols=[buys?"#5cf2b3":"#d8d0ff",blocked?"#ff6b78":"#b7a0ff",order?"#ffb547":"#ffffff"];
+ couriers.forEach((c,i)=>{c.routeIndex=(i*4)%courierRoute.length;c.path=[];c.pathIndex=0;c.pause=i*1.25;c.dossier.material.color.set(cols[i]);c.glow.color.set(cols[i]);const d=officeDoor(BYKEY[courierRoute[c.routeIndex]]);c.person.position.set(d.x,.16,d.z);setCourierTarget(c)});
+}
+function animateCourier(c,dt){
+ if(!c.path.length)return;if(c.pause>0){c.pause-=dt;if(c.pause<=0)setCourierTarget(c);return}
+ const target=c.path[c.pathIndex];if(!target){c.pause=1;return}const p=c.person.position,dx=target.x-p.x,dz=target.z-p.z,dist=Math.hypot(dx,dz);
+ if(dist<.18){c.pathIndex++;if(c.pathIndex>=c.path.length){c.pause=1.0+(.35*c.index);lastRouteAt=clockT}return}
+ const speed=6.3+c.index*.7,step=Math.min(dist,dt*speed);p.x+=dx/dist*step;p.z+=dz/dist*step;c.person.rotation.y=Math.atan2(dx,dz);
+ const P=c.person.userData.parts,sw=Math.sin(clockT*(9+c.index)+c.index)*.55,legs=c.person.userData.legs||[];if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.25-sw*.35;P.armR.rotation.x=-1.25+sw*.35;
 }
 function animate(dt){
  clockT+=dt;
- // per-department activity from actual state
- for(const f of FLOORS){const goal=floorHot(f.key)?1:.24;activity[f.key]+=(goal-activity[f.key])*Math.min(1,dt*2.2)}
- for(const w of workers){const P=w.g.userData.parts,a=activity[w.key]||.2,sp=(2.5+8*a);P.armL.rotation.x=-.6+Math.sin(clockT*sp+w.phase)*(.05+.14*a);P.armR.rotation.x=-.6+Math.sin(clockT*sp+w.phase+2)*(.05+.14*a);P.head.rotation.y=Math.sin(clockT*.55+w.phase)*.13}
- for(const w of walkers){const a=activity[w.key]||.2,t=clockT*.25*(.5+2*a)+w.phase;w.g.position.x=w.baseX+Math.sin(t)*w.range;w.g.position.z=w.baseZ+Math.cos(t*.7)*1.1;const P=w.g.userData.parts,sw=Math.sin(clockT*8+w.phase)*.5;const legs=w.g.userData.legs||[];if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.35-sw*.4;P.armR.rotation.x=-1.35+sw*.4}
- for(const s of screenMats){const k=.84+.16*Math.sin(clockT*3+s.phase);s.mesh.material.color.copy(s.base).multiplyScalar(k)}
- if(courier&&courierPath.length){
-   if(courierPause>0){courierPause-=dt;if(courierPause<=0)setNextCourierTarget()}
-   else{
-     const target=courierPath[courierPathIndex],dx=target.x-courier.position.x,dz=target.z-courier.position.z,dist=Math.hypot(dx,dz);
-     if(dist<.18){
-       courierPathIndex++;
-       if(courierPathIndex>=courierPath.length){courierPause=1.4;lastRouteAt=clockT}
-     }else{
-       const speed=7.5,step=Math.min(dist,dt*speed);courier.position.x+=dx/dist*step;courier.position.z+=dz/dist*step;
-       courier.rotation.y=Math.atan2(dx,dz);
-       const P=courier.userData.parts,sw=Math.sin(clockT*10)*.55,legs=courier.userData.legs||[];
-       if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.25-sw*.35;P.armR.rotation.x=-1.25+sw*.35;
-     }
-   }
- }
- const rl=floorGroups.risk?.userData.riskLight;if(rl&&D){rl.material.color.set(D.books?.live?.risk?.halted?"#ff3344":(D.events||[]).some(e=>e.ts>=D.generated_ts-1200&&e.type==="blocked")?"#ff6b78":"#5cf2b3")}
+ for(const ff of FLOORS){const goal=floorHot(ff.key)?1:.2;activity[ff.key]+=(goal-activity[ff.key])*Math.min(1,dt*2.1)}
+ for(const w of workers){const P=w.g.userData.parts,a=activity[w.key]||.2,sp=2.2+8*a;P.armL.rotation.x=-.6+Math.sin(clockT*sp+w.phase)*(.05+.15*a);P.armR.rotation.x=-.6+Math.sin(clockT*sp+w.phase+2)*(.05+.15*a);P.head.rotation.y=Math.sin(clockT*.55+w.phase)*.15}
+ for(const w of walkers){const a=activity[w.key]||.2,t=clockT*.24*(.5+2.2*a)+w.phase;w.g.position.x=w.baseX+Math.sin(t)*w.range;w.g.position.z=w.baseZ+Math.cos(t*.72)*1.25;const P=w.g.userData.parts,sw=Math.sin(clockT*(7+4*a)+w.phase)*.5,legs=w.g.userData.legs||[];if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.35-sw*.4;P.armR.rotation.x=-1.35+sw*.4}
+ for(const sm of screenMats){const k=.84+.16*Math.sin(clockT*3+sm.phase);sm.mesh.material.color.copy(sm.base).multiplyScalar(k)}
+ couriers.forEach(c=>animateCourier(c,dt));updateCamera(dt);
+ for(const [key,lightKey] of [["fast","alert"],["risk","riskLight"],["execution","orderLight"],["ops","opsLight"]]){const l=floorGroups[key]?.userData[lightKey];if(l&&floorHot(key))l.scale.setScalar(1+.15*Math.sin(clockT*7))}
 }
-let last=performance.now();function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!REDUCED)animate(dt);controls.update();renderer.render(scene,camera);labelRenderer.render(scene,camera)}
+let last=performance.now();function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!REDUCED)animate(dt);else updateCamera(dt);controls.update();renderer.render(scene,camera);labelRenderer.render(scene,camera)}
 async function load(){
  try{
   const [r,e]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("equities.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);
-  if(!r.ok)throw new Error(r.status);const d=await r.json(),eq=e&&e.ok?await e.json():null,key=d.generated_ts+":"+(eq?.generated_ts||0);if(key===lastKey)return;D=d;EQ=eq;lastKey=key;latestScan=D.scan_history?.[0]||null;updateUI();startRoute();if(innerWidth<=820)buildCompact();
+  if(!r.ok)throw new Error(r.status);const d=await r.json(),eq=e&&e.ok?await e.json():null,key=d.generated_ts+":"+(eq?.generated_ts||0);
+  if(key===lastKey){updateClocks();return}D=d;EQ=eq;lastKey=key;latestScan=D.scan_history?.[0]||null;updateUI();startRoute();if(innerWidth<=820)buildCompact();
  }catch(err){document.getElementById("caption").innerHTML=`<b>Data</b>${esc(err.message||err)}`}
 }
 function buildCompact(){
