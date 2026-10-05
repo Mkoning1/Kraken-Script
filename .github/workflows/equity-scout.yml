@@ -2,6 +2,14 @@ name: Equity Scout
 
 on:
   workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "equity_scan.py"
+      - "agents/equities.py"
+      - "config.json"
+      - "requirements-equities.txt"
+      - ".github/workflows/equity-scout.yml"
   schedule:
     # Hong Kong: rond open, midden sessie, close en Europese ochtendcheck op weekdagen.
     - cron: "20 0,4,8,12 * * 1-5"
