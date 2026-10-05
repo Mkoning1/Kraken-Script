@@ -326,28 +326,65 @@ function createCourier(color,dossierColor,index){
  const c={person:p,dossier:d,glow,index,routeIndex:index,path:[],pathIndex:0,pause:index*1.8};couriers.push(c);return c;
 }
 function buildShaft(){
- const g=new THREE.Group();scene.add(g);const floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
- // hoofdgangen
- box(g,108,.28,6.4,floorMat,0,.05,7,false);box(g,122,.28,6.4,floorMat,5,.05,39,false);box(g,6.4,.28,42,floorMat,0,.05,23,false);
- // duidelijk verlichte randen
- for(let x=-52;x<=52;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,3.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,10.15,false)}
- for(let x=-55;x<=65;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,35.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,42.15,false)}
- // office connectors
- for(const f of FLOORS){const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;if(len>.5)box(g,3.4,.25,len,floorMat,d.x,.06,mid,false)}
- // lobby/entree
- box(g,24,.32,13,mat("#30236a"),0,.08,-27,false);box(g,6.4,.28,24,floorMat,0,.05,-10,false);
- box(g,8,.95,2.0,mat("#ddd6f4"),0,.55,-28,false);wallBoard(g,"lobby","KRAKEN AGENTS HQ",0,2.15,-29.2,"#ffb547","event-label");
- for(let x=-8;x<=8;x+=8)plant(g,x,-23.5,1.2);
- // central atrium + koffiehoek
- box(g,12,.32,12,mat("#30236a"),0,.08,23,false);box(g,3.6,1.1,1.2,mat("#d9d0f7"),4,.7,22,false);wallBoard(g,"coffee","COFFEE",4,2.1,22,"#c9bdff");
- plant(g,-4,20,1.15);plant(g,-4,26,1.0);
- // fysieke richtingsborden
- wallBoard(g,"wingA","← ANALYSE VLEUGEL",-18,1.35,7,"#8fa8e8");wallBoard(g,"wingB","MANAGEMENT VLEUGEL →",18,1.35,7,"#d49bea");wallBoard(g,"wingC","DEALING / OPERATIONS",0,1.35,39,"#ffb547");
- // gang-wallboards
- wallBoard(g,"corridorMarket","MARKT —",-34,1.55,7,"#6fd6b4");wallBoard(g,"ticker","BTC / ETH / RADAR —",0,1.55,7,"#c9bdff");wallBoard(g,"corridorRisk","RISK —",22,1.55,39,"#ff7d88");wallBoard(g,"corridorCash","KAPITAAL —",40,1.55,39,"#f4d35e");
- // parkeer-/entree-markeringen in plaats van zwarte skylineblokken
- for(let x=-52;x<=52;x+=8){box(g,4.5,.03,.08,new THREE.MeshBasicMaterial({color:"#41356f"}),x,.02,-38,false);box(g,.08,.03,7,new THREE.MeshBasicMaterial({color:"#41356f"}),x-2.2,.02,-34.5,false)}
- // couriers: parallelle dossiers
+ const g=new THREE.Group();scene.add(g);const floorMat=mat("#25204a"),edgeMat=new THREE.MeshBasicMaterial({color:"#7566cf",toneMapped:false});
+ // Eén doorlopende kantoorvloer met duidelijke vleugels.
+ box(g,116,.24,82,mat("#1f183e"),4,.01,13,false);
+ // primaire corridors
+ box(g,92,.22,6.2,floorMat,0,.12,6,false);box(g,112,.22,6.2,floorMat,7,.12,37,false);box(g,6.2,.22,34,floorMat,0,.12,22,false);
+ for(let x=-44;x<=44;x+=3.6){box(g,1.7,.035,.07,edgeMat,x,.25,2.95,false);box(g,1.7,.035,.07,edgeMat,x,.25,9.05,false)}
+ for(let x=-48;x<=60;x+=3.6){box(g,1.7,.035,.07,edgeMat,x,.25,33.95,false);box(g,1.7,.035,.07,edgeMat,x,.25,40.05,false)}
+ // verbindingsstroken naar alle kantoren
+ for(const f of FLOORS){const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;if(len>.35)box(g,2.8,.22,len,floorMat,d.x,.12,mid,false)}
+
+ // Hoofdingang en receptie
+ box(g,28,.25,13,mat("#302655"),0,.13,-27,false);box(g,6.2,.22,22,floorMat,0,.12,-10,false);
+ box(g,8.2,1.0,2.1,mat("#dcd5ed"),0,.62,-28,false);staticSign(g,"RECEPTIE",0,1.55,-27.95,"#ffb547",4.4,.58);
+ // glazen dubbele entree
+ const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.18,roughness:.04,depthWrite:false});
+ box(g,5.8,4.7,.08,glass,0,2.35,-33.2,false);box(g,.09,4.7,.25,mat("#8b7bc5"),0,2.35,-33.1,false);
+ for(let x=-9;x<=9;x+=6)plant(g,x,-24,1.0);
+
+ // CENTRALE HAL / COMMAND CENTER
+ box(g,34,.28,18,mat("#342b61"),0,.15,6,false);
+ // atrium-vloeraccent en logo-ring
+ box(g,20,.035,9,mat("#281f4e"),0,.31,3,false);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(4.2,.13,10,64),new THREE.MeshBasicMaterial({color:"#8f7bff"}));ring.rotation.x=-Math.PI/2;ring.position.set(0,.35,3);g.add(ring);
+ // command wall aan de managementzijde
+ box(g,30,5.9,.34,mat("#15102f"),0,3.0,13.8,false);
+ staticSign(g,"KRAKEN AGENTS · COMMAND CENTER",0,5.2,13.58,"#ffb547",18,.75);
+ wallBoard(g,"hallEquity","VERMOGEN —",-10,3.85,13.58,"#ffffff","",6.2,.82);
+ wallBoard(g,"hallCash","VRIJ —",-3.35,3.85,13.58,"#5cf2b3","",6.2,.82);
+ wallBoard(g,"hallExposure","BELEGD —",3.35,3.85,13.58,"#ffb547","",6.2,.82);
+ wallBoard(g,"hallOpen","OPEN —",10,3.85,13.58,"#8f7bff","",6.2,.82);
+ wallBoard(g,"hallMarket","MARKT —",-10,2.75,13.58,"#6fd6b4","",6.2,.82);
+ wallBoard(g,"hallRisk","RISK —",-3.35,2.75,13.58,"#ff7d88","",6.2,.82);
+ wallBoard(g,"hallOpportunity","BESTE KANS —",3.35,2.75,13.58,"#c9bdff","",6.2,.82);
+ wallBoard(g,"hallLast","LAATSTE TRADE —",10,2.75,13.58,"#ffb547","",6.2,.82);
+ // centrale infobalie / zitjes
+ box(g,6.5,.85,2.0,mat("#d9d0f7"),0,.58,7.5,false);staticSign(g,"STATUS & ROUTING",0,1.48,7.5,"#24163d",4.7,.5);
+ loungeSeat(g,-10,2.0,.25);loungeSeat(g,10,2.0,-.25);plant(g,-14,9,1.15);plant(g,14,9,1.15);
+ // overhead hall lights
+ for(let x=-12;x<=12;x+=6)lightStrip(g,x,5.7,3.0,4.5,"#fff0cb");
+
+ // tweede hal richting dealing floor
+ box(g,18,.25,11,mat("#302655"),0,.13,37,false);staticSign(g,"DEALING & OPERATIONS",0,1.65,37,"#ffb547",7,.58);
+ loungeSeat(g,-5,37,Math.PI/2);loungeSeat(g,5,37,-Math.PI/2);plant(g,-8,40,1.0);plant(g,8,40,1.0);
+
+ // wandwijzers die echt op pilaren zitten
+ for(const x of [-45,-23,23,45])box(g,.65,3.2,.65,mat("#33275f"),x,1.7,6,false);
+ staticSign(g,"ANALYSE ←",-24,2.9,6.36,"#8fa8e8",4.8,.55);staticSign(g,"→ MANAGEMENT",24,2.9,6.36,"#d49bea",5.5,.55);
+ staticSign(g,"TRADEFLOOR ↑",0,2.7,37.36,"#ffb547",5.5,.55);
+
+ // subtiele corridor-statusschermen
+ wallBoard(g,"corridorMarket","MARKT —",-34,1.55,9.1,"#6fd6b4","",5.2,.7);
+ wallBoard(g,"ticker","RADAR —",0,1.55,9.1,"#c9bdff","",8.0,.7);
+ wallBoard(g,"corridorRisk","RISK —",18,1.55,40.1,"#ff7d88","",5.2,.7);
+ wallBoard(g,"corridorCash","KAPITAAL —",36,1.55,40.1,"#f4d35e","",5.8,.7);
+
+ // buitenrand: lage glasbalustrade geeft één gebouw zonder inkijk te blokkeren
+ const extGlass=new THREE.MeshStandardMaterial({color:"#7465b9",transparent:true,opacity:.11,roughness:.04,depthWrite:false});
+ box(g,116,2.0,.08,extGlass,4,1.0,-34,false);box(g,116,2.0,.08,extGlass,4,1.0,60,false);box(g,.08,2.0,94,extGlass,-54,1.0,13,false);box(g,.08,2.0,94,extGlass,62,1.0,13,false);
+
  createCourier("#ffffff","#d8d0ff",0);createCourier("#6fd6b4","#5cf2b3",1);createCourier("#ffb547","#ffb547",2);
 }
 function routeWaypoints(fromKey,toKey){
@@ -450,7 +487,7 @@ function showFloor(key){
  <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
 }
 function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">Een levende 3D tradingcampus in plaats van een technisch schema.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
-function setBoard(key,text){if(wallboards[key])wallboards[key].textContent=text}
+function setBoard(key,text){if(wallboards[key])renderBoard(wallboards[key],text)}
 function updateClocks(){
  const fmt=z=>new Intl.DateTimeFormat("nl-NL",{timeZone:z,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
  setBoard("clockAMS","AMS "+fmt("Europe/Amsterdam"));setBoard("clockNY","NYC "+fmt("America/New_York"));setBoard("clockHK","HONG KONG "+fmt("Asia/Hong_Kong"));
@@ -475,10 +512,18 @@ function updateWallboards(){
  setBoard("ops",D.errors?.length?`SYSTEM · ${D.errors.length} MELDING(EN)`:"SYSTEM · ALL GREEN");
  setBoard("owner",live?`EQUITY ${eur.format(st?.equity||0)} · OPEN ${live.positions?.length||0}`:"OWNER VIEW —");
  setBoard("trade",live?.positions?.length?`LIVE · ${live.positions.length} OPEN · ${eur.format(live.exposure)}`:"LIVE POSITIONS · GEEN");
+ setBoard("hallEquity",st?`VERMOGEN ${eur.format(st.equity||0)}`:"VERMOGEN —");
+ setBoard("hallCash",live?`VRIJ ${eur.format(live.cash||0)}`:"VRIJ —");
+ setBoard("hallExposure",live?`BELEGD ${eur.format(live.exposure||0)}`:"BELEGD —");
+ setBoard("hallOpen",`OPEN ${live?.positions?.length||0}`);
+ setBoard("hallMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
+ setBoard("hallRisk",riskText);
+ setBoard("hallOpportunity",top?`BESTE ${top.market} · ${num((top.score||0)*100,0)}/100`:"BESTE KANS —");
+ const hallTrade=(live?.trades||[])[0];setBoard("hallLast",hallTrade?`${hallTrade.market} · ${hallTrade.pnl_pct>=0?"+":""}${num(hallTrade.pnl_pct||0,1)}%`:"LAATSTE TRADE —");
  setBoard("corridorMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
  const tick=(D.scanner?.candidates||[]).slice(0,3).map(x=>`${String(x.market||"").split("/")[0]} ${(Number(x.change_pct)||0)>=0?"+":""}${num(Number(x.change_pct)||0,1)}%`).join(" · ");setBoard("ticker",tick||"RADAR —");
  const lt=(live?.trades||[])[0];setBoard("tradeTape",lt?`${lt.market} · ${lt.pnl_pct>=0?"+":""}${num(lt.pnl_pct||0,1)}% · ${eur.format(lt.pnl||0)}`:"LAST TRADE —");
- const pos=live?.positions||[];tradePositionBoards.forEach((el,i)=>{const p=pos[i];el.textContent=p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`;el.style.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff"});
+ const pos=live?.positions||[];tradePositionBoards.forEach((rec,i)=>{const p=pos[i];rec.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff";renderBoard(rec,p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`)});
  const eq=st?.equity||0,cash=live?.cash||0,expo=live?.exposure||0,vals={cash:eq?cash/eq:0,exposure:eq?expo/eq:0,room:eq?Math.max(0,1-expo/eq):1};
  for(const b of capitalBars){const ratio=Math.max(.04,Math.min(1,vals[b.type]??0));b.mesh.scale.y=ratio;b.mesh.position.y=b.baseY+(b.maxH*ratio)/2}
  const riskLight=floorGroups.risk?.userData.riskLight;if(riskLight)riskLight.material.color.set(live?.risk?.halted?"#ff3344":blocked&&(!approved||blocked.ts>=approved.ts)?"#ff6b78":"#5cf2b3");
