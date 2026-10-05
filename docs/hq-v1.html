@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="nl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kraken Agents HQ</title>
+<style>html,body{height:100%;margin:0;background:#0d0924;color:#f3efff;font:16px system-ui,sans-serif}.load{height:100%;display:grid;place-items:center;text-align:center;padding:24px}.load b{color:#ffb547}.load a{color:#c9bdff}</style></head>
+<body><div class="load" id="loading"><div><b>KRAKEN AGENTS HQ</b><p>Het kantoorpand wordt geopend…</p></div></div>
+<script type="module">
+try {
+  const res = await fetch("hq.html.gz?t=" + Date.now(), {cache:"no-store"});
+  if (!res.ok) throw new Error("HQ-bestand " + res.status);
+  const bytes = new Uint8Array(await res.arrayBuffer());
+  const gzip = bytes[0] === 0x1f && bytes[1] === 0x8b;
+  let html;
+  if (gzip) {
+    if (!("DecompressionStream" in window)) throw new Error("Deze browser ondersteunt de HQ-decompressie niet");
+    const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
+    html = await new Response(stream).text();
+  } else {
+    html = new TextDecoder().decode(bytes);
+  }
+  document.open();
+  document.write(html);
+  document.close();
+} catch (e) {
+  document.getElementById("loading").innerHTML = `<div><b>HQ kon niet laden</b><p>${String(e.message || e)}</p><p><a href="trades.html">Open Trades</a> · <a href="details.html">Open Details</a></p></div>`;
+}
+</script></body></html>
