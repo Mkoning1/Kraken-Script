@@ -103,7 +103,7 @@ async function load(){
    '<section><h2>Wat houdt hij nu vast?</h2>'+positionsHTML(live)+'</section>'+
    '<section><h2>Alle afgesloten trades met echt geld</h2>'+closedTradesHTML(d)+'</section>'+
    '<section><h2>Schaduwtests</h2>'+shadowHTML(d)+'</section>'+
-   '<section><h2>Scanlog · iedere controle</h2><p class="muted">Dit log begint vanaf deze dashboardupgrade en bewaart de laatste zeven dagen aan scans.</p>'+scanHTML(d)+'</section>';
+   '<section id="scanlog"><h2>Scanlog · iedere controle</h2><p class="muted">Dit log begint vanaf deze dashboardupgrade en bewaart de laatste zeven dagen aan scans.</p>'+scanHTML(d)+'</section>';
  }catch(e){document.getElementById("app").innerHTML='<div class="empty">Data kon niet worden geladen: '+esc(e.message)+'</div>'}
 }
 load();setInterval(load,60000);
