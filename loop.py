@@ -1,6 +1,6 @@
 """Houdt de bot aan het werk zonder externe wekker.
 
-Eén GitHub-run blijft bijna 6 uur actief en draait de bot daarbinnen elk kwartier (3, 18, 33 en 48 minuten
+Eén GitHub-run blijft bijna 6 uur actief en draait de bot daarbinnen elke 5 minuten (3, 8, 13, ... en 58 minuten
 over het uur, UTC). Elke ronde:
   1. Nieuwste versie ophalen (zo worden aanpassingen meteen gebruikt).
   2. Is de code veranderd? Dan eerst de veiligheidstest. Mislukt die, dan wordt die ronde niet gehandeld.
@@ -15,7 +15,7 @@ import sys
 import time
 
 DURATION = int(os.environ.get("LOOP_MINUTES", "340")) * 60
-SLOTS = (3, 18, 33, 48)
+SLOTS = tuple(range(3, 60, 5))
 CODE = ("agents/", "tests/", "main.py", "config.json", "requirements.txt", "data/tuned_params.json")
 
 
