@@ -148,6 +148,7 @@ button { font: inherit; }
   <span class="brand">Kraken agents</span>
   <nav class="tabs" aria-label="Weergave">
     <a href="index.html" aria-current="page">Handelsvloer</a>
+    <a href="trades.html">Trades</a>
     <a href="details.html">Details</a>
     <a href="opportunities.html">Opportunities</a>
   </nav>
@@ -191,25 +192,31 @@ const clock = ts => new Date(ts * 1000).toLocaleTimeString("nl-NL", { hour: "2-d
 const base = m => m.split("/")[0];
 const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-const TEAM = { trend4h: "#7F9BFF", mean_reversion: "#C08CFF", breakout: "#45D1EE", momentum: "#FF9A62", squeeze: "#F4D35E" };
+const TEAM = { trend4h: "#7F9BFF", mean_reversion: "#C08CFF", breakout: "#45D1EE", momentum: "#FF9A62", squeeze: "#F4D35E", fast_breakout: "#5CF2B3" };
 const SIGNAL = { buy: "#5CF2B3", sell: "#FF6B78", hold: "#33405A" };
 const ACT = { buy: "kopen", sell: "negatief", hold: "afwachten" };
 const TYPES = { entry: "Gekocht", exit: "Verkocht", blocked: "Tegengehouden", validated: "Gevalideerd", note: "Melding" };
 const METHOD = {
   trend4h: "Jouw oorspronkelijke bot. Koopt als een 4-uursslot boven het hoogste punt van de vorige 55 candles breekt, met RSI boven 50. Verkoopt via een tweetraps trailing stop: 2 ATR onder de piek, 6 ATR zodra de winst 3 ATR is.",
   mean_reversion: "Koopt paniekdalingen: RSI onder 28 en de koers onder de onderste Bollinger-band, op uurcandles, in een munt die op 4-uursbasis stijgt. Verkoopt als de koers terug is bij het gemiddelde, of na 12 uur zonder herstel.",
-  breakout: "Koopt als de koers met extra volume door het hoogste punt van de laatste 24 uur breekt, in een stijgende trend. Zijn stop schuift mee omhoog.",
-  momentum: "Koopt een versnelling op uurcandles: de MACD kruist omhoog met veel volume, boven het gemiddelde. Verkoopt als de MACD weer omlaag kruist.",
-  squeeze: "Wacht tot de markt op uurbasis heel rustig is (smalle Bollinger-banden) en koopt de uitbraak omhoog die daarna komt.",
+  breakout: "Swing desk. Koopt op 1-uurscandles als de koers met extra volume uitbreekt, bevestigd door de 4-uurs trend.",
+  momentum: "Fast desk. Zoekt iedere gesloten 15-minutencandle naar een MACD-versnelling met extra volume.",
+  squeeze: "Fast desk. Zoekt op 15 minuten naar een rustige markt die vervolgens omhoog uitbreekt.",
+  fast_breakout: "Fast desk. Probeert een sterke 15-minutenuitbraak vroeg te zien, maar begint als schaduwstrategie.",
 };
 const ROOMS = [
-  { key: "data", label: "Data-agent", x: -21, color: "#8FA8E8", role: "Houdt de liquide kern vast en scant daarnaast een bredere Kraken-pool op volume, momentum, dagrange en spread. Extra discovery-kansen starten schaduw-only." },
-  { key: "markt", label: "Markt-agent", x: -14, color: "#6FD6B4", role: "Bepaalt of de hele markt stijgt, daalt of zijwaarts gaat, op basis van BTC op uurbasis. In een dalende markt wordt niets gekocht." },
-  { key: "prestatie", label: "Prestatie-agent", x: -7, color: "#D49BEA", role: "Meet elke strategie-agent in R en bepaalt zijn invloed. Beslist ook wie met echt geld mag handelen en wie in de schaduw blijft." },
-  { key: "beslis", label: "Beslis-agent", x: 0, w: 8, color: "#E9E4FF", role: "Weegt alle koopadviezen: sterkte maal invloed, bonus als agents het eens zijn, maal de marktfase. De beste kansen gaan eerst." },
-  { key: "risico", label: "Risico-agent", x: 7, color: "#FF7D88", role: "Bepaalt hoeveel er ingezet wordt en heeft het laatste woord: daglimiet, noodstop, maximaal aantal posities en je budget." },
-  { key: "uitvoer", label: "Uitvoer-agent", x: 14, color: "#FFB547", role: "Plaatst de orders op Kraken, zet onder elke positie een stop-loss op Kraken zelf en controleert elke run of alles klopt." },
-  { key: "monitor", label: "Monitor-agent", x: 21, color: "#8FC3E8", role: "Schrijft na elke run het verslag in gewone taal en houdt het logboek bij." },
+  { key: "data", label: "Radar & Data", x: -23.1, w: 4.0, color: "#8FA8E8", role: "De receptie van het handelsbedrijf: bekijkt iedere 5 minuten de brede Kraken-markt en bepaalt welke munten aandacht krijgen." },
+  { key: "fast", label: "Fast 15m", x: -18.9, w: 4.0, color: "#FF9A62", role: "Snelle handelsafdeling. Momentum, Squeeze en Snelle uitbraak beoordelen iedere gesloten 15-minutencandle." },
+  { key: "swing", label: "Swing 1u", x: -14.7, w: 4.0, color: "#45D1EE", role: "Swingafdeling. Dip-koper en Uitbraak-agent werken op 1 uur en gebruiken de 4-uurs trend als bevestiging." },
+  { key: "trend", label: "Trend 4u", x: -10.5, w: 4.0, color: "#7F9BFF", role: "Langere-termijnafdeling. Trend-4u zoekt grotere uitbraken en probeert sterke runners langer vast te houden." },
+  { key: "markt", label: "Markt", x: -6.3, w: 4.0, color: "#6FD6B4", role: "Bepaalt of de cryptomarkt stijgt, neutraal is of daalt. Deze afdeling geeft de rest van het bedrijf het marktklimaat door." },
+  { key: "equity", label: "China/HK", x: -2.1, w: 4.0, color: "#B7A0FF", role: "Researchafdeling voor Hongkong/China. Draait los van Kraken en handelt voorlopig alleen met paper money." },
+  { key: "prestatie", label: "Prestatie", x: 2.1, w: 4.0, color: "#D49BEA", role: "HR en kwaliteitscontrole: meet welke strategieën echt geld verdienen en welke eerst verder moeten oefenen." },
+  { key: "beslis", label: "Directie", x: 6.3, w: 4.0, color: "#E9E4FF", role: "De directiekamer. Hier worden alle koopadviezen naast elkaar gelegd en worden de beste kansen gekozen." },
+  { key: "risico", label: "Risk", x: 10.5, w: 4.0, color: "#FF7D88", role: "Risk management heeft veto-recht. Bepaalt positieomvang, daglimieten, correlatie en noodstops." },
+  { key: "kapitaal", label: "Kapitaal", x: 14.7, w: 4.0, color: "#F4D35E", role: "Treasury. Houdt bij hoeveel echt geld op Kraken vrij is, hoeveel belegd is en hoeveel ruimte er nog is." },
+  { key: "uitvoer", label: "Execution", x: 18.9, w: 4.0, color: "#FFB547", role: "De dealing desk. Plaatst echte orders bij Kraken en bewaakt de exchange-stoplosses." },
+  { key: "monitor", label: "Operations", x: 23.1, w: 4.0, color: "#8FC3E8", role: "Operations schrijft het verslag, bewaart het scanlog en zorgt dat het dashboard laat zien wat het bedrijf heeft gedaan." },
 ];
 const ROOM = Object.fromEntries(ROOMS.map(r => [r.key, r]));
 
@@ -231,14 +238,21 @@ function roomStatus(key) {
   const val = ev.filter(e => e.type === "validated"), bl = ev.filter(e => e.type === "blocked");
   const stops = live ? live.positions.filter(p => p.stop_on_exchange).length : 0;
   const errs = D.errors.filter(e => e.ts === D.generated_ts);
+  const latest = D.scan_history?.[0], c = D.cadence || {};
+  const eqTop = EQ?.candidates?.[0];
   return {
-    data: D.scanner?.enabled ? `${D.scanner.pool_count || 0} markten gescand, ${(D.scanner.active_discovery_markets || []).length} discovery-kansen actief${errs.length ? `, ${errs.length} melding(en)` : ""}` : `${D.markets.length} munten gescand om ${clock(D.generated_ts)}${errs.length ? `, ${errs.length} melding(en)` : ""}`,
+    data: D.scanner?.enabled ? `${D.scanner.eligible_count || 0} gezien · ${D.scanner.pool_count || 0} gerankt · ${(D.scanner.active_discovery_markets || []).length} discovery` : `${D.markets.length} munten bekeken`,
+    fast: latest?.desks?.fast ? `Nieuwe 15m-candle beoordeeld · ${D.agents.filter(a => a.horizon === "fast").length} strategieën` : `Wacht op volgende 15m-candle`,
+    swing: latest?.desks?.swing ? `Nieuwe 1u-candle beoordeeld · ${D.agents.filter(a => a.horizon === "swing").length} strategieën` : `Wacht op volgende 1u-candle`,
+    trend: latest?.desks?.trend ? "Nieuwe 4u-candle beoordeeld" : "Wacht op volgende 4u-candle",
     markt: `Markt ${D.regime.label}. ${D.regime.reason}.`,
-    prestatie: `${D.agents.filter(a => a.status === "live").length} van ${D.agents.length} agents handelen met echt geld`,
+    equity: eqTop ? `Beste researchkans: ${eqTop.name} · ${num(eqTop.score,0)}/100` : "Equity research wacht op scan",
+    prestatie: `${D.agents.filter(a => a.status === "live").length} van ${D.agents.length} strategieën mogen echt geld gebruiken`,
     beslis: buys.length ? `${buys.length} koopadvies${buys.length > 1 ? "en" : ""} op tafel` : "Geen koopadvies deze ronde",
-    risico: r.halted ? `Noodstop actief` : ent.length ? `Goedgekeurd: ${ent.map(e => base(e.market)).join(", ")}` : val.length ? `Goedgekeurd (validatie): ${val.map(e => base(e.market)).join(", ")}` : bl.length ? `Tegengehouden: ${bl.map(e => base(e.market)).join(", ")}` : `Verlies vandaag ${num(r.daily_loss_pct || 0, 1)}% van ${L.max_daily_loss_pct}%`,
-    uitvoer: ent.length || ex.length ? `${ent.length} gekocht, ${ex.length} verkocht` : `Geen orders, ${stops} stop-loss${stops === 1 ? "" : "es"} op Kraken`,
-    monitor: `Verslag bijgewerkt om ${clock(D.generated_ts)}`,
+    risico: r.halted ? "NOODSTOP ACTIEF" : `Dagverlies ${num(r.daily_loss_pct || 0, 1)}% / ${L.max_daily_loss_pct}% · max ${L.max_open_positions} posities`,
+    kapitaal: live ? `${eur.format(live.cash)} vrij · ${eur.format(live.exposure)} belegd · budget ALLES` : "Geen live kapitaal",
+    uitvoer: ent.length || ex.length ? `${ent.length} gekocht · ${ex.length} verkocht` : `Geen order · ${stops} Kraken-stop${stops === 1 ? "" : "s"} actief`,
+    monitor: `Scan #${D.scan_history?.length || 0} bewaard · laatste run ${clock(D.generated_ts)}`,
   }[key];
 }
 
@@ -486,7 +500,11 @@ function equityRadarHTML() {
 function roomHTML(key) {
   const r = ROOM[key], live = D.books.live, L = D.risk_limits, risk = live?.risk || {};
   let extra = "";
-  if (key === "data") extra = scannerHTML() + equityRadarHTML() + `<section><h2>Actieve munten deze uurcyclus</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
+  if (key === "data") extra = scannerHTML() + `<section><h2>Actieve handelslijst</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
+  if (key === "fast") extra = deskDepartmentHTML("fast", "15 minuten", "Momentum, Squeeze en Snelle uitbraak");
+  if (key === "swing") extra = deskDepartmentHTML("swing", "1 uur", "Dip-koper en normale Uitbraak");
+  if (key === "trend") extra = deskDepartmentHTML("trend", "4 uur", "Trend-4u");
+  if (key === "equity") extra = equityRadarHTML();
   if (key === "markt") extra = `<div class="doing"><div class="act ${D.regime.label === "stijgend" ? "act-buy" : D.regime.label === "dalend" ? "act-sell" : "act-hold"}">Markt ${esc(D.regime.label)}</div><p>${esc(D.regime.reason)}. Koopkansen tellen voor ${num(D.regime.multiplier * 100, 0)}% mee.</p></div>`;
   if (key === "prestatie") extra = (BT ? `<section><h2>Backtest van het hele team</h2><dl class="kv">
       <dt>Periode</dt><dd>${new Date(BT.period.start * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })} tot ${new Date(BT.period.end * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })}</dd>
@@ -497,6 +515,22 @@ function roomHTML(key) {
       <p class="when">Met kosten (${num(BT.fee_pct, 2)}% per order) en ${num(BT.slippage_pct, 2)}% slippage, profiel ${esc(BT.profile)}.</p></section>` : "") + `<section><h2>Het team</h2><ul class="list">${D.agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br>Invloed ${num(a.weight, 2)}×, ${a.trades} trades${a.expectancy_r != null ? `, gem. ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r, 2)}R` : ""}${a.promotion_note ? `. ${esc(a.promotion_note)}` : ""}</li>`).join("")}</ul></section>`;
   if (key === "beslis") { const b = buyList(); extra = `<section><h2>Op tafel</h2>${b.length ? `<ul class="list">${b.map(x => `<li><span class="dot" style="background:${TEAM[x.agent]}"></span><button class="link" data-analyst="${x.agent}|${esc(x.coin)}">${esc(x.label)}</button> op ${esc(base(x.coin))}, sterkte ${num(x.s.strength, 2)}<br>${esc(x.s.reason)}</li>`).join("")}</ul>` : `<p>Geen koopadviezen. Er valt niets te beslissen.</p>`}
     ${Object.entries(D.evaluations).flatMap(([m, e]) => (e.notes || []).filter(n => n.startsWith("Kandidaat") || n.startsWith("Risico") || n.startsWith("Uitvoer")).map(n => `<p class="when">${esc(base(m))}: ${esc(n)}</p>`)).join("")}</section>`; }
+function deskDepartmentHTML(horizon, windowLabel, description) {
+  const agents = D.agents.filter(a => a.horizon === horizon);
+  const buys = [], sells = [];
+  for (const [market, ev] of Object.entries(D.evaluations || {})) {
+    for (const a of agents) {
+      const sig = ev.signals?.[a.agent];
+      if (sig?.action === "buy") buys.push(`${base(market)} · ${a.agent}`);
+      if (sig?.action === "sell") sells.push(`${base(market)} · ${a.agent}`);
+    }
+  }
+  return `<section><h2>Werkvenster: ${windowLabel}</h2><p>${description}.</p>
+    <ul class="list">${agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br><span class="when">${a.trades} afgeronde trades${a.expectancy_r != null ? ` · gemiddeld ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r,2)}R` : ""}</span></li>`).join("")}</ul>
+    <p><b>Nu kopen:</b> ${buys.length ? esc(buys.join(", ")) : "geen"}</p>
+    <p><b>Nu negatief/verkoop:</b> ${sells.length ? esc(sells.slice(0,8).join(", ")) : "geen"}</p></section>`;
+}
+
   if (key === "risico") extra = `<section><h2>Limieten (profiel ${esc(D.profile)})</h2><dl class="kv">
       <dt>Verlies vandaag</dt><dd>${num(risk.daily_loss_pct || 0, 1)}% van ${L.max_daily_loss_pct}%</dd>
       <dt>Onder de hoogste stand</dt><dd>${num(risk.drawdown_pct || 0, 1)}% van ${L.max_drawdown_pct}%</dd>
@@ -504,9 +538,19 @@ function roomHTML(key) {
       <dt>Max per positie</dt><dd>${L.max_position_pct}%</dd>
       <dt>Max posities</dt><dd>${L.max_open_positions}</dd>
       <dt>Noodstop</dt><dd>${risk.halted ? `<span class="down">actief</span>` : "niet actief"}</dd></dl></section>`;
+  if (key === "kapitaal") extra = live ? `<section><h2>Kraken-kapitaal</h2><dl class="kv">
+      <dt>Totaal in bot</dt><dd><b style="color:var(--money)">${eur.format(live.stats.equity)}</b></dd>
+      <dt>Vrije euro's</dt><dd>${eur.format(live.cash)}</dd>
+      <dt>Nu belegd</dt><dd>${eur.format(live.exposure)}</dd>
+      <dt>Budgetregel</dt><dd><b>ALLES</b></dd>
+      <dt>Max exposure</dt><dd>${L.max_exposure_pct}%</dd>
+      <dt>Max posities</dt><dd>${L.max_open_positions}</dd></dl>
+      <p class="doing">De bot mag je volledige vrije EUR-saldo op Kraken gebruiken. Risk Management bepaalt per trade hoeveel daarvan daadwerkelijk ingezet wordt.</p>
+      <p><a href="trades.html">Open Trades & Posities →</a></p></section>` : "<p>Geen live-geldboek actief.</p>";
   if (key === "uitvoer") { const ps = live?.positions || []; extra = `<section><h2>Posities met echt geld</h2>${ps.length ? `<ul class="list">${ps.map(p => `<li><button class="link" data-coin="${esc(p.market)}">${esc(p.market)}</button> ${eur.format(p.value)} <span class="${p.unrealized >= 0 ? "up" : "down"}">${signed(p.unrealized)}</span><br>Stop ${price(p.stop)}, ${p.stop_on_exchange ? "staat op Kraken" : "nog niet op Kraken"}</li>`).join("")}</ul>` : "<p>Geen open posities.</p>"}</section>
     <section><h2>Laatste orders</h2><ul class="list">${D.events.filter(e => ["entry", "exit", "validated", "blocked"].includes(e.type)).slice(0, 6).map(e => `<li><span class="when">${when(e.ts)} ${e.book === "live" ? "echt geld" : "schaduw"}</span><br><b>${TYPES[e.type]} ${esc(e.market)}</b>${e.pnl != null ? ` <span class="${e.pnl >= 0 ? "up" : "down"}">${signed(e.pnl)}</span>` : ""}</li>`).join("") || "<li>Nog geen orders.</li>"}</ul></section>`; }
-  if (key === "monitor") extra = `<section><h2>Verslag</h2>${D.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</section>`;
+  if (key === "monitor") extra = `<section><h2>Verslag</h2>${D.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</section>
+    <section><h2>Scanlog</h2><p>${D.scan_history?.length || 0} scans zichtbaar. Iedere 5-minutencontrole wordt vastgelegd.</p><p><a href="trades.html#scanlog">Open het volledige scanlog →</a></p></section>`;
   return `<h3><span class="dot" style="background:${r.color}"></span>${r.label}</h3><p class="sub">${esc(r.role)}</p>
     <div class="doing"><p style="color:var(--muted);font-size:.8rem;margin:0">Wat hij nu doet</p><p style="margin:2px 0 0;font-size:1rem">${esc(roomStatus(key))}</p></div>${extra}`;
 }
