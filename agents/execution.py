@@ -92,13 +92,17 @@ def _stop_kind(pos, fee, slip):
 
 
 def new_position(book, market, agent, signal, qty, fill, cost, fee, stop, hard, extra, risk_eur, candle_ts, tf_sec, reason, score, plan):
+    extra = dict(extra or {})
+    position_tf_sec = int(extra.pop("_tf_sec", tf_sec))
+    cooldown_sec = int(extra.pop("_cooldown_sec", 0))
     pos = {
         "market": market, "agent": agent, "book": book["name"], "qty": qty,
-        "entry_price": fill, "entry_cost": cost + fee, "entry_ts": candle_ts + tf_sec,
+        "entry_price": fill, "entry_cost": cost + fee, "entry_ts": candle_ts + position_tf_sec,
         "exit_style": signal.exit_style, "stop": stop, "initial_stop": stop, "hard_stop": hard,
         "risk_eur": risk_eur, "r_unit": fill - stop if fill > stop else fill * 0.02,
         "trailing": signal.trailing, "trail_distance": fill - stop, "max_candles": signal.max_candles,
         "candles_held": 0, "highest_close": fill, "last_checked_ts": candle_ts,
+        "timeframe_sec": position_tf_sec, "cooldown_sec": cooldown_sec,
         "entry_reason": reason, "score": round(score, 2), "plan": plan,
     }
     pos.update(extra)
@@ -122,7 +126,7 @@ def record_exit(book, pos, fill, proceeds_net, fee, ts, reason, learner, cooldow
     book["trades"].append(trade)
     learner.record(trade)
     if pnl < 0:
-        book["cooldown"][pos["market"]] = ts + cooldown_sec
+        book["cooldown"][pos["market"]] = ts + int(pos.get("cooldown_sec") or cooldown_sec)
     return trade
 
 
@@ -160,7 +164,8 @@ class PaperExecutionAgent:
         pos = book["positions"].get(market)
         if not pos:
             return None
-        hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip, self.tf_sec, intrabar=True)
+        hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip,
+                      int(pos.get("timeframe_sec") or self.tf_sec), intrabar=True)
         return self.sell(book, market, hit[0], hit[1], hit[2], learner) if hit else None
 
 
@@ -395,7 +400,8 @@ class LiveExecutionAgent:
         trade = self.reconcile(book, market, last_price, learner)
         if trade:
             return trade
-        hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip, self.tf_sec, intrabar=False)
+        hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip,
+                      int(pos.get("timeframe_sec") or self.tf_sec), intrabar=False)
         if hit:
             return self.sell(book, market, hit[0], hit[1], hit[2], learner)
         target = float(self.ex.price_to_precision(market, exchange_stop(pos)))
