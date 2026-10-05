@@ -1,0 +1,271 @@
+{
+ "ts": 1791194131,
+ "default_list": {
+  "ok": true,
+  "pairs": 1458,
+  "eur_pairs": 546,
+  "aclass_base": [
+   "currency"
+  ],
+  "error": null
+ },
+ "xstocks_in_default_list": {
+  "count": 0,
+  "eur": [],
+  "usd_sample": []
+ },
+ "gold_and_stable_pairs": {
+  "PAXG": [
+   "PAXGEUR"
+  ],
+  "XAUT": [],
+  "USDC": [
+   "USDCEUR"
+  ],
+  "USDT": [
+   "USDTEUR"
+  ],
+  "EURC": [
+   "EURCEUR"
+  ],
+  "EURQ": [
+   "EURQEUR"
+  ]
+ },
+ "margin_XBTEUR": {
+  "leverage_buy": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "leverage_sell": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "ordermin": "0.00005"
+ },
+ "margin_ETHEUR": {
+  "leverage_buy": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "leverage_sell": [
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "ordermin": "0.001"
+ },
+ "tokenized_lists": {
+  "asset_class=tokenized_asset": {
+   "ok": true,
+   "count": 1458,
+   "eur": [
+    "0GEUR",
+    "1INCHEUR",
+    "2ZEUR",
+    "AAVEEUR",
+    "ABEUR",
+    "ACAEUR",
+    "ACHEUR",
+    "ACTEUR",
+    "ACUEUR",
+    "ACXEUR",
+    "ADAEUR",
+    "ADIEUR",
+    "ADXEUR",
+    "AEROEUR",
+    "AEUR",
+    "AEVOEUR",
+    "AI3EUR",
+    "AIEUR",
+    "AIOEUR",
+    "AIOZEUR",
+    "AIXBTEUR",
+    "AKEEUR",
+    "AKTEUR",
+    "ALCHEUR",
+    "ALCXEUR",
+    "ALGOEUR",
+    "ALICEEUR",
+    "ALKIMIEUR",
+    "ALPHAEUR",
+    "ALTEUR",
+    "ALTHEAEUR",
+    "ANIMEEUR",
+    "ANKREUR",
+    "ANONEUR",
+    "APEEUR",
+    "APENFTEUR",
+    "API3EUR",
+    "APREUR",
+    "APTEUR",
+    "APUEUR",
+    "ARBEUR",
+    "ARCEUR",
+    "AREUR",
+    "ARKMEUR",
+    "ARPAEUR",
+    "ASTEREUR",
+    "ASTREUR",
+    "ATHEUR",
+    "ATOMEUR",
+    "AUCTIONEUR",
+    "AUDIOEUR",
+    "AUSDEUR",
+    "AVAEUR",
+    "AVAXEUR",
+    "AVNTEUR",
+    "AXSEUR",
+    "AZTECEUR",
+    "B2EUR",
+    "B3EUR",
+    "BABYEUR",
+    "BADGEREUR",
+    "BALEUR",
+    "BANANAS31EUR",
+    "BANDEUR",
+    "BASEDEUR",
+    "BATEUR",
+    "BCHEUR",
+    "BDXNEUR",
+    "BEAMEUR",
+    "BERAEUR",
+    "BERTEUR",
+    "BGBEUR",
+    "BICOEUR",
+    "BIGTIMEEUR",
+    "BILLEUR",
+    "BILLYEUR",
+    "BIOEUR",
+    "BKSEUR",
+    "BLENDEUR",
+    "BLUAIEUR"
+   ],
+   "usd_sample": [
+    "0GUSD",
+    "1INCHUSD",
+    "2ZUSD",
+    "AAVEUSD",
+    "ABUSD",
+    "ACAUSD",
+    "ACHUSD",
+    "ACTUSD",
+    "ACUUSD",
+    "ACXUSD",
+    "ADAUSD",
+    "ADIUSD",
+    "ADXUSD",
+    "AEROUSD",
+    "AEVOUSD",
+    "AI3USD",
+    "AINUSD",
+    "AIOUSD",
+    "AIOZUSD",
+    "AIUSD"
+   ]
+  },
+  "aclass_base=tokenized_asset": {
+   "ok": true,
+   "count": 354,
+   "eur": [],
+   "usd_sample": [
+    "AAOIxUSD",
+    "AAOIxUSD",
+    "AAPLxUSD",
+    "AAPLxUSD",
+    "ABBVxUSD",
+    "ABBVxUSD",
+    "ABTxUSD",
+    "ABTxUSD",
+    "ACNxUSD",
+    "ACNxUSD",
+    "ADBExUSD",
+    "ADBExUSD",
+    "AMATxUSD",
+    "AMATxUSD",
+    "AMBRxUSD",
+    "AMBRxUSD",
+    "AMDxUSD",
+    "AMDxUSD",
+    "AMZNxUSD",
+    "AMZNxUSD"
+   ]
+  }
+ },
+ "validate_control_btc": {
+  "ok": true,
+  "pair": "XBTEUR",
+  "volume": 0.0001,
+  "extra": {},
+  "answer": "buy 0.00010 XBTEUR @ market"
+ },
+ "stock_pair_info": {
+  "altname": "0GEUR",
+  "wsname": "0G/EUR",
+  "quote": "ZEUR",
+  "aclass_base": "currency",
+  "aclass_quote": "currency",
+  "ordermin": "17",
+  "costmin": "0.45",
+  "lot_decimals": 5,
+  "status": "online"
+ },
+ "validate_stock": [
+  {
+   "ok": true,
+   "pair": "0GEUR",
+   "volume": 170.0,
+   "extra": {},
+   "answer": "buy 170.0000 0GEUR @ market"
+  }
+ ],
+ "other_asset_classes": {
+  "equity": {
+   "ok": true,
+   "count": 1458,
+   "error": null
+  },
+  "equity_pair": {
+   "ok": true,
+   "count": 1458,
+   "error": null
+  },
+  "stock": {
+   "ok": true,
+   "count": 1458,
+   "error": null
+  },
+  "us_equity": {
+   "ok": true,
+   "count": 1458,
+   "error": null
+  }
+ }
+}
