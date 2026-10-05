@@ -5,12 +5,9 @@
 <body><div class="load" id="loading"><div><b>KRAKEN AGENTS HQ</b><p>Het levende kantoorpand wordt geopend…</p></div></div>
 <script type="module">
 try {
-  const res=await fetch("hq-v3.html.gz?t="+Date.now(),{cache:"no-store"});
+  const res=await fetch("hq-v3.html?t="+Date.now(),{cache:"no-store"});
   if(!res.ok) throw new Error("HQ-bestand "+res.status);
-  const bytes=new Uint8Array(await res.arrayBuffer());
-  if(!("DecompressionStream" in window)) throw new Error("Deze browser ondersteunt de HQ-decompressie niet");
-  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
-  const html=await new Response(stream).text();
+  const html=await res.text();
   document.open();document.write(html);document.close();
 } catch(e) {
   document.getElementById("loading").innerHTML='<div><b>HQ kon niet laden</b><p>'+String(e.message||e)+'</p><p><a href="hq-v1.html">Open vorige HQ</a> · <a href="trades.html">Open Trades</a></p></div>';
