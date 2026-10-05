@@ -159,8 +159,10 @@ button { font: inherit; }
   <div class="kpi"><span>Markt</span><b id="regime">–</b></div>
   <div class="kpi"><span>Radar</span><b id="radar">–</b></div>
   <div class="kpi"><span>China/HK</span><b id="equityradar">–</b></div>
-  <div class="kpi"><span>Volgende run</span><b id="nextrun">–</b></div>
-  <div class="kpi"><span>4-uurssluiting</span><b id="next4h">–</b></div>
+  <div class="kpi"><span>Monitor</span><b id="nextrun">–</b></div>
+  <div class="kpi"><span>Fast 15m</span><b id="next15">–</b></div>
+  <div class="kpi"><span>Swing 1u</span><b id="next1h">–</b></div>
+  <div class="kpi"><span>Trend 4u</span><b id="next4h">–</b></div>
 </header>
 
 <div id="stage" aria-label="De handelsvloer met alle agents"></div>
@@ -280,10 +282,16 @@ function header() {
 }
 function tickClocks() {
   const now = Date.now() / 1000, d = new Date(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
-  const slots = [3, 18, 33, 48]; const next = slots.find(x => x > m);
+  const slots = Array.from({length:12}, (_,i) => 3 + i * 5);
+  const next = slots.find(x => x > m);
   const secs = ((next !== undefined ? next - m : 60 - m + slots[0]) * 60) - s;
-  document.getElementById("nextrun").textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+  const fmt = x => `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, "0")}`;
+  document.getElementById("nextrun").textContent = fmt(Math.max(0, secs));
+  const n15 = Math.ceil(now / 900) * 900 - now;
+  const n1 = Math.ceil(now / 3600) * 3600 - now;
   const n4 = Math.ceil(now / 14400) * 14400 - now;
+  document.getElementById("next15").textContent = fmt(Math.max(0, n15));
+  document.getElementById("next1h").textContent = fmt(Math.max(0, n1));
   document.getElementById("next4h").textContent = `${Math.floor(n4 / 3600)}:${String(Math.floor((n4 % 3600) / 60)).padStart(2, "0")}`;
 }
 
@@ -458,8 +466,10 @@ function scannerHTML() {
   const rows = (s.candidates || []).slice(0, 8).map(c => `<li><button class="link" data-coin="${esc(c.market)}">${esc(c.market)}</button> 
     <b>${num((c.score || 0) * 100, 0)}</b>/100 · 24u ${pct(c.change_pct)} · volume ${eur.format(c.quote_volume || 0)} 
     ${active.has(c.market) ? `<span class="chip">discovery · schaduw</span>` : ""}</li>`).join("");
+  const c = D.cadence || {};
   return `<section><h2>Opportunity radar</h2>
-    <p>${s.pool_count || 0} liquide EUR-markten zijn goedkoop voorgefilterd. De kern blijft op volume gebaseerd; maximaal ${(s.discovery_markets || []).length} extra kansen krijgen de zware analyse. Discovery draait voorlopig alleen met schaduwgeld.</p>
+    <p>${s.eligible_count || 0} EUR-markten gezien; maximaal ${s.pool_count || 0} krijgen de goedkope ranking. Kern + ${(s.discovery_markets || []).length} discovery-kansen gaan door naar de desks.</p>
+    <div class="doing"><p><b>Multi-speed:</b> prijzen/stops elke ${c.monitor_minutes || 5}m · discovery ${c.discovery_minutes || 15}m · fast ${c.fast_minutes || 15}m · swing ${c.swing_minutes || 60}m · trend ${c.trend_minutes || 240}m.</p></div>
     <ul class="list">${rows || "<li>Geen geschikte discovery-kansen.</li>"}</ul></section>`;
 }
 
