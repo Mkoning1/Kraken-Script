@@ -139,6 +139,7 @@ class MonitorAgent:
             "evaluations": state["evaluations"], "events": state["events"][-50:][::-1],
             "narrative": state["narrative"], "errors": state["errors"][-10:][::-1],
             "last_run_ok": state["last_run"]["ok"], "legacy_trades": state.get("legacy_trades", [])[::-1],
+            "scan_history": state.get("scan_history", [])[-2016:][::-1],
             "levels": {m: v for m, v in state.get("levels", {}).items() if m in extra.get("markets", [])},
             **extra,
         }
