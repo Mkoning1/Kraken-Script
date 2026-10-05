@@ -144,9 +144,25 @@ def score_equity(fundamentals, momentum, weights):
     comps = _component_scores(fundamentals, momentum)
     weighted = [(float(weights.get(k, 0)), v) for k, v in comps.items() if float(weights.get(k, 0)) > 0]
     total_w = sum(w for w, _ in weighted)
-    score = sum(w * v for w, v in weighted) / total_w if total_w else 0.0
+    raw_score = sum(w * v for w, v in weighted) / total_w if total_w else 0.0
     requested = [k for k in ("growth", "margin", "momentum", "valuation", "quality") if float(weights.get(k, 0)) > 0]
     quality = len(comps) / max(1, len(requested)) * 100
+
+    # Nieuwe listings of incomplete fundamentals mogen niet boven complete kandidaten komen puur
+    # doordat de beschikbare componenten toevallig sterk zijn. 55-100% van de ruwe score telt mee
+    # afhankelijk van de datadekking.
+    coverage_factor = 0.55 + 0.45 * (quality / 100)
+    score = raw_score * coverage_factor
+
+    # Groei zonder winstgevendheid is speculatiever. Negatieve operationele/nettomarges krijgen
+    # daarom een expliciete straf, maar blijven zichtbaar op de radar.
+    profit_margin = fundamentals.get("profit_margin")
+    operating_margin = fundamentals.get("operating_margin")
+    if profit_margin is not None and profit_margin < 0:
+        score -= min(0.12, 0.05 + abs(profit_margin) * 0.5)
+    if operating_margin is not None and operating_margin < 0:
+        score -= 0.04
+    score = clamp(score)
     return round(score * 100, 1), {k: round(v * 100, 1) for k, v in comps.items()}, round(quality, 0)
 
 
@@ -282,6 +298,10 @@ def update_paper_book(state, report, cfg, now_ts):
         and r["score"] >= entry_score
         and r["data_quality_pct"] >= min_quality
         and (r.get("m20_pct") or 0) > 0
+        and (
+            r.get("fundamentals", {}).get("profit_margin") is None
+            or r.get("fundamentals", {}).get("profit_margin") >= float(cfg.get("min_profit_margin", 0.0))
+        )
     ]
     slots = max(0, max_pos - len(book["positions"]))
     for row in candidates[:slots]:
