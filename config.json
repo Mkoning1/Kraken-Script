@@ -59,9 +59,9 @@
     },
     "assertief": {
       "risk_per_trade_pct": 1.25,
-      "max_position_pct": 45,
+      "max_position_pct": 100,
       "max_open_positions": 4,
-      "max_exposure_pct": 95,
+      "max_exposure_pct": 100,
       "max_daily_loss_pct": 5,
       "max_drawdown_pct": 20,
       "cooldown_candles": 3,
