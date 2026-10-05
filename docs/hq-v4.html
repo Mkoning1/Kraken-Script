@@ -181,7 +181,7 @@ function buildFloor(f){
  const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
  return g;
 }
-function iColorfunction iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
+function iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
 function officeDoor(f){
  const D=f.d||(f.trade?22:13.5),front=(D/2)+1.4;
  return {x:f.x,z:f.z+(f.face===1?front:-front),lane:f.lane};
@@ -221,7 +221,7 @@ function routeWaypoints(fromKey,toKey){
  pts.push(new THREE.Vector3(b.x,.16,b.z));
  return pts;
 }
-function createScenefunction createScene(){
+function createScene(){
  renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;stage.appendChild(renderer.domElement);
  labelRenderer=new CSS2DRenderer();labelRenderer.setSize(innerWidth,innerHeight);labelRenderer.domElement.className="l2d";labelRenderer.domElement.style.cssText="position:absolute;inset:0;pointer-events:none";stage.appendChild(labelRenderer.domElement);
  scene=new THREE.Scene();scene.background=new THREE.Color("#140D33");scene.fog=new THREE.Fog("#140D33",125,220);
