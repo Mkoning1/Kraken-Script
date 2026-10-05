@@ -187,79 +187,131 @@ function addDesk(parent,x,z,yBase,color,workerColor=color){
  workers.push({g:p,key:parent.userData.key,phase:Math.random()*6.2,seated:true});
  return p;
 }
+function decorateDepartment(g,f,W,D,H){
+ const back=-D/2+.26;
+ plant(g,-W/2+1.0,D/2-1.2,.8);if(!f.trade)plant(g,W/2-1.0,D/2-1.2,.7);
+ if(f.key==="data"){
+   monitor(g,0,H-1.35,back,f.color,true);monitor(g,-3.3,H-1.65,back,f.color);monitor(g,3.3,H-1.65,back,f.color);
+   wallBoard(g,"data","SCAN —",0,H-2.55,back+.12,f.color);wallBoard(g,"dataTop","TOP RADAR —",0,H-3.25,back+.12,f.color);
+ }
+ if(f.key==="market"){
+   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"market","MARKT —",0,H-2.55,back+.12,f.color);
+   wallBoard(g,"clockAMS","AMS —",-2.8,H-3.15,back+.12);wallBoard(g,"clockNY","NYC —",2.8,H-3.15,back+.12);
+ }
+ if(f.key==="fast"){
+   for(let x=-4.5;x<=4.5;x+=3)monitor(g,x,H-1.45,back,f.color);
+   wallBoard(g,"fast","FAST DESK —",0,H-2.55,back+.12,f.color);beacon(g,"alert",W/2-1,H-1,D/2-1,f.color);
+ }
+ if(f.key==="swing"){
+   monitor(g,-2.1,H-1.45,back,f.color,true);monitor(g,2.6,H-1.65,back,f.color);
+   wallBoard(g,"swing","SWING SETUPS —",0,H-2.7,back+.12,f.color);
+   box(g,4.8,2.1,.08,mat("#efeafd"),0,2.1,-D/2+.33,false);wallBoard(g,"swingBoard","1H SETUPS",0,2.1,-D/2+.42,"#17113d");
+ }
+ if(f.key==="trend"){
+   for(let x=-4.1;x<=4.1;x+=4.1)monitor(g,x,H-1.55,back,f.color,true);
+   wallBoard(g,"trend","4H RUNNERS —",0,H-2.85,back+.12,f.color);
+ }
+ if(f.key==="equity"){
+   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"equity","HK RESEARCH —",0,H-2.55,back+.12,f.color);
+   wallBoard(g,"clockHK","HONG KONG —",-2.8,H-3.15,back+.12);wallBoard(g,"equityPaper","PAPER —",2.8,H-3.15,back+.12);
+ }
+ if(f.key==="performance"){
+   monitor(g,-2.5,H-1.5,back,f.color,true);wallBoard(g,"performance","AGENT RANKING —",-2.5,H-2.8,back+.12,f.color);
+   box(g,4.2,2.4,.08,mat("#302454"),3.5,2.2,-D/2+.33,false);wallBoard(g,"shadow","SHADOW LAB",3.5,2.8,-D/2+.42,"#c9bdff");
+   wallBoard(g,"nofomo","NO FOMO",3.5,1.8,-D/2+.42,"#ffb547");
+ }
+ if(f.key==="directie"){
+   box(g,9,.32,2.8,mat("#d9d0f7"),0,.88,2.0);
+   for(let i=0;i<5;i++){const p=makePerson(f.color,true);p.position.set(-4+i*2,.15,3.3);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true});}
+   monitor(g,0,H-1.35,back,f.color,true);wallBoard(g,"directie","BOARDROOM —",0,H-2.55,back+.12,f.color);
+ }
+ if(f.key==="risk"){
+   monitor(g,0,H-1.45,back,"#ff6b78",true);wallBoard(g,"risk","RISK DECISION —",0,H-2.65,back+.12,"#ff6b78");
+   beacon(g,"riskLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+ }
+ if(f.key==="capital"){
+   wallBoard(g,"capital","TREASURY —",0,H-1.3,back+.12,f.color);
+   const types=["cash","exposure","room"],cols=["#5cf2b3","#ffb547","#8f7bff"];
+   for(let i=0;i<3;i++){const m=box(g,1.05,3.2,.8,mat(cols[i]),-3+i*3,2.0,-D/2+1.0,false);capitalBars.push({mesh:m,type:types[i],baseY:.4,maxH:3.2});}
+   wallBoard(g,"capitalLegend","VRIJ · BELEGD · RUIMTE",0,4.25,back+.12,f.color);
+ }
+ if(f.key==="execution"){
+   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"execution","ORDER QUEUE —",0,H-2.65,back+.12,f.color);
+   beacon(g,"orderLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+ }
+ if(f.key==="ops"){
+   for(let x=-6;x<=6;x+=3){box(g,2.1,3.4,1.4,mat("#18142f"),x,1.9,-D/2+1.4,false);for(let y=.8;y<3.1;y+=.55)box(g,1.65,.08,.04,new THREE.MeshBasicMaterial({color:y%1.1<.2?"#ffb547":"#5cf2b3",toneMapped:false}),x,y,-D/2+2.12,false)}
+   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.2,back+.12,f.color);beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+ }
+ if(f.key==="owner"){
+   box(g,6.4,.22,2.4,mat("#ddd6f4"),0,.9,-1.1);monitor(g,0,H-1.4,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.7,back+.12,"#ffffff");
+   box(g,4,.55,1.5,mat("#4b3c6f"),0,.35,3.2);plant(g,-W/2+1.2,2.8,1.15);plant(g,W/2-1.2,2.8,1.15);
+ }
+ if(f.trade){
+   monitor(g,0,H-1.4,back,"#ffb547",true);wallBoard(g,"trade","LIVE POSITIONS",0,H-2.75,back+.12,"#ffb547");
+   for(let i=0;i<4;i++){const l=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-3.55,back+.12,"#ffffff");tradePositionBoards.push(l.element)}
+   for(let x=-16;x<=16;x+=4) box(g,3.2,.48,.03,new THREE.MeshBasicMaterial({color:iColor(x),toneMapped:false}),x,H-4.35,back+.05,false);
+   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.5,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.2,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);
+   wallBoard(g,"krakenGate","KRAKEN GATE",-W/2+2,4.8,-1,"#ffb547","event-label");
+ }
+}
 function buildFloor(f){
  const g=new THREE.Group();g.userData={key:f.key};g.position.set(f.x,0,f.z);g.rotation.y=f.face===-1?Math.PI:0;scene.add(g);floorGroups[f.key]=g;
  const H=f.trade?7.4:5.6,W=f.w||(f.trade?40:15.5),D=f.d||(f.trade?22:13.5);
  box(g,W,.42,D,mat(f.trade?"#35236e":"#34277c"),0,0,0,false);
- // three solid walls, corridor side deliberately open.
- box(g,W,H,.36,mat("#221752"),0,H/2,-D/2,false);
- box(g,.36,H,D,mat("#281c62"),-W/2,H/2,0,false);
- box(g,.36,H,D,mat("#281c62"),W/2,H/2,0,false);
- box(g,W,.16,.16,new THREE.MeshBasicMaterial({color:f.color,toneMapped:false}),0,H-.12,D/2-.08,false);
- const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.11,roughness:.06,depthWrite:false});
- box(g,2.1,H-.65,.08,glass,-W/2+1.1,H/2,D/2,false);box(g,2.1,H-.65,.08,glass,W/2-1.1,H/2,D/2,false);
- const lab=cssLabel(g,`${f.no} · ${f.name}`,"floor-label",0,H-.55,D/2+.55);lab.element.style.background=f.color;lab.element.onclick=()=>focusFloor(f.key);labelsByFloor[f.key]=lab;
-
- const count=f.staff,cols=f.trade?6:2,spacingX=f.trade?5.6:5.2;
+ box(g,W,H,.28,mat("#20164d"),0,H/2,-D/2,false);box(g,.28,H,D,mat("#271b5d"),-W/2,H/2,0,false);box(g,.28,H,D,mat("#271b5d"),W/2,H/2,0,false);
+ const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.12,roughness:.06,depthWrite:false});
+ const door=2.8,panel=(W-door)/2;box(g,panel,H-.35,.07,glass,-(door+panel)/2,H/2,D/2,false);box(g,panel,H-.35,.07,glass,(door+panel)/2,H/2,D/2,false);
+ box(g,door,.18,.16,new THREE.MeshBasicMaterial({color:f.color,toneMapped:false}),0,H-.25,D/2-.03,false);
+ const lab=cssLabel(g,f.no,"floor-label",0,H-.52,D/2+.18);lab.element.style.background=f.color;labelsByFloor[f.key]=lab;
+ const count=f.staff,cols=f.trade?6:(f.key==="owner"?1:2),spacingX=f.trade?5.6:5.2;
  for(let i=0;i<count;i++){
-   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,count-row*cols);
-   const x=(col-(used-1)/2)*spacingX;
-   const z=f.trade?(-5.2+row*4.3):(-3.2+row*3.15);
+   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,count-row*cols),x=(col-(used-1)/2)*spacingX,z=f.trade?(-5.2+row*4.3):(-3.0+row*3.1);
    addDesk(g,x,z,.2,f.color);
  }
- const moving=f.trade?8:(["fast","data","execution","risk"].includes(f.key)?2:1);
- for(let i=0;i<moving;i++){
-   const p=makePerson(f.color,false);p.position.set(-W/2+2.2+i*.75,.15,D/2-2.0-i*.35);g.add(p);
-   walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?12:3.2});
- }
- const screenCount=f.trade?7:2;
- for(let i=0;i<screenCount;i++) monitor(g,-(screenCount-1)*1.75+i*3.5,H-1.45,-D/2+.25,f.color,true);
-
- if(f.key==="directie"){
-   box(g,9,.32,2.8,mat("#d9d0f7"),0,.88,2.0);
-   for(let i=0;i<5;i++){const p=makePerson(f.color,true);p.position.set(-4+i*2,.15,3.3);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true});}
- }
- if(f.key==="risk"){
-   const light=new THREE.Mesh(new THREE.SphereGeometry(.42,16,12),new THREE.MeshBasicMaterial({color:"#5cf2b3"}));light.position.set(0,H-1.0,-D/2+.55);g.add(light);g.userData.riskLight=light;
- }
- if(f.trade){
-   monitor(g,0,H-1.7,-D/2+.24,"#ffb547",true);
-   for(let x=-16;x<=16;x+=4) box(g,3.2,.48,.03,new THREE.MeshBasicMaterial({color:iColor(x),toneMapped:false}),x,H-3.3,-D/2+.25,false);
-   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.5,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.2,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);
-   cssLabel(g,"KRAKEN GATE","event-label",-W/2+2,4.8,-1);
- }
+ const moving=f.trade?10:(["fast","data","execution","risk","ops"].includes(f.key)?2:1);
+ for(let i=0;i<moving;i++){const p=makePerson(f.color,false);p.position.set(-W/2+2.1+i*.8,.15,D/2-2.0-i*.35);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?14:3.0})}
+ decorateDepartment(g,f,W,D,H);
  const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
  return g;
 }
-function iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
+function iColorfunction iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
 function officeDoor(f){
  const D=f.d||(f.trade?22:13.5),front=(D/2)+1.4;
  return {x:f.x,z:f.z+(f.face===1?front:-front),lane:f.lane};
 }
-function buildShaft(){
- const g=new THREE.Group();scene.add(g);
- const floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
- // Two main corridors and a central spine.
- box(g,96,.28,5.6,floorMat,0,.05,7,false);
- box(g,94,.28,5.6,floorMat,0,.05,39,false);
- box(g,5.6,.28,36,floorMat,0,.05,23,false);
- box(g,96,.05,.12,edgeMat,0,.22,4.3,false);box(g,96,.05,.12,edgeMat,0,.22,9.7,false);
- box(g,94,.05,.12,edgeMat,0,.22,36.3,false);box(g,94,.05,.12,edgeMat,0,.22,41.7,false);
- // Short connector hallways from every office to its corridor lane.
- for(const f of FLOORS){
-   const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;
-   if(len>.5) box(g,3.2,.25,len,floorMat,d.x,.06,mid,false);
- }
- // Small central atrium / junction.
- box(g,11,.32,11,mat("#30236a"),0,.08,23,false);
- cssLabel(g,"CENTRALE GANG","worker-label",0,2.1,7);
- cssLabel(g,"DEALING VLEUGEL","worker-label",0,2.1,39);
-
- courier=makePerson("#ffffff",false,1.0);courier.position.set(-36,.16,7);scene.add(courier);
- dossier=box(courier,.38,.28,.5,new THREE.MeshBasicMaterial({color:"#ffb547",toneMapped:false}),.52,1.35,-.05,false);
- cssLabel(courier,"DOSSIER","event-label",0,2.75,0);
+function createCourier(color,dossierColor,index){
+ const p=makePerson(color,false,.92);p.position.set(-36,.16,7);scene.add(p);
+ const d=box(p,.38,.28,.5,new THREE.MeshBasicMaterial({color:dossierColor,toneMapped:false}),.52,1.35,-.05,false);
+ const glow=new THREE.PointLight(dossierColor,.7,4);glow.position.set(.52,1.4,-.05);p.add(glow);
+ const c={person:p,dossier:d,glow,index,routeIndex:index,path:[],pathIndex:0,pause:index*1.8};couriers.push(c);return c;
 }
-function routeWaypoints(fromKey,toKey){
+function buildShaft(){
+ const g=new THREE.Group();scene.add(g),floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
+ // hoofdgangen
+ box(g,108,.28,6.4,floorMat,0,.05,7,false);box(g,122,.28,6.4,floorMat,5,.05,39,false);box(g,6.4,.28,42,floorMat,0,.05,23,false);
+ // duidelijk verlichte randen
+ for(let x=-52;x<=52;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,3.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,10.15,false)}
+ for(let x=-55;x<=65;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,35.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,42.15,false)}
+ // office connectors
+ for(const f of FLOORS){const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;if(len>.5)box(g,3.4,.25,len,floorMat,d.x,.06,mid,false)}
+ // lobby/entree
+ box(g,24,.32,13,mat("#30236a"),0,.08,-27,false);box(g,6.4,.28,24,floorMat,0,.05,-10,false);
+ box(g,8,.95,2.0,mat("#ddd6f4"),0,.55,-28,false);wallBoard(g,"lobby","KRAKEN AGENTS HQ",0,2.15,-29.2,"#ffb547","event-label");
+ for(let x=-8;x<=8;x+=8)plant(g,x,-23.5,1.2);
+ // central atrium + koffiehoek
+ box(g,12,.32,12,mat("#30236a"),0,.08,23,false);box(g,3.6,1.1,1.2,mat("#d9d0f7"),4,.7,22,false);wallBoard(g,"coffee","COFFEE",4,2.1,22,"#c9bdff");
+ plant(g,-4,20,1.15);plant(g,-4,26,1.0);
+ // fysieke richtingsborden
+ wallBoard(g,"wingA","← ANALYSE VLEUGEL",-18,1.35,7,"#8fa8e8");wallBoard(g,"wingB","MANAGEMENT VLEUGEL →",18,1.35,7,"#d49bea");wallBoard(g,"wingC","DEALING / OPERATIONS",0,1.35,39,"#ffb547");
+ // gang-wallboards
+ wallBoard(g,"corridorMarket","MARKT —",-34,1.55,7,"#6fd6b4");wallBoard(g,"corridorRisk","RISK —",22,1.55,39,"#ff7d88");wallBoard(g,"corridorCash","KAPITAAL —",40,1.55,39,"#f4d35e");
+ // parkeer-/entree-markeringen in plaats van zwarte skylineblokken
+ for(let x=-52;x<=52;x+=8){box(g,4.5,.03,.08,new THREE.MeshBasicMaterial({color:"#41356f"}),x,.02,-38,false);box(g,.08,.03,7,new THREE.MeshBasicMaterial({color:"#41356f"}),x-2.2,.02,-34.5,false)}
+ // couriers: parallelle dossiers
+ createCourier("#ffffff","#d8d0ff",0);createCourier("#6fd6b4","#5cf2b3",1);createCourier("#ffb547","#ffb547",2);
+}
+function routeWaypointsfunction routeWaypoints(fromKey,toKey){
  const a=officeDoor(BYKEY[fromKey]),b=officeDoor(BYKEY[toKey]),pts=[];
  pts.push(new THREE.Vector3(a.x,.16,a.z));
  pts.push(new THREE.Vector3(a.x,.16,a.lane));
