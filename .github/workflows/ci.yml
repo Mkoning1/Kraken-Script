@@ -42,11 +42,11 @@ jobs:
               Path("/tmp/dashboard.mjs").write_text("\n".join(scripts))
               subprocess.run(["node", "--check", "/tmp/dashboard.mjs"], check=True)
 
-          with gzip.open("docs/hq-v2.html.gz", "rt", encoding="utf-8") as fh:
+          with gzip.open("docs/hq-v3.html.gz", "rt", encoding="utf-8") as fh:
               text = fh.read()
           scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
           if not scripts:
-              raise SystemExit("geen JavaScript gevonden in docs/hq-v2.html.gz")
+              raise SystemExit("geen JavaScript gevonden in docs/hq-v3.html.gz")
           Path("/tmp/hq.mjs").write_text("\n".join(scripts))
           subprocess.run(["node", "--check", "/tmp/hq.mjs"], check=True)
           PY
