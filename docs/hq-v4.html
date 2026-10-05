@@ -241,7 +241,7 @@ function focusFloor(key){
  const f=BYKEY[key];if(!f)return;selected=key;document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));Object.entries(labelsByFloor).forEach(([k,l])=>l.element.classList.toggle("active",k===key));
  controls.target.set(f.x,1.4,f.z);camera.position.set(f.x+22,18,f.z+27);camera.zoom=f.trade?1.28:1.65;camera.updateProjectionMatrix();controls.update();showFloor(key);
 }
-function resize()function resize(){const a=innerWidth/innerHeight,F=72;Object.assign(camera,{left:-F*a/2,right:F*a/2,top:F/2,bottom:-F/2});camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
+function resize(){const a=innerWidth/innerHeight,F=72;Object.assign(camera,{left:-F*a/2,right:F*a/2,top:F/2,bottom:-F/2});camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
 function setupPicking(){
  const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();let down;
  renderer.domElement.addEventListener("pointerdown",e=>down={x:e.clientX,y:e.clientY});
