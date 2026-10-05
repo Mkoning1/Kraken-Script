@@ -37,15 +37,51 @@
   "slippage_pct": 0.08,
   "min_order_eur": 5,
   "profiles": {
-    "voorzichtig": { "risk_per_trade_pct": 1.0, "max_position_pct": 25, "max_open_positions": 2, "max_exposure_pct": 50, "max_daily_loss_pct": 3, "max_drawdown_pct": 15, "cooldown_candles": 8, "correlation_limit": 0.85 },
-    "normaal": { "risk_per_trade_pct": 1.5, "max_position_pct": 35, "max_open_positions": 3, "max_exposure_pct": 75, "max_daily_loss_pct": 5, "max_drawdown_pct": 20, "cooldown_candles": 6, "correlation_limit": 0.85 },
-    "assertief": { "risk_per_trade_pct": 1.0, "max_position_pct": 40, "max_open_positions": 3, "max_exposure_pct": 90, "max_daily_loss_pct": 5, "max_drawdown_pct": 20, "cooldown_candles": 4, "correlation_limit": 0.85 },
-    "agressief": { "risk_per_trade_pct": 2.5, "max_position_pct": 50, "max_open_positions": 3, "max_exposure_pct": 100, "max_daily_loss_pct": 8, "max_drawdown_pct": 30, "cooldown_candles": 4, "correlation_limit": 0.85 }
+    "voorzichtig": {
+      "risk_per_trade_pct": 1,
+      "max_position_pct": 25,
+      "max_open_positions": 2,
+      "max_exposure_pct": 50,
+      "max_daily_loss_pct": 3,
+      "max_drawdown_pct": 15,
+      "cooldown_candles": 8,
+      "correlation_limit": 0.85
+    },
+    "normaal": {
+      "risk_per_trade_pct": 1.5,
+      "max_position_pct": 35,
+      "max_open_positions": 3,
+      "max_exposure_pct": 75,
+      "max_daily_loss_pct": 5,
+      "max_drawdown_pct": 20,
+      "cooldown_candles": 6,
+      "correlation_limit": 0.85
+    },
+    "assertief": {
+      "risk_per_trade_pct": 1,
+      "max_position_pct": 40,
+      "max_open_positions": 3,
+      "max_exposure_pct": 90,
+      "max_daily_loss_pct": 5,
+      "max_drawdown_pct": 20,
+      "cooldown_candles": 4,
+      "correlation_limit": 0.85
+    },
+    "agressief": {
+      "risk_per_trade_pct": 2.5,
+      "max_position_pct": 50,
+      "max_open_positions": 3,
+      "max_exposure_pct": 100,
+      "max_daily_loss_pct": 8,
+      "max_drawdown_pct": 30,
+      "cooldown_candles": 4,
+      "correlation_limit": 0.85
+    }
   },
   "regime_multiplier": {
-    "stijgend": 1.0,
+    "stijgend": 1,
     "neutraal": 0.7,
-    "dalend": 0.0
+    "dalend": 0
   },
   "decision": {
     "min_score": 0.55,
@@ -71,10 +107,10 @@
     "backtest_min_r": 0.1
   },
   "exits": {
-    "breakeven_at_r": 1.0,
+    "breakeven_at_r": 1,
     "trail_after_r": 1.5,
-    "min_stop_pct": 2.0,
-    "catastrophe_atr": 1.0
+    "min_stop_pct": 2,
+    "catastrophe_atr": 1
   },
   "agents": {
     "trend4h": {
@@ -83,9 +119,9 @@
       "use_regime": true,
       "lookback": 55,
       "rsi_min": 50,
-      "initial_atr": 2.0,
-      "runner_atr": 6.0,
-      "runner_threshold_atr": 3.0
+      "initial_atr": 2,
+      "runner_atr": 6,
+      "runner_threshold_atr": 3
     },
     "mean_reversion": {
       "start": "schaduw",
@@ -108,7 +144,7 @@
       "force": null,
       "use_regime": true,
       "volume_mult": 1.5,
-      "stop_atr": 2.0
+      "stop_atr": 2
     },
     "squeeze": {
       "start": "schaduw",
@@ -116,7 +152,7 @@
       "use_regime": true,
       "squeeze_lookback": 120,
       "squeeze_pct": 10,
-      "stop_atr": 2.0
+      "stop_atr": 2
     }
   },
   "backtest": {
@@ -174,5 +210,19 @@
       15
     ],
     "auto_universe_size": false
+  },
+  "scanner": {
+    "enabled": true,
+    "pool_size": 60,
+    "discovery_slots": 4,
+    "shadow_only": true,
+    "min_quote_volume_eur": 50000,
+    "max_spread_pct": 1.2,
+    "weights": {
+      "liquidity": 0.4,
+      "momentum": 0.35,
+      "range": 0.15,
+      "spread": 0.1
+    }
   }
 }

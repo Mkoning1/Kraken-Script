@@ -156,6 +156,7 @@ button { font: inherit; }
   <div class="kpi"><span>Resultaat</span><b id="ret">–</b></div>
   <div class="kpi"><span>BTC vasthouden</span><b id="bench">–</b></div>
   <div class="kpi"><span>Markt</span><b id="regime">–</b></div>
+  <div class="kpi"><span>Radar</span><b id="radar">–</b></div>
   <div class="kpi"><span>Volgende run</span><b id="nextrun">–</b></div>
   <div class="kpi"><span>4-uurssluiting</span><b id="next4h">–</b></div>
 </header>
@@ -198,7 +199,7 @@ const METHOD = {
   squeeze: "Wacht tot de markt op uurbasis heel rustig is (smalle Bollinger-banden) en koopt de uitbraak omhoog die daarna komt.",
 };
 const ROOMS = [
-  { key: "data", label: "Data-agent", x: -21, color: "#8FA8E8", role: "Kiest elke run de 15 drukste EUR-munten op Kraken en haalt de koersen op: 15 minuten, 1 uur en 4 uur." },
+  { key: "data", label: "Data-agent", x: -21, color: "#8FA8E8", role: "Houdt de liquide kern vast en scant daarnaast een bredere Kraken-pool op volume, momentum, dagrange en spread. Extra discovery-kansen starten schaduw-only." },
   { key: "markt", label: "Markt-agent", x: -14, color: "#6FD6B4", role: "Bepaalt of de hele markt stijgt, daalt of zijwaarts gaat, op basis van BTC op uurbasis. In een dalende markt wordt niets gekocht." },
   { key: "prestatie", label: "Prestatie-agent", x: -7, color: "#D49BEA", role: "Meet elke strategie-agent in R en bepaalt zijn invloed. Beslist ook wie met echt geld mag handelen en wie in de schaduw blijft." },
   { key: "beslis", label: "Beslis-agent", x: 0, w: 8, color: "#E9E4FF", role: "Weegt alle koopadviezen: sterkte maal invloed, bonus als agents het eens zijn, maal de marktfase. De beste kansen gaan eerst." },
@@ -227,7 +228,7 @@ function roomStatus(key) {
   const stops = live ? live.positions.filter(p => p.stop_on_exchange).length : 0;
   const errs = D.errors.filter(e => e.ts === D.generated_ts);
   return {
-    data: `${D.markets.length} munten gescand om ${clock(D.generated_ts)}${errs.length ? `, ${errs.length} melding(en)` : ""}`,
+    data: D.scanner?.enabled ? `${D.scanner.pool_count || 0} markten gescand, ${(D.scanner.active_discovery_markets || []).length} discovery-kansen actief${errs.length ? `, ${errs.length} melding(en)` : ""}` : `${D.markets.length} munten gescand om ${clock(D.generated_ts)}${errs.length ? `, ${errs.length} melding(en)` : ""}`,
     markt: `Markt ${D.regime.label}. ${D.regime.reason}.`,
     prestatie: `${D.agents.filter(a => a.status === "live").length} van ${D.agents.length} agents handelen met echt geld`,
     beslis: buys.length ? `${buys.length} koopadvies${buys.length > 1 ? "en" : ""} op tafel` : "Geen koopadvies deze ronde",
@@ -264,6 +265,8 @@ function header() {
   document.getElementById("bench").textContent = st ? pct(st.benchmark_return_pct) : "–";
   const rg = document.getElementById("regime"); rg.textContent = D.regime.label;
   rg.className = D.regime.label === "stijgend" ? "up" : D.regime.label === "dalend" ? "down" : "";
+  const radar = document.getElementById("radar");
+  if (radar) radar.textContent = D.scanner?.enabled ? `${(D.scanner.active_discovery_markets || []).length} kansen` : "uit";
 }
 function tickClocks() {
   const now = Date.now() / 1000, d = new Date(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
@@ -438,10 +441,22 @@ function coinHTML(coin) {
     ${e?.notes?.length ? `<section><h2>Besluit</h2><ul class="list">${e.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul></section>` : ""}`;
 }
 
+function scannerHTML() {
+  const s = D.scanner;
+  if (!s?.enabled) return "";
+  const active = new Set(s.active_discovery_markets || []);
+  const rows = (s.candidates || []).slice(0, 8).map(c => `<li><button class="link" data-coin="${esc(c.market)}">${esc(c.market)}</button> 
+    <b>${num((c.score || 0) * 100, 0)}</b>/100 · 24u ${pct(c.change_pct)} · volume ${eur.format(c.quote_volume || 0)} 
+    ${active.has(c.market) ? `<span class="chip">discovery · schaduw</span>` : ""}</li>`).join("");
+  return `<section><h2>Opportunity radar</h2>
+    <p>${s.pool_count || 0} liquide EUR-markten zijn goedkoop voorgefilterd. De kern blijft op volume gebaseerd; maximaal ${(s.discovery_markets || []).length} extra kansen krijgen de zware analyse. Discovery draait voorlopig alleen met schaduwgeld.</p>
+    <ul class="list">${rows || "<li>Geen geschikte discovery-kansen.</li>"}</ul></section>`;
+}
+
 function roomHTML(key) {
   const r = ROOM[key], live = D.books.live, L = D.risk_limits, risk = live?.risk || {};
   let extra = "";
-  if (key === "data") extra = `<section><h2>Munten deze run</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
+  if (key === "data") extra = scannerHTML() + `<section><h2>Actieve munten deze uurcyclus</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
   if (key === "markt") extra = `<div class="doing"><div class="act ${D.regime.label === "stijgend" ? "act-buy" : D.regime.label === "dalend" ? "act-sell" : "act-hold"}">Markt ${esc(D.regime.label)}</div><p>${esc(D.regime.reason)}. Koopkansen tellen voor ${num(D.regime.multiplier * 100, 0)}% mee.</p></div>`;
   if (key === "prestatie") extra = (BT ? `<section><h2>Backtest van het hele team</h2><dl class="kv">
       <dt>Periode</dt><dd>${new Date(BT.period.start * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })} tot ${new Date(BT.period.end * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })}</dd>

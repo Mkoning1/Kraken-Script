@@ -8,7 +8,7 @@ Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 
 | Agent | Taak |
 |---|---|
-| Data-agent | Kiest elke run de 8 EUR-munten met het meeste volume (plus BTC, ETH en alles waar je in zit) en haalt uur- en 4-uurscandles op. Waarom 8: in de eerlijke backtest werkte Trend-4u op de drukste munten veel beter dan op 15 of 30 (8 munten: +24%, grootste daling 14,6%). |
+| Data-agent | Houdt de bewezen kern van 8 liquide EUR-munten (plus BTC, ETH en posities) en scant daarnaast goedkoop een bredere pool op volume, momentum, dagrange en spread. Maximaal 4 discovery-kansen krijgen extra analyse en blijven voorlopig schaduw-only. |
 | Markt-agent | Stijgende, neutrale of dalende markt, op basis van BTC op 4 uur. |
 | **Trend-4u** | Je oorspronkelijke bot: koopt een 4-uursuitbraak boven het hoogste punt van de vorige periode (RSI boven 50). Verkoopt via de tweetraps trailing stop. Koopt niet als BTC in een dalende trend zit. Gemiste 4-uurscandles worden alsnog verwerkt. |
 | Dip-koper | Koopt paniekdalingen op uurcandles in een stijgende munt, verkoopt bij herstel of na 12 uur. |
@@ -21,6 +21,12 @@ Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 | Uitvoer-agents | Echt geld via Kraken (met stop-loss order op Kraken zelf), schaduwgeld op papier. |
 | Monitor-agent | Verslag in gewone taal en het dashboard. |
 | Historie- en backtest-lab | Speelt twee jaar historie na en zoekt per agent betere instellingen (zie backtest). |
+
+## Opportunity scanner en efficiency
+
+Elke kwartier-run haalt één ticker-snapshot op voor de brede Kraken-markt. De zware uur- en 4-uurscandles worden alleen opnieuw opgehaald wanneer er een nieuwe uurcandle is gesloten. Het actieve handelsuniversum blijft gedurende dat uur stabiel. Daardoor kan de bot veel breder zoeken zonder vier keer per uur dezelfde OHLCV-data op te vragen.
+
+De live-kern blijft gebaseerd op de liquiditeitsselectie die al in de backtest is gebruikt. De opportunity scanner voegt maximaal vier extra markten toe op basis van liquiditeit, positief 24-uursmomentum, dagrange en spread. Die discovery-markten handelen standaard uitsluitend met schaduwgeld; zo verzamelen ze bewijs zonder het live-risico te vergroten.
 
 ## Risicoprofiel
 

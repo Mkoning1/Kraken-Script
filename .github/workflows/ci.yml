@@ -1,0 +1,41 @@
+name: CI
+# Safe verification only: no Kraken credentials or trading steps.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Python syntax
+        run: python -m compileall -q main.py agents tests
+
+      - name: Safety tests
+        run: python tests/quick.py
+
+      - name: Dashboard JavaScript syntax
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          for name in ("docs/index.html", "docs/details.html"):
+              text = Path(name).read_text()
+              scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
+              if not scripts:
+                  raise SystemExit(f"geen JavaScript gevonden in {name}")
+              Path("/tmp/dashboard.mjs").write_text("\n".join(scripts))
+              import subprocess
+              subprocess.run(["node", "--check", "/tmp/dashboard.mjs"], check=True)
+          PY

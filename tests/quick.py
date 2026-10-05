@@ -94,6 +94,33 @@ def unit_checks():
     assert correlation(a, b) > 0.9, "samenhang tussen gelijk bewegende munten niet herkend"
     assert abs(correlation(a, c)) < 0.3, "samenhang tussen onafhankelijke munten te hoog"
     print("GOED  samenhang-berekening")
+
+    from agents.data import DataAgent
+    class ScanEx:
+        def __init__(self):
+            vols = {"BTC": 10e6, "ETH": 8e6, "SOL": 6e6, "XRP": 5e6, "ADA": 4e6, "ALT": 1e6}
+            self.markets = {f"{base}/EUR": {"base": base, "quote": "EUR", "active": True, "type": "spot"} for base in vols}
+            self.tickers = {}
+            for base, volume in vols.items():
+                pct = 15.0 if base == "ALT" else 0.0
+                self.tickers[f"{base}/EUR"] = {"last": 100.0, "quoteVolume": volume, "percentage": pct,
+                                                "high": 118.0 if base == "ALT" else 102.0,
+                                                "low": 98.0, "bid": 99.95, "ask": 100.05, "open": 100.0}
+        def load_markets(self): return self.markets
+        def fetch_tickers(self): return self.tickers
+
+    scfg = {
+        "universe": {"size": 3, "always_include": ["BTC/EUR", "ETH/EUR"], "exclude_bases": []},
+        "scanner": {"enabled": True, "pool_size": 6, "discovery_slots": 1, "shadow_only": True,
+                    "min_quote_volume_eur": 1000, "max_spread_pct": 1.2,
+                    "weights": {"liquidity": 0.40, "momentum": 0.35, "range": 0.15, "spread": 0.10}},
+    }
+    da = DataAgent(ScanEx(), scfg)
+    chosen, _, _ = da.universe(set())
+    assert da.scan_report["core_markets"][:3] == ["BTC/EUR", "ETH/EUR", "SOL/EUR"], "core-universe is veranderd"
+    assert da.scan_report["discovery_markets"] == ["ALT/EUR"], "scanner vond de momentum-altcoin niet"
+    assert chosen[-1] == "ALT/EUR", "discovery-markt niet toegevoegd"
+    print("GOED  opportunity-scanner")
     return True
 
 
