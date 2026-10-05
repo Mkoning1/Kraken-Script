@@ -127,7 +127,7 @@ class MonitorAgent:
             books[name] = {
                 "stats": book_stats(book, eq, ratio), "cash": round(book["cash"], 2),
                 "exposure": round(book_exposure(book, prices), 2), "risk": book.get("risk_status"),
-                "positions": positions, "trades": book["trades"][-60:][::-1],
+                "positions": positions, "trades": book["trades"][::-1],
                 "equity_history": book["equity_history"],
             }
         dashboard = {
