@@ -165,6 +165,8 @@ def unit_checks():
         scout = EquityScout(ecfg, Path(eqtmp) / "fund.json", provider=EquityProvider())
         report = scout.scan(1_800_000_000)
         assert report["candidates"][0]["symbol"] == "GROW.HK", "equity scorer rangschikt sterke groeier niet bovenaan"
+        incomplete_score = next(x["score"] for x in report["candidates"] if x["symbol"] == "WEAK.HK")
+        assert incomplete_score < report["candidates"][0]["score"], "zwakke fundamentals krijgen onvoldoende straf"
         estate = {}
         book = update_paper_book(estate, report, ecfg, 1_800_000_000)
         assert "GROW.HK" in book["positions"], "equity paper desk opent geen sterke kandidaat"
