@@ -180,6 +180,8 @@ function render(d) {
 
     <div class="story" aria-label="Verslag van de laatste run">${d.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</div>
 
+    ${scannerSection(d)}
+
     ${live ? bookSection("live", "Echt geld", live, d) : ""}
 
     <section style="margin:40px 0">
@@ -213,6 +215,25 @@ function render(d) {
   drawChart("chart-schaduw", sh.equity_history, sh.stats.start);
 }
 
+function scannerSection(d) {
+  const s = d.scanner;
+  if (!s?.enabled) return "";
+  const active = new Set(s.active_discovery_markets || []);
+  const rows = (s.candidates || []).slice(0, 10).map(c => `<tr>
+    <td><b>${esc(c.market)}</b></td>
+    <td>${num((c.score || 0) * 100, 0)}/100</td>
+    <td class="${cls(c.change_pct)}">${pct(c.change_pct)}</td>
+    <td>${pct(c.range_pct)}</td>
+    <td>${eur.format(c.quote_volume || 0)}</td>
+    <td>${c.spread_pct == null ? "–" : num(c.spread_pct, 2) + "%"}</td>
+    <td>${active.has(c.market) ? "Discovery · schaduw" : (s.core_markets || []).includes(c.market) ? "Kern" : "Radar"}</td>
+  </tr>`).join("");
+  return `<section style="margin:32px 0 40px">
+    <h2>Opportunity radar</h2>
+    <p class="muted" style="margin-bottom:12px;font-size:.9375rem">De scanner filtert ${s.pool_count || 0} liquide EUR-markten met één ticker-snapshot. Alleen de kern plus maximaal ${(s.discovery_markets || []).length} discovery-kansen krijgen OHLCV-analyse. Discovery-kansen mogen voorlopig uitsluitend met schaduwgeld handelen.</p>
+    <div class="table-wrap"><table><thead><tr><th>Munt</th><th>Score</th><th>24u</th><th>Range</th><th>24u volume</th><th>Spread</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </section>`;
+}
 function bookSection(key, title, b, d) {
   const s = b.stats, r = b.risk || {}, L = d.risk_limits;
   const diff = s.benchmark_return_pct == null ? null : s.return_pct - s.benchmark_return_pct;
