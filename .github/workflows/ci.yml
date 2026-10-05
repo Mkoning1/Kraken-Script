@@ -1,4 +1,5 @@
 name: CI
+# Safe verification only: no Kraken credentials or trading steps.
 
 on:
   pull_request:
