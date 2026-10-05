@@ -90,6 +90,10 @@ class LearningAgent:
         b = self.backtest.get(agent)
         if not b:
             return "geen"
+        cfg_tf = int((self.acfg.get(agent) or {}).get("timeframe_minutes", 240 if agent == "trend4h" else 60))
+        bt_tf = int(b.get("timeframe_minutes", 240 if agent == "trend4h" else 60))
+        if cfg_tf != bt_tf:
+            return "geen"
         trades, exp = b.get("oos_trades", 0), b.get("oos_expectancy_r")
         if exp is None or trades < max(10, self.bt_min_trades // 3):
             trades, exp = b.get("trades", 0), b.get("expectancy_r")
@@ -121,6 +125,6 @@ class LearningAgent:
                                    f"nog {need} schaduwtrades nodig" + (" (snelle route, backtest positief)" if bt == "positief" else "") if need else
                                    "wacht op een beter gemiddelde")
                                   if self.status(a.name) == "schaduw" else None,
-                "backtest": self.backtest.get(a.name),
+                "backtest": self.backtest.get(a.name) if self.bt_verdict(a.name) != "geen" else None,
             })
         return out
