@@ -58,13 +58,13 @@
       "correlation_limit": 0.85
     },
     "assertief": {
-      "risk_per_trade_pct": 1,
-      "max_position_pct": 40,
-      "max_open_positions": 3,
-      "max_exposure_pct": 90,
+      "risk_per_trade_pct": 1.25,
+      "max_position_pct": 45,
+      "max_open_positions": 4,
+      "max_exposure_pct": 95,
       "max_daily_loss_pct": 5,
       "max_drawdown_pct": 20,
-      "cooldown_candles": 4,
+      "cooldown_candles": 3,
       "correlation_limit": 0.85
     },
     "agressief": {
@@ -80,11 +80,11 @@
   },
   "regime_multiplier": {
     "stijgend": 1,
-    "neutraal": 0.7,
+    "neutraal": 0.8,
     "dalend": 0
   },
   "decision": {
-    "min_score": 0.55,
+    "min_score": 0.52,
     "veto_strength": 0.8,
     "confluence_bonus": 0.15
   },
@@ -98,12 +98,12 @@
   "promotion": {
     "enabled": true,
     "all_agents_live": false,
-    "promote_after_trades": 40,
-    "promote_expectancy_r": 0.2,
+    "promote_after_trades": 24,
+    "promote_expectancy_r": 0.15,
     "demote_window": 10,
     "demote_expectancy_r": -0.25,
-    "fast_track_shadow_trades": 15,
-    "fast_track_shadow_r": 0.1,
+    "fast_track_shadow_trades": 10,
+    "fast_track_shadow_r": 0.12,
     "backtest_min_r": 0.1
   },
   "exits": {
@@ -121,7 +121,8 @@
       "rsi_min": 50,
       "initial_atr": 2,
       "runner_atr": 6,
-      "runner_threshold_atr": 3
+      "runner_threshold_atr": 3,
+      "timeframe_minutes": 240
     },
     "mean_reversion": {
       "start": "schaduw",
@@ -129,7 +130,8 @@
       "use_regime": true,
       "rsi_buy": 28,
       "stop_atr": 1.8,
-      "max_candles": 12
+      "max_candles": 12,
+      "timeframe_minutes": 60
     },
     "breakout": {
       "start": "schaduw",
@@ -137,14 +139,16 @@
       "use_regime": true,
       "lookback": 24,
       "volume_mult": 1.2,
-      "stop_atr": 2.5
+      "stop_atr": 2.5,
+      "timeframe_minutes": 60
     },
     "momentum": {
       "start": "schaduw",
       "force": null,
       "use_regime": true,
       "volume_mult": 1.5,
-      "stop_atr": 2
+      "stop_atr": 2,
+      "timeframe_minutes": 15
     },
     "squeeze": {
       "start": "schaduw",
@@ -152,7 +156,17 @@
       "use_regime": true,
       "squeeze_lookback": 120,
       "squeeze_pct": 10,
-      "stop_atr": 2
+      "stop_atr": 2,
+      "timeframe_minutes": 15
+    },
+    "fast_breakout": {
+      "start": "schaduw",
+      "force": null,
+      "use_regime": true,
+      "lookback": 20,
+      "volume_mult": 1.35,
+      "stop_atr": 2,
+      "timeframe_minutes": 15
     }
   },
   "backtest": {
@@ -213,8 +227,8 @@
   },
   "scanner": {
     "enabled": true,
-    "pool_size": 60,
-    "discovery_slots": 4,
+    "pool_size": 100,
+    "discovery_slots": 6,
     "shadow_only": true,
     "min_quote_volume_eur": 50000,
     "max_spread_pct": 1.2,
@@ -311,5 +325,12 @@
       }
     ],
     "min_profit_margin": 0
+  },
+  "cadence": {
+    "monitor_minutes": 5,
+    "discovery_minutes": 15,
+    "fast_minutes": 15,
+    "swing_minutes": 60,
+    "trend_minutes": 240
   }
 }
