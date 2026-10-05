@@ -11,8 +11,8 @@ on:
       - "requirements-equities.txt"
       - ".github/workflows/equity-scout.yml"
   schedule:
-    # Hong Kong: rond open, midden sessie, close en Europese ochtendcheck op weekdagen.
-    - cron: "20 0,4,8,12 * * 1-5"
+    # Koersmomentum ieder uur rond de Hongkong-sessie; fundamentals blijven 24u gecachet.
+    - cron: "20 1-8 * * 1-5"
 
 permissions:
   contents: write
