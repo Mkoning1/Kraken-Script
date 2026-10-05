@@ -48,6 +48,12 @@ for k in range(K0, K0 + STEPS, SKIP):
     st = run(k)
     errs += [e["message"] for e in st["errors"] if e["ts"] == ex.now() + 180]
     check(st, f"stap {k}")
+    assert st.get("scan_history"), f"{k}: scanlog ontbreekt"
+    scan = st["scan_history"][-1]
+    assert scan["ts"] == ex.now() + 180, f"{k}: verkeerde scantijd"
+    assert scan["desks"]["monitor"] is True, f"{k}: 5m-monitor niet gelogd"
+    assert scan["ranked"] >= 0 and scan["active"] >= 1, f"{k}: scan-aantallen ontbreken"
+assert len(st["scan_history"]) <= 2016, "scanlog groeit voorbij de 7-daagse limiet"
 assert not errs, f"fouten: {errs[:3]}"
 live = st["books"]["live"]
 if SCENARIOS:
