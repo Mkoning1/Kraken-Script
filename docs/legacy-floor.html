@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kraken agents: handelsvloer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Saira:wght@400;500;600&family=Saira+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #140D33;
+  --glass: rgba(24, 16, 62, 0.86);
+  --edge: rgba(190, 170, 255, 0.28);
+  --text: #EEEAFF;
+  --muted: #A9A0D6;
+  --buy: #5CF2B3;
+  --neg: #FF6B78;
+  --money: #FFB547;
+  --accent: #8F7BFF;
+  --sans: "Saira", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --cond: "Saira Condensed", "Saira", system-ui, sans-serif;
+  box-sizing: border-box;
+}
+*, *::before, *::after { box-sizing: inherit; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--void); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.45; font-variant-numeric: tabular-nums; }
+body.floor { height: 100vh; overflow: hidden; }
+a { color: #C9BDFF; }
+button { font: inherit; }
+:focus-visible { outline: 2px solid var(--money); outline-offset: 2px; }
+.up { color: var(--buy); } .down { color: var(--neg); }
+
+/* Bovenbalk */
+.bar { position: relative; z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 26px; padding: 10px 20px; background: rgba(16, 10, 44, 0.92); border-bottom: 1px solid var(--edge); padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+.brand { font-family: var(--cond); font-weight: 700; font-size: 1.3rem; letter-spacing: .02em; }
+.tabs { display: flex; gap: 4px; margin-right: auto; }
+.tabs a { text-decoration: none; color: var(--muted); padding: 4px 12px; border-radius: 3px; font-weight: 500; }
+.tabs a[aria-current="page"] { color: var(--text); background: rgba(143, 123, 255, 0.25); }
+.mode { font-family: var(--cond); font-weight: 600; padding: 2px 12px; border: 1px solid currentColor; border-radius: 3px; }
+.mode.live { color: var(--money); }
+.live-dot { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.live-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #5B5480; }
+.live-dot.on { color: var(--buy); }
+.live-dot.on::before { background: var(--buy); box-shadow: 0 0 0 0 rgba(92, 242, 179, .7); animation: pulse 1.6s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 7px rgba(92, 242, 179, 0); } 100% { box-shadow: 0 0 0 0 rgba(92, 242, 179, 0); } }
+.desk-tag.up { border-color: var(--buy); } .desk-tag.down { border-color: var(--neg); }
+.mini.alert { background: var(--money) !important; }
+.mode.other { color: #C9BDFF; }
+.kpi { display: flex; flex-direction: column; line-height: 1.12; }
+.kpi span { font-size: .75rem; color: var(--muted); }
+.kpi b { font-family: var(--cond); font-weight: 600; font-size: 1.2rem; }
+.kpi .money { color: var(--money); }
+
+/* 3D-vloer */
+#stage { position: fixed; inset: 0; top: 0; z-index: 1; }
+#stage canvas { display: block; }
+.l2d { pointer-events: none; }
+.desk-tag { pointer-events: auto; cursor: pointer; font-family: var(--cond); font-weight: 600; font-size: 13px; color: #fff; background: rgba(30, 20, 78, 0.88); border: 1px solid rgba(200, 185, 255, 0.55); padding: 2px 7px; border-radius: 3px; white-space: nowrap; transform: translateY(-4px); }
+.desk-tag small { font-family: var(--sans); font-weight: 400; color: var(--muted); margin-left: 5px; }
+.desk-tag .pos { color: var(--money); margin-left: 5px; }
+.desk-tag .pos.sh { color: #C9BDFF; }
+.desk-tag.ping { animation: ping .9s ease-out; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 rgba(92, 242, 179, .9); border-color: var(--buy); } 100% { box-shadow: 0 0 0 14px rgba(92, 242, 179, 0); } }
+.room-tag { pointer-events: auto; cursor: pointer; font-family: var(--cond); font-weight: 600; font-size: 14px; color: #fff; padding: 2px 9px; border-radius: 2px; white-space: nowrap; }
+.bubble { pointer-events: none; max-width: 210px; font-size: 12px; line-height: 1.3; color: #1A1240; background: #fff; padding: 5px 9px; border-radius: 10px; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); transition: transform .25s, opacity .25s; transform: translateY(-6px); }
+.bubble.hot { background: #FFF4DE; box-shadow: 0 0 0 2px var(--money), 0 4px 16px rgba(255, 181, 71, .45); }
+.bubble.quiet { opacity: 0; transform: translateY(4px); }
+.mini { pointer-events: none; font-family: var(--cond); font-weight: 700; font-size: 12px; padding: 1px 6px; border-radius: 8px; color: #10122A; }
+.gate-tag { pointer-events: none; font-family: var(--cond); font-weight: 700; font-size: 15px; color: var(--money); text-shadow: 0 0 10px rgba(255, 181, 71, .7); }
+
+/* Panelen over de vloer */
+.panel { position: fixed; z-index: 4; right: 14px; top: 76px; bottom: 14px; width: 370px; overflow-y: auto; background: var(--glass); border: 1px solid var(--edge); backdrop-filter: blur(8px); padding: 16px 18px; border-radius: 4px; }
+.panel h2 { font-family: var(--cond); font-weight: 600; font-size: 1.1rem; margin: 0 0 8px; color: #C9BDFF; }
+.panel h3 { font-family: var(--cond); font-weight: 600; font-size: 1.5rem; margin: 0; line-height: 1.15; }
+.panel .sub { color: var(--muted); font-size: .88rem; margin: 2px 0 12px; }
+.panel .close { position: absolute; top: 8px; right: 10px; border: 0; background: none; color: var(--muted); font-size: 1.5rem; cursor: pointer; line-height: 1; }
+.panel .back { border: 0; background: none; color: #C9BDFF; cursor: pointer; padding: 0; margin: 0 0 10px; font-size: .85rem; }
+.panel section { margin: 0 0 16px; }
+.panel p { margin: 0 0 6px; font-size: .9rem; }
+.doing { padding: 10px 12px; border-left: 3px solid var(--accent); background: rgba(143, 123, 255, 0.12); margin-bottom: 14px; }
+.doing .act { font-family: var(--cond); font-size: 1.35rem; font-weight: 600; }
+.act-buy { color: var(--buy); } .act-sell { color: var(--neg); } .act-hold { color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; font-size: .88rem; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; text-align: right; }
+.list { list-style: none; margin: 0; padding: 0; }
+.list li { padding: 6px 0; border-top: 1px solid rgba(190, 170, 255, 0.14); font-size: .86rem; }
+.list li button.link { border: 0; background: none; color: #C9BDFF; cursor: pointer; padding: 0; font-weight: 600; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.chip { font-size: .72rem; padding: 0 6px; border: 1px solid var(--muted); color: var(--muted); border-radius: 2px; margin-left: 6px; vertical-align: 2px; white-space: nowrap; }
+.chip.real { border-color: var(--money); color: var(--money); }
+.story p { font-size: .88rem; }
+.story p.cursor::after { content: "▍"; color: var(--money); animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.when { color: var(--muted); font-size: .76rem; }
+.err { color: var(--neg); }
+
+.caption { position: fixed; z-index: 4; left: 14px; bottom: 14px; right: 400px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; pointer-events: none; }
+.caption .now { background: var(--glass); border: 1px solid var(--edge); padding: 8px 14px; border-radius: 4px; font-family: var(--cond); font-size: 1.15rem; font-weight: 500; backdrop-filter: blur(8px); }
+.caption .now b { color: var(--money); font-weight: 600; margin-right: 8px; }
+.leftcol { position: fixed; z-index: 4; left: 14px; top: 76px; width: 290px; max-height: calc(100vh - 200px); overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.legend { background: var(--glass); border: 1px solid var(--edge); padding: 10px 12px; border-radius: 4px; font-size: .8rem; backdrop-filter: blur(8px); }
+.cashp { background: var(--glass); border: 1px solid rgba(255, 181, 71, 0.45); padding: 12px 14px; border-radius: 4px; backdrop-filter: blur(8px); font-size: .86rem; }
+.cashp h2 { font-family: var(--cond); font-weight: 600; font-size: 1.05rem; margin: 0 0 2px; color: var(--money); }
+.cashp .total { font-family: var(--cond); font-weight: 600; font-size: 1.6rem; line-height: 1.1; }
+.cashp .src { color: var(--muted); font-size: .76rem; margin: 0 0 8px; }
+#compact .cashp h2 { color: var(--money); margin: 0 0 2px; }
+.split { display: flex; height: 12px; border-radius: 2px; overflow: hidden; background: rgba(185, 174, 255, 0.22); margin: 4px 0 6px; }
+.split i { display: block; background: var(--money); }
+.split i.pos2 { background: #E8962E; } .split i.pos3 { background: #C97A1E; }
+.cashp .row { display: flex; justify-content: space-between; gap: 10px; margin: 2px 0; }
+.cashp .row span:first-child { color: var(--muted); }
+.cashp .rules { margin: 8px 0 0; padding: 8px 0 0; border-top: 1px solid rgba(190, 170, 255, 0.18); }
+.cashp .next { margin-top: 8px; padding: 6px 8px; background: rgba(255, 181, 71, 0.08); border-radius: 3px; }
+.legend p { margin: 0 0 4px; color: var(--muted); }
+.legend div { margin: 2px 0; }
+.legend .sw { display: inline-block; width: 18px; height: 10px; margin-right: 6px; vertical-align: 0; border-radius: 2px; }
+.tools { position: fixed; z-index: 4; left: 14px; bottom: 70px; display: flex; gap: 6px; }
+.tools button { background: var(--glass); color: var(--text); border: 1px solid var(--edge); padding: 5px 12px; border-radius: 3px; cursor: pointer; }
+.tools span { font-size: .78rem; color: var(--muted); align-self: center; }
+.loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 3; color: var(--muted); font-family: var(--cond); font-size: 1.2rem; }
+
+/* Compacte versie (telefoon) */
+#compact { padding: 14px 16px 40px; }
+#compact h2 { font-family: var(--cond); font-weight: 600; font-size: 1.1rem; color: #C9BDFF; margin: 18px 0 8px; }
+.rooms-c { display: grid; gap: 8px; }
+.rooms-c button { text-align: left; background: rgba(143, 123, 255, 0.10); border: 1px solid var(--edge); color: var(--text); padding: 8px 10px; border-radius: 4px; cursor: pointer; }
+.rooms-c b { font-family: var(--cond); font-weight: 600; }
+.rooms-c span { display: block; font-size: .8rem; color: var(--muted); }
+.rooms-c span.dot { display: inline-block; }
+.desks-c { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.desks-c button { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--edge); color: var(--text); border-radius: 4px; padding: 8px; text-align: left; cursor: pointer; }
+.desks-c button.real { border-color: var(--money); }
+.desks-c .t { font-family: var(--cond); font-weight: 600; font-size: 1.05rem; display: flex; justify-content: space-between; }
+.desks-c .p { font-size: .78rem; color: var(--muted); }
+.screens { display: flex; gap: 4px; margin-top: 6px; }
+.screens i { flex: 1; height: 14px; border-radius: 2px; border-bottom: 3px solid; }
+.sheet { position: fixed; inset: auto 0 0 0; width: auto; max-height: 82vh; overflow-y: auto; z-index: 9; background: #1A1146; border-top: 1px solid var(--edge); padding: 16px 18px 28px; border-radius: 12px 12px 0 0; }
+@media (max-width: 1200px) { .legend { display: none; } }
+@media (max-height: 760px) { .legend { display: none; } }
+@media (prefers-reduced-motion: reduce) { .desk-tag.ping { animation: none; } .story p.cursor::after { animation: none; } }
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<header class="bar">
+  <span class="brand">Kraken agents</span>
+  <nav class="tabs" aria-label="Weergave">
+    <a href="index.html" aria-current="page">HQ</a>
+    <a href="trades.html">Trades</a>
+    <a href="details.html">Details</a>
+    <a href="opportunities.html">Opportunities</a>
+  </nav>
+  <span class="mode other" id="mode">Laden</span>
+  <span class="live-dot" id="livestat" title="Live koersen van Kraken: verbinden">Live</span>
+  <div class="kpi"><span>Echt geld</span><b class="money" id="eq">–</b></div>
+  <div class="kpi"><span>Resultaat</span><b id="ret">–</b></div>
+  <div class="kpi"><span>BTC vasthouden</span><b id="bench">–</b></div>
+  <div class="kpi"><span>Markt</span><b id="regime">–</b></div>
+  <div class="kpi"><span>Radar</span><b id="radar">–</b></div>
+  <div class="kpi"><span>China/HK</span><b id="equityradar">–</b></div>
+  <div class="kpi"><span>Monitor</span><b id="nextrun">–</b></div>
+  <div class="kpi"><span>Fast 15m</span><b id="next15">–</b></div>
+  <div class="kpi"><span>Swing 1u</span><b id="next1h">–</b></div>
+  <div class="kpi"><span>Trend 4u</span><b id="next4h">–</b></div>
+</header>
+
+<div id="stage" aria-label="De handelsvloer met alle agents"></div>
+<div class="loading" id="loading">De handelsvloer wordt ingericht…</div>
+<aside class="panel" id="panel" aria-live="polite" hidden></aside>
+<div class="leftcol" id="leftcol" hidden><section class="cashp" id="money" aria-label="Je geld"></section><div class="legend" id="legend"></div></div>
+<div class="tools" id="tools" hidden><button id="reset">Overzicht</button><span>Slepen om te schuiven, scrollen om te zoomen, rechts slepen om te draaien</span></div>
+<div class="caption" id="caption" hidden><div class="now" id="now"></div></div>
+<main id="compact" hidden></main>
+
+<script type="module">
+import * as THREE from "three";
+import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+
+/* ============ opmaak en teksten ============ */
+const eur = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" });
+const num = (v, d = 2) => new Intl.NumberFormat("nl-NL", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
+const pct = v => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + num(Math.abs(v), 1) + "%";
+const signed = v => (v > 0 ? "+" : v < 0 ? "−" : "") + eur.format(Math.abs(v));
+const price = v => v == null ? "–" : v >= 100 ? eur.format(v) : v >= 1 ? "€ " + num(v, 3) : v >= 0.01 ? "€ " + num(v, 5) : "€ " + num(v, 8);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const when = ts => new Date(ts * 1000).toLocaleString("nl-NL", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+const clock = ts => new Date(ts * 1000).toLocaleTimeString("nl-NL", { hour: "2-digit", minute: "2-digit" });
+const base = m => m.split("/")[0];
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const TEAM = { trend4h: "#7F9BFF", mean_reversion: "#C08CFF", breakout: "#45D1EE", momentum: "#FF9A62", squeeze: "#F4D35E", fast_breakout: "#5CF2B3" };
+const SIGNAL = { buy: "#5CF2B3", sell: "#FF6B78", hold: "#33405A" };
+const ACT = { buy: "kopen", sell: "negatief", hold: "afwachten" };
+const TYPES = { entry: "Gekocht", exit: "Verkocht", blocked: "Tegengehouden", validated: "Gevalideerd", note: "Melding" };
+const METHOD = {
+  trend4h: "Jouw oorspronkelijke bot. Koopt als een 4-uursslot boven het hoogste punt van de vorige 55 candles breekt, met RSI boven 50. Verkoopt via een tweetraps trailing stop: 2 ATR onder de piek, 6 ATR zodra de winst 3 ATR is.",
+  mean_reversion: "Koopt paniekdalingen: RSI onder 28 en de koers onder de onderste Bollinger-band, op uurcandles, in een munt die op 4-uursbasis stijgt. Verkoopt als de koers terug is bij het gemiddelde, of na 12 uur zonder herstel.",
+  breakout: "Swing desk. Koopt op 1-uurscandles als de koers met extra volume uitbreekt, bevestigd door de 4-uurs trend.",
+  momentum: "Fast desk. Zoekt iedere gesloten 15-minutencandle naar een MACD-versnelling met extra volume.",
+  squeeze: "Fast desk. Zoekt op 15 minuten naar een rustige markt die vervolgens omhoog uitbreekt.",
+  fast_breakout: "Fast desk. Probeert een sterke 15-minutenuitbraak vroeg te zien, maar begint als schaduwstrategie.",
+};
+const ROOMS = [
+  { key: "data", label: "Radar & Data", x: -23.1, w: 4.0, color: "#8FA8E8", role: "De receptie van het handelsbedrijf: bekijkt iedere 5 minuten de brede Kraken-markt en bepaalt welke munten aandacht krijgen." },
+  { key: "fast", label: "Fast 15m", x: -18.9, w: 4.0, color: "#FF9A62", role: "Snelle handelsafdeling. Momentum, Squeeze en Snelle uitbraak beoordelen iedere gesloten 15-minutencandle." },
+  { key: "swing", label: "Swing 1u", x: -14.7, w: 4.0, color: "#45D1EE", role: "Swingafdeling. Dip-koper en Uitbraak-agent werken op 1 uur en gebruiken de 4-uurs trend als bevestiging." },
+  { key: "trend", label: "Trend 4u", x: -10.5, w: 4.0, color: "#7F9BFF", role: "Langere-termijnafdeling. Trend-4u zoekt grotere uitbraken en probeert sterke runners langer vast te houden." },
+  { key: "markt", label: "Markt", x: -6.3, w: 4.0, color: "#6FD6B4", role: "Bepaalt of de cryptomarkt stijgt, neutraal is of daalt. Deze afdeling geeft de rest van het bedrijf het marktklimaat door." },
+  { key: "equity", label: "China/HK", x: -2.1, w: 4.0, color: "#B7A0FF", role: "Researchafdeling voor Hongkong/China. Draait los van Kraken en handelt voorlopig alleen met paper money." },
+  { key: "prestatie", label: "Prestatie", x: 2.1, w: 4.0, color: "#D49BEA", role: "HR en kwaliteitscontrole: meet welke strategieën echt geld verdienen en welke eerst verder moeten oefenen." },
+  { key: "beslis", label: "Directie", x: 6.3, w: 4.0, color: "#E9E4FF", role: "De directiekamer. Hier worden alle koopadviezen naast elkaar gelegd en worden de beste kansen gekozen." },
+  { key: "risico", label: "Risk", x: 10.5, w: 4.0, color: "#FF7D88", role: "Risk management heeft veto-recht. Bepaalt positieomvang, daglimieten, correlatie en noodstops." },
+  { key: "kapitaal", label: "Kapitaal", x: 14.7, w: 4.0, color: "#F4D35E", role: "Treasury. Houdt bij hoeveel echt geld op Kraken vrij is, hoeveel belegd is en hoeveel ruimte er nog is." },
+  { key: "uitvoer", label: "Execution", x: 18.9, w: 4.0, color: "#FFB547", role: "De dealing desk. Plaatst echte orders bij Kraken en bewaakt de exchange-stoplosses." },
+  { key: "monitor", label: "Operations", x: 23.1, w: 4.0, color: "#8FC3E8", role: "Operations schrijft het verslag, bewaart het scanlog en zorgt dat het dashboard laat zien wat het bedrijf heeft gedaan." },
+];
+const ROOM = Object.fromEntries(ROOMS.map(r => [r.key, r]));
+
+/* ============ data ============ */
+let D = null, lastGen = null, BT = null, EQ = null;
+const agentByName = n => D.agents.find(a => a.name === n);
+const lastRunEvents = () => D.events.filter(e => e.ts >= D.generated_ts - 20 * 60);
+function buyList() {
+  const out = [];
+  for (const m of D.markets) {
+    const e = D.evaluations[m]; if (!e) continue;
+    for (const a of D.agents) { const s = e.signals[a.agent]; if (s && s.action === "buy") out.push({ coin: m, agent: a.name, label: a.agent, s }); }
+  }
+  return out;
+}
+function roomStatus(key) {
+  const live = D.books.live, ev = lastRunEvents(), L = D.risk_limits, r = live ? live.risk || {} : {};
+  const buys = buyList(), ent = ev.filter(e => e.type === "entry"), ex = ev.filter(e => e.type === "exit");
+  const val = ev.filter(e => e.type === "validated"), bl = ev.filter(e => e.type === "blocked");
+  const stops = live ? live.positions.filter(p => p.stop_on_exchange).length : 0;
+  const errs = D.errors.filter(e => e.ts === D.generated_ts);
+  const latest = D.scan_history?.[0], c = D.cadence || {};
+  const eqTop = EQ?.candidates?.[0];
+  return {
+    data: D.scanner?.enabled ? `${D.scanner.eligible_count || 0} gezien · ${D.scanner.pool_count || 0} gerankt · ${(D.scanner.active_discovery_markets || []).length} discovery` : `${D.markets.length} munten bekeken`,
+    fast: latest?.desks?.fast ? `Nieuwe 15m-candle beoordeeld · ${D.agents.filter(a => a.horizon === "fast").length} strategieën` : `Wacht op volgende 15m-candle`,
+    swing: latest?.desks?.swing ? `Nieuwe 1u-candle beoordeeld · ${D.agents.filter(a => a.horizon === "swing").length} strategieën` : `Wacht op volgende 1u-candle`,
+    trend: latest?.desks?.trend ? "Nieuwe 4u-candle beoordeeld" : "Wacht op volgende 4u-candle",
+    markt: `Markt ${D.regime.label}. ${D.regime.reason}.`,
+    equity: eqTop ? `Beste researchkans: ${eqTop.name} · ${num(eqTop.score,0)}/100` : "Equity research wacht op scan",
+    prestatie: `${D.agents.filter(a => a.status === "live").length} van ${D.agents.length} strategieën mogen echt geld gebruiken`,
+    beslis: buys.length ? `${buys.length} koopadvies${buys.length > 1 ? "en" : ""} op tafel` : "Geen koopadvies deze ronde",
+    risico: r.halted ? "NOODSTOP ACTIEF" : `Dagverlies ${num(r.daily_loss_pct || 0, 1)}% / ${L.max_daily_loss_pct}% · max ${L.max_open_positions} posities`,
+    kapitaal: live ? `${eur.format(live.cash)} vrij · ${eur.format(live.exposure)} belegd · budget ALLES` : "Geen live kapitaal",
+    uitvoer: ent.length || ex.length ? `${ent.length} gekocht · ${ex.length} verkocht` : `Geen order · ${stops} Kraken-stop${stops === 1 ? "" : "s"} actief`,
+    monitor: `Scan #${D.scan_history?.length || 0} bewaard · laatste run ${clock(D.generated_ts)}`,
+  }[key];
+}
+
+async function load() {
+  try {
+    const [res, eqr] = await Promise.all([
+      fetch("data.json?t=" + Date.now(), { cache: "no-store" }),
+      fetch("equities.json?t=" + Date.now(), { cache: "no-store" }).catch(() => null)
+    ]);
+    if (!res.ok) throw new Error(res.status);
+    const d = await res.json();
+    const eq = eqr && eqr.ok ? await eqr.json() : null;
+    const key = d.generated_ts + ":" + (eq?.generated_ts || eq?.last_attempt_ts || 0);
+    if (key === lastGen) return;
+    D = d; EQ = eq; lastGen = key;
+    try { const b = await fetch("backtest.json?t=" + Date.now(), { cache: "no-store" }); BT = b.ok ? await b.json() : null; } catch { BT = null; }
+    header();
+    if (COMPACT) buildCompact(); else rebuildFloor();
+    if (!LIVE.ws) connectLive(); else resubscribe();
+  } catch (e) {
+    if (!D) document.getElementById("loading").textContent = "Nog geen gegevens. Start een run via Actions, Trader, Run workflow.";
+  }
+}
+
+function header() {
+  const live = D.books.live, st = live ? live.stats : null;
+  const mode = document.getElementById("mode");
+  if (D.mode === "live" && !D.validate_only) { mode.textContent = "Echt geld"; mode.className = "mode live"; }
+  else { mode.textContent = D.mode === "live" ? "Validatiemodus" : "Papier"; mode.className = "mode other"; }
+  document.getElementById("eq").textContent = st ? eur.format(st.equity) : "–";
+  const ret = document.getElementById("ret"); ret.textContent = st ? pct(st.return_pct) : "–";
+  ret.className = st && st.return_pct > 0 ? "up" : st && st.return_pct < 0 ? "down" : "";
+  document.getElementById("bench").textContent = st ? pct(st.benchmark_return_pct) : "–";
+  const rg = document.getElementById("regime"); rg.textContent = D.regime.label;
+  rg.className = D.regime.label === "stijgend" ? "up" : D.regime.label === "dalend" ? "down" : "";
+  const radar = document.getElementById("radar");
+  if (radar) radar.textContent = D.scanner?.enabled ? `${(D.scanner.active_discovery_markets || []).length} kansen` : "uit";
+  const eqradar = document.getElementById("equityradar");
+  const topEq = EQ?.candidates?.[0];
+  if (eqradar) eqradar.textContent = topEq ? `${topEq.symbol.replace(".HK","")} · ${num(topEq.score,0)}` : "wacht";
+}
+function tickClocks() {
+  const now = Date.now() / 1000, d = new Date(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
+  const slots = Array.from({length:12}, (_,i) => 3 + i * 5);
+  const next = slots.find(x => x > m);
+  const secs = ((next !== undefined ? next - m : 60 - m + slots[0]) * 60) - s;
+  const fmt = x => `${Math.floor(x / 60)}:${String(Math.floor(x % 60)).padStart(2, "0")}`;
+  document.getElementById("nextrun").textContent = fmt(Math.max(0, secs));
+  const n15 = Math.ceil(now / 900) * 900 - now;
+  const n1 = Math.ceil(now / 3600) * 3600 - now;
+  const n4 = Math.ceil(now / 14400) * 14400 - now;
+  document.getElementById("next15").textContent = fmt(Math.max(0, n15));
+  document.getElementById("next1h").textContent = fmt(Math.max(0, n1));
+  document.getElementById("next4h").textContent = `${Math.floor(n4 / 3600)}:${String(Math.floor((n4 % 3600) / 60)).padStart(2, "0")}`;
+}
+
+/* ============ live koersen van Kraken (alleen lezen, geen sleutels) ============ */
+const LIVE = { px: {}, prev: {}, ok: false, last: 0, ws: null, tries: 0, subs: new Set() };
+function liveSymbols() {
+  return [...new Set([...(D?.markets || []), ...((D?.books.live?.positions || []).map(p => p.market)), D?.benchmark_market || "BTC/EUR"])];
+}
+function connectLive() {
+  if (typeof WebSocket === "undefined") return;
+  let ws;
+  try { ws = new WebSocket("wss://ws.kraken.com/v2"); } catch { setTimeout(connectLive, 15000); return; }
+  LIVE.ws = ws; LIVE.subs = new Set();
+  ws.onopen = () => { LIVE.tries = 0; resubscribe(); };
+  ws.onmessage = ev => {
+    let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    if (msg.channel !== "ticker" || !Array.isArray(msg.data)) return;
+    for (const t of msg.data) {
+      const sym = String(t.symbol).replace(/^XBT\//, "BTC/").replace(/^XDG\//, "DOGE/");
+      if (t.last) LIVE.px[sym] = +t.last;
+    }
+    LIVE.last = Date.now(); LIVE.ok = true;
+  };
+  ws.onclose = () => { LIVE.ok = false; setTimeout(connectLive, Math.min(30000, 2000 * 2 ** LIVE.tries++)); };
+  ws.onerror = () => { try { ws.close(); } catch {} };
+}
+function resubscribe() {
+  if (!LIVE.ws || LIVE.ws.readyState !== 1 || !D) return;
+  const want = liveSymbols().filter(s => !LIVE.subs.has(s));
+  if (!want.length) return;
+  LIVE.ws.send(JSON.stringify({ method: "subscribe", params: { channel: "ticker", symbol: want } }));
+  want.forEach(s => LIVE.subs.add(s));
+}
+let liveTick = 0;
+function applyLive() {
+  const st = document.getElementById("livestat"), fresh = LIVE.ok && Date.now() - LIVE.last < 30000;
+  st.className = "live-dot" + (fresh ? " on" : "");
+  st.title = fresh ? "Live koersen van Kraken, elke seconde bijgewerkt" : "Live koersen niet verbonden; je ziet de stand van de laatste run";
+  if (!D || !Object.keys(LIVE.px).length) return;
+  liveTick++;
+  const live = D.books.live;
+  if (live) {
+    let inv = 0;
+    for (const p of live.positions) {
+      const lp = LIVE.px[p.market], q = p.qty ?? (p.price ? p.value / p.price : 0);
+      if (lp) { p.price = lp; p.value = +(q * lp).toFixed(2); p.unrealized = +(p.value - p.entry_cost).toFixed(2); }
+      inv += p.value;
+    }
+    live.exposure = +inv.toFixed(2);
+    live.stats.equity = +(live.cash + inv).toFixed(2);
+    live.stats.return_pct = (live.stats.equity / (live.stats.start || 1) - 1) * 100;
+  }
+  header();
+  if (COMPACT) {
+    const c = document.querySelector("#compact .cashp"); if (c) c.innerHTML = moneyHTML();
+    document.querySelectorAll("#compact [data-px]").forEach(el => { const v = LIVE.px[el.dataset.px]; if (v) el.textContent = price(v); });
+    return;
+  }
+  if (!renderer || !dyn) return;
+  document.getElementById("money").innerHTML = moneyHTML();
+  for (const [m, d] of Object.entries(deskRefs)) {
+    const p = LIVE.px[m]; if (!p || !d.tag) continue;
+    const prev = LIVE.prev[m];
+    d.tag.element.innerHTML = deskTagHTML(m);
+    if (prev && p !== prev) { d.tag.element.classList.remove("up", "down"); void d.tag.element.offsetWidth; d.tag.element.classList.add(p > prev ? "up" : "down"); }
+    LIVE.prev[m] = p;
+    if (liveTick % 15 === 0 && d.chart) drawDeskChart(d.chart);
+  }
+  for (const a of analysts) {
+    if (a.agent !== "trend4h") continue;
+    const lvl = D.levels?.[a.coin]?.breakout, p = LIVE.px[a.coin];
+    const dist = lvl && p ? (p / lvl - 1) * 100 : null;
+    const alert = dist == null ? null : dist >= 0 ? "boven het uitbraakniveau" : dist > -1.5 ? `${num(-dist, 1)}% onder uitbraak` : null;
+    if (alert !== a.alert) {
+      a.alert = alert;
+      if (a.alertTag) { dyn.remove(a.alertTag); a.alertTag.element.remove(); a.alertTag = null; }
+      if (alert) { a.alertTag = label(alert, "mini alert", a.seat.x, 2.95, a.seat.z, dyn); }
+    }
+  }
+  if (liveTick % 15 === 0) drawBigScreen();
+  if (liveTick % 30 === 0) drawTicker();
+}
+
+/* ============ dossiers (wat doet deze agent?) ============ */
+const panel = document.getElementById("panel");
+let panelMode = "verslag";
+function openPanel(html, mode) {
+  panelMode = mode;
+  if (COMPACT) {
+    let sh = document.querySelector(".sheet");
+    if (!sh) { sh = document.createElement("div"); sh.className = "sheet panel"; sh.style.position = "fixed"; document.body.appendChild(sh); }
+    sh.innerHTML = `<button class="close" aria-label="Sluiten">×</button>` + html;
+    sh.querySelector(".close").onclick = () => sh.remove();
+    wireLinks(sh);
+    return;
+  }
+  panel.hidden = false;
+  panel.innerHTML = (mode === "verslag" ? "" : `<button class="close" aria-label="Sluiten">×</button>`) + html;
+  const c = panel.querySelector(".close"); if (c) c.onclick = () => { clearSelection(); showVerslag(); };
+  wireLinks(panel);
+  panel.scrollTop = 0;
+}
+function wireLinks(root) {
+  root.querySelectorAll("[data-coin]").forEach(b => b.onclick = () => selectCoin(b.dataset.coin));
+  root.querySelectorAll("[data-analyst]").forEach(b => { const [a, c] = b.dataset.analyst.split("|"); b.onclick = () => selectAnalyst(a, c); });
+  root.querySelectorAll("[data-room]").forEach(b => b.onclick = () => selectRoom(b.dataset.room));
+}
+
+function analystHTML(name, coin) {
+  const a = agentByName(name), e = D.evaluations[coin], s = e?.signals[a.agent];
+  const real = a.status === "live";
+  const counts = { buy: [], sell: 0, hold: 0 };
+  Object.entries(D.evaluations).forEach(([m, ev]) => { const x = ev.signals[a.agent]; if (!x) return; if (x.action === "buy") counts.buy.push(m); else counts[x.action]++; });
+  const pos = [...(D.books.live?.positions || []).map(p => ({ ...p, book: "live" })), ...D.books.schaduw.positions.map(p => ({ ...p, book: "schaduw" }))].filter(p => p.agent === name);
+  return `<h3><span class="dot" style="background:${TEAM[name]}"></span>${esc(a.agent)}<span class="chip ${real ? "real" : ""}">${real ? "echt geld" : "schaduw"}</span></h3>
+    <p class="sub">Aan het bureau van ${esc(coin)}${e ? `, koers ${price(e.price)}` : ""}</p>
+    <div class="doing"><p style="color:var(--muted);font-size:.8rem;margin:0">Wat hij nu doet</p>
+      <div class="act act-${s ? s.action : "hold"}">${s ? (s.action === "buy" ? `Wil ${esc(base(coin))} kopen` : s.action === "sell" ? `Negatief over ${esc(base(coin))}` : `Wacht af bij ${esc(base(coin))}`) : "Nog niet beoordeeld"}</div>
+      <p style="margin:4px 0 0">${s ? esc(s.reason) : ""}${s && s.strength ? `. Sterkte ${num(s.strength, 2)}.` : ""}</p>
+      ${e ? `<p class="when" style="margin:4px 0 0">Beoordeeld ${when(e.ts)}</p>` : ""}</div>
+    ${name === "trend4h" && D.levels?.[coin] ? `<p class="when" style="margin:-6px 0 12px">Uitbraakniveau ${price(D.levels[coin].breakout)}; ${LIVE.px[coin] ? `nu live ${price(LIVE.px[coin])}, ${num((LIVE.px[coin] / D.levels[coin].breakout - 1) * 100, 1)}%` : "live koers nog niet binnen"}. Kopen gebeurt pas bij een 4-uursslot erboven.</p>` : ""}
+    <section><h2>Zijn methode</h2><p>${esc(METHOD[name] || "")}</p></section>
+    <section><h2>Zijn cijfers</h2><dl class="kv">
+      <dt>Geld</dt><dd>${real ? "echt geld" : "schaduwgeld"}</dd>
+      <dt>Invloed</dt><dd>${num(a.weight, 2)}×</dd>
+      <dt>Trades</dt><dd>${a.trades}</dd>
+      <dt>Met winst</dt><dd>${a.win_rate_pct != null ? a.win_rate_pct + "%" : "–"}</dd>
+      <dt>Gemiddeld per trade</dt><dd>${a.expectancy_r != null ? (a.expectancy_r > 0 ? "+" : "") + num(a.expectancy_r, 2) + " R" : "–"}</dd>
+      <dt>Resultaat echt geld</dt><dd class="${a.pnl_live >= 0 ? "up" : "down"}">${signed(a.pnl_live)}</dd>
+      <dt>Resultaat schaduw</dt><dd class="${a.pnl_schaduw >= 0 ? "up" : "down"}">${signed(a.pnl_schaduw)}</dd>
+    </dl>${a.promotion_note ? `<p class="when" style="margin-top:6px">Naar echt geld: ${esc(a.promotion_note)}</p>` : ""}</section>
+    <section><h2>Backtest: 2 jaar historie</h2>${btHTML(a.backtest)}</section>
+    ${pos.length ? `<section><h2>Zijn open posities</h2><ul class="list">${pos.map(p => `<li><button class="link" data-coin="${esc(p.market)}">${esc(p.market)}</button> ${p.book === "live" ? "echt geld" : "schaduw"}, ${eur.format(p.value)} <span class="${p.unrealized >= 0 ? "up" : "down"}">${signed(p.unrealized)}</span></li>`).join("")}</ul></section>` : ""}
+    <section><h2>Zijn mening over de hele vloer</h2>
+      <p>${counts.buy.length ? `Wil kopen: ${counts.buy.map(m => `<button class="link" style="border:0;background:none;color:#C9BDFF;cursor:pointer;padding:0;font-weight:600" data-analyst="${name}|${esc(m)}">${esc(base(m))}</button>`).join(", ")}. ` : "Wil nergens kopen. "}${counts.sell} keer negatief, ${counts.hold} keer afwachten.</p></section>
+    <p><button class="link" style="border:0;background:none;color:#C9BDFF;cursor:pointer;padding:0" data-coin="${esc(coin)}">Bekijk wat alle agents van ${esc(base(coin))} vinden</button></p>`;
+}
+
+const PARAM = { lookback: "periode", initial_atr: "krappe stop (ATR)", runner_atr: "runner-stop (ATR)", rsi_buy: "RSI-grens", stop_atr: "stop (ATR)",
+  max_candles: "max uren", volume_mult: "volume-eis", squeeze_pct: "rust-grens (%)" };
+function btHTML(b) {
+  if (!b) return `<p class="when">Nog geen backtest gedraaid.</p>`;
+  const r = v => v == null ? "–" : (v > 0 ? "+" : "") + num(v, 2) + " R";
+  return `<dl class="kv">
+    <dt>Trades</dt><dd>${b.trades}</dd>
+    <dt>Met winst</dt><dd>${b.win_rate_pct ?? "–"}%</dd>
+    <dt>Gemiddeld per trade</dt><dd class="${(b.expectancy_r || 0) >= 0 ? "up" : "down"}">${r(b.expectancy_r)}</dd>
+    <dt>Rendement (op € 1.000)</dt><dd class="${b.return_pct >= 0 ? "up" : "down"}">${pct(b.return_pct)}</dd>
+    <dt>Grootste daling</dt><dd>${num(b.max_drawdown_pct, 1)}%</dd>
+    <dt>Beste munt</dt><dd>${esc((b.best_market || "–").split("/")[0])} (${r(b.best_market_r)} totaal)</dd>
+    <dt>Zonder die munt</dt><dd class="${(b.ex_best_return_pct || 0) >= 0 ? "up" : "down"}">${pct(b.ex_best_return_pct)}, gem. ${r(b.ex_best_expectancy_r)}</dd>
+    <dt>Controleperiode (nooit gezien)</dt><dd class="${(b.oos_expectancy_r || 0) >= 0 ? "up" : "down"}">${r(b.oos_expectancy_r)} over ${b.oos_trades} trades</dd>
+  </dl><p class="when" style="margin-top:6px">${b.tuned ? "Instellingen geoptimaliseerd en bevestigd in de controleperiode: " : "Standaardinstellingen: "}${Object.entries(b.params || {}).map(([k, v]) => `${PARAM[k] || k} ${v}`).join(", ")}.</p>`;
+}
+
+function coinHTML(coin) {
+  const e = D.evaluations[coin];
+  const lp = (D.books.live?.positions || []).find(p => p.market === coin), sp = D.books.schaduw.positions.find(p => p.market === coin);
+  return `<h3>${esc(coin)}</h3><p class="sub">${e ? `${price(e.price)}, beoordeeld ${when(e.ts)}` : "Nog niet beoordeeld"}</p>
+    ${lp ? `<div class="doing" style="border-color:var(--money)"><p style="margin:0"><b style="color:var(--money)">Positie met echt geld</b>: ${eur.format(lp.value)} <span class="${lp.unrealized >= 0 ? "up" : "down"}">${signed(lp.unrealized)}</span>. Stop ${price(lp.stop)}${lp.stop_on_exchange ? ", staat op Kraken" : ""}${lp.is_runner ? ", runner" : ""}.</p></div>` : ""}
+    ${sp ? `<p>Schaduwpositie: ${eur.format(sp.value)} <span class="${sp.unrealized >= 0 ? "up" : "down"}">${signed(sp.unrealized)}</span></p>` : ""}
+    <section><h2>Wat de agents aan dit bureau vinden</h2><ul class="list">
+    ${D.agents.map(a => { const s = e?.signals[a.agent]; return `<li><span class="dot" style="background:${TEAM[a.name]}"></span><button class="link" data-analyst="${a.name}|${esc(coin)}">${esc(a.agent)}</button>: <span class="act-${s?.action || "hold"}">${s ? ACT[s.action] : "–"}</span><br>${esc(s?.reason || "")}</li>`; }).join("")}
+    </ul></section>
+    ${e?.notes?.length ? `<section><h2>Besluit</h2><ul class="list">${e.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul></section>` : ""}`;
+}
+
+function scannerHTML() {
+  const s = D.scanner;
+  if (!s?.enabled) return "";
+  const active = new Set(s.active_discovery_markets || []);
+  const rows = (s.candidates || []).slice(0, 8).map(c => `<li><button class="link" data-coin="${esc(c.market)}">${esc(c.market)}</button> 
+    <b>${num((c.score || 0) * 100, 0)}</b>/100 · 24u ${pct(c.change_pct)} · volume ${eur.format(c.quote_volume || 0)} 
+    ${active.has(c.market) ? `<span class="chip">discovery · schaduw</span>` : ""}</li>`).join("");
+  const c = D.cadence || {};
+  return `<section><h2>Opportunity radar</h2>
+    <p>${s.eligible_count || 0} EUR-markten gezien; maximaal ${s.pool_count || 0} krijgen de goedkope ranking. Kern + ${(s.discovery_markets || []).length} discovery-kansen gaan door naar de desks.</p>
+    <div class="doing"><p><b>Multi-speed:</b> prijzen/stops elke ${c.monitor_minutes || 5}m · discovery ${c.discovery_minutes || 15}m · fast ${c.fast_minutes || 15}m · swing ${c.swing_minutes || 60}m · trend ${c.trend_minutes || 240}m.</p></div>
+    <ul class="list">${rows || "<li>Geen geschikte discovery-kansen.</li>"}</ul></section>`;
+}
+
+function equityRadarHTML() {
+  if (!EQ?.enabled) return "";
+  const rows = (EQ.candidates || []).slice(0, 5).map(x => `<li><b>${esc(x.name)}</b> <span class="chip">paper</span><br>
+    <span class="when">${esc(x.symbol)} · score ${num(x.score,0)}/100 · 20d ${pct(x.m20_pct)}</span></li>`).join("");
+  return `<section><h2>China/HK research desk</h2>
+    <p>De aandelenlaag draait los van Kraken en kan je cryptobot niet blokkeren. Live aandelenorders staan uit; de beste kandidaten worden paper-only gevolgd.</p>
+    <ul class="list">${rows || "<li>Eerste equity-scan moet nog draaien.</li>"}</ul>
+    <p><a href="opportunities.html">Open Global Opportunities →</a></p></section>`;
+}
+
+function roomHTML(key) {
+  const r = ROOM[key], live = D.books.live, L = D.risk_limits, risk = live?.risk || {};
+  let extra = "";
+  if (key === "data") extra = scannerHTML() + `<section><h2>Actieve handelslijst</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
+  if (key === "fast") extra = deskDepartmentHTML("fast", "15 minuten", "Momentum, Squeeze en Snelle uitbraak");
+  if (key === "swing") extra = deskDepartmentHTML("swing", "1 uur", "Dip-koper en normale Uitbraak");
+  if (key === "trend") extra = deskDepartmentHTML("trend", "4 uur", "Trend-4u");
+  if (key === "equity") extra = equityRadarHTML();
+  if (key === "markt") extra = `<div class="doing"><div class="act ${D.regime.label === "stijgend" ? "act-buy" : D.regime.label === "dalend" ? "act-sell" : "act-hold"}">Markt ${esc(D.regime.label)}</div><p>${esc(D.regime.reason)}. Koopkansen tellen voor ${num(D.regime.multiplier * 100, 0)}% mee.</p></div>`;
+  if (key === "prestatie") extra = (BT ? `<section><h2>Backtest van het hele team</h2><dl class="kv">
+      <dt>Periode</dt><dd>${new Date(BT.period.start * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })} tot ${new Date(BT.period.end * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })}</dd>
+      <dt>Trades</dt><dd>${BT.team.trades}</dd><dt>Rendement</dt><dd class="${BT.team.return_pct >= 0 ? "up" : "down"}">${pct(BT.team.return_pct)}</dd>
+      <dt>BTC vasthouden</dt><dd>${pct(BT.btc_return_pct)}</dd><dt>Grootste daling</dt><dd>${num(BT.team.max_drawdown_pct, 1)}%</dd>
+      <dt>Noodstops</dt><dd>${BT.team.halts}</dd></dl>
+      ${BT.live_team ? `<p style="margin-top:8px">Alleen de agents met echt geld: <b class="${BT.live_team.return_pct >= 0 ? "up" : "down"}">${pct(BT.live_team.return_pct)}</b>, grootste daling ${num(BT.live_team.max_drawdown_pct, 1)}%, ${BT.live_team.halts} noodstop(s). Gekozen uit ${BT.pool_size} munten, elke dag de ${BT.universe_size} drukste van dat moment.</p>` : ""}
+      <p class="when">Met kosten (${num(BT.fee_pct, 2)}% per order) en ${num(BT.slippage_pct, 2)}% slippage, profiel ${esc(BT.profile)}.</p></section>` : "") + `<section><h2>Het team</h2><ul class="list">${D.agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br>Invloed ${num(a.weight, 2)}×, ${a.trades} trades${a.expectancy_r != null ? `, gem. ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r, 2)}R` : ""}${a.promotion_note ? `. ${esc(a.promotion_note)}` : ""}</li>`).join("")}</ul></section>`;
+  if (key === "beslis") { const b = buyList(); extra = `<section><h2>Op tafel</h2>${b.length ? `<ul class="list">${b.map(x => `<li><span class="dot" style="background:${TEAM[x.agent]}"></span><button class="link" data-analyst="${x.agent}|${esc(x.coin)}">${esc(x.label)}</button> op ${esc(base(x.coin))}, sterkte ${num(x.s.strength, 2)}<br>${esc(x.s.reason)}</li>`).join("")}</ul>` : `<p>Geen koopadviezen. Er valt niets te beslissen.</p>`}
+    ${Object.entries(D.evaluations).flatMap(([m, e]) => (e.notes || []).filter(n => n.startsWith("Kandidaat") || n.startsWith("Risico") || n.startsWith("Uitvoer")).map(n => `<p class="when">${esc(base(m))}: ${esc(n)}</p>`)).join("")}</section>`; }
+function deskDepartmentHTML(horizon, windowLabel, description) {
+  const agents = D.agents.filter(a => a.horizon === horizon);
+  const buys = [], sells = [];
+  for (const [market, ev] of Object.entries(D.evaluations || {})) {
+    for (const a of agents) {
+      const sig = ev.signals?.[a.agent];
+      if (sig?.action === "buy") buys.push(`${base(market)} · ${a.agent}`);
+      if (sig?.action === "sell") sells.push(`${base(market)} · ${a.agent}`);
+    }
+  }
+  return `<section><h2>Werkvenster: ${windowLabel}</h2><p>${description}.</p>
+    <ul class="list">${agents.map(a => `<li><span class="dot" style="background:${TEAM[a.name]}"></span><b>${esc(a.agent)}</b><span class="chip ${a.status === "live" ? "real" : ""}">${a.status === "live" ? "echt geld" : "schaduw"}</span><br><span class="when">${a.trades} afgeronde trades${a.expectancy_r != null ? ` · gemiddeld ${a.expectancy_r > 0 ? "+" : ""}${num(a.expectancy_r,2)}R` : ""}</span></li>`).join("")}</ul>
+    <p><b>Nu kopen:</b> ${buys.length ? esc(buys.join(", ")) : "geen"}</p>
+    <p><b>Nu negatief/verkoop:</b> ${sells.length ? esc(sells.slice(0,8).join(", ")) : "geen"}</p></section>`;
+}
+
+  if (key === "risico") extra = `<section><h2>Limieten (profiel ${esc(D.profile)})</h2><dl class="kv">
+      <dt>Verlies vandaag</dt><dd>${num(risk.daily_loss_pct || 0, 1)}% van ${L.max_daily_loss_pct}%</dd>
+      <dt>Onder de hoogste stand</dt><dd>${num(risk.drawdown_pct || 0, 1)}% van ${L.max_drawdown_pct}%</dd>
+      <dt>Risico per trade</dt><dd>${num(L.risk_per_trade_pct, 1)}%</dd>
+      <dt>Max per positie</dt><dd>${L.max_position_pct}%</dd>
+      <dt>Max posities</dt><dd>${L.max_open_positions}</dd>
+      <dt>Noodstop</dt><dd>${risk.halted ? `<span class="down">actief</span>` : "niet actief"}</dd></dl></section>`;
+  if (key === "kapitaal") extra = live ? `<section><h2>Kraken-kapitaal</h2><dl class="kv">
+      <dt>Totaal in bot</dt><dd><b style="color:var(--money)">${eur.format(live.stats.equity)}</b></dd>
+      <dt>Vrije euro's</dt><dd>${eur.format(live.cash)}</dd>
+      <dt>Nu belegd</dt><dd>${eur.format(live.exposure)}</dd>
+      <dt>Budgetregel</dt><dd><b>ALLES</b></dd>
+      <dt>Max exposure</dt><dd>${L.max_exposure_pct}%</dd>
+      <dt>Max posities</dt><dd>${L.max_open_positions}</dd></dl>
+      <p class="doing">De bot mag je volledige vrije EUR-saldo op Kraken gebruiken. Risk Management bepaalt per trade hoeveel daarvan daadwerkelijk ingezet wordt.</p>
+      <p><a href="trades.html">Open Trades & Posities →</a></p></section>` : "<p>Geen live-geldboek actief.</p>";
+  if (key === "uitvoer") { const ps = live?.positions || []; extra = `<section><h2>Posities met echt geld</h2>${ps.length ? `<ul class="list">${ps.map(p => `<li><button class="link" data-coin="${esc(p.market)}">${esc(p.market)}</button> ${eur.format(p.value)} <span class="${p.unrealized >= 0 ? "up" : "down"}">${signed(p.unrealized)}</span><br>Stop ${price(p.stop)}, ${p.stop_on_exchange ? "staat op Kraken" : "nog niet op Kraken"}</li>`).join("")}</ul>` : "<p>Geen open posities.</p>"}</section>
+    <section><h2>Laatste orders</h2><ul class="list">${D.events.filter(e => ["entry", "exit", "validated", "blocked"].includes(e.type)).slice(0, 6).map(e => `<li><span class="when">${when(e.ts)} ${e.book === "live" ? "echt geld" : "schaduw"}</span><br><b>${TYPES[e.type]} ${esc(e.market)}</b>${e.pnl != null ? ` <span class="${e.pnl >= 0 ? "up" : "down"}">${signed(e.pnl)}</span>` : ""}</li>`).join("") || "<li>Nog geen orders.</li>"}</ul></section>`; }
+  if (key === "monitor") extra = `<section><h2>Verslag</h2>${D.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</section>
+    <section><h2>Scanlog</h2><p>${D.scan_history?.length || 0} scans zichtbaar. Iedere 5-minutencontrole wordt vastgelegd.</p><p><a href="trades.html#scanlog">Open het volledige scanlog →</a></p></section>`;
+  return `<h3><span class="dot" style="background:${r.color}"></span>${r.label}</h3><p class="sub">${esc(r.role)}</p>
+    <div class="doing"><p style="color:var(--muted);font-size:.8rem;margin:0">Wat hij nu doet</p><p style="margin:2px 0 0;font-size:1rem">${esc(roomStatus(key))}</p></div>${extra}`;
+}
+
+let typer = null;
+function showVerslag() {
+  const errs = D.errors.filter(e => e.ts === D.generated_ts);
+  openPanel(`<h2>Verslag van de laatste run</h2><div class="story" id="story"></div>
+    <h2 style="margin-top:16px">Logboek</h2><ul class="list">${errs.map(e => `<li class="err">${esc(e.message)}</li>`).join("")}
+    ${D.events.slice(0, 14).map(e => `<li><span class="when">${when(e.ts)}${e.book === "live" ? " <span style='color:var(--money)'>echt geld</span>" : e.book === "schaduw" ? " schaduw" : ""}</span><br><b>${TYPES[e.type] || esc(e.type)}${e.market ? " " + esc(e.market) : ""}</b>${e.pnl != null ? ` <span class="${e.pnl >= 0 ? "up" : "down"}">${signed(e.pnl)}</span>` : ""}<br><span style="color:var(--muted)">${esc(e.reason)}</span></li>`).join("")}</ul>
+    <p class="when" style="margin-top:12px">Klik op een agent achter zijn bureau, een afdeling of een munt om te zien wat er gebeurt.</p>`, "verslag");
+  const box = document.getElementById("story"), lines = D.narrative;
+  if (typer) clearInterval(typer);
+  if (REDUCED) { box.innerHTML = lines.map(l => `<p>${esc(l)}</p>`).join(""); return; }
+  let li = 0, ci = 0, p = null;
+  typer = setInterval(() => {
+    if (!document.body.contains(box) || li >= lines.length) { clearInterval(typer); return; }
+    if (!p) { p = document.createElement("p"); p.className = "cursor"; box.appendChild(p); }
+    ci += 3; p.textContent = lines[li].slice(0, ci);
+    if (ci >= lines[li].length) { p.classList.remove("cursor"); p = null; li++; ci = 0; }
+  }, 18);
+}
+
+/* ============ compacte versie voor de telefoon ============ */
+function webglOK() { try { const c = document.createElement("canvas"); return !!(c.getContext("webgl2") || c.getContext("webgl")); } catch { return false; } }
+const COMPACT = innerWidth < 900 || !webglOK();
+function buildCompact() {
+  const el = document.getElementById("compact");
+  el.hidden = false; document.getElementById("loading").hidden = true; document.getElementById("stage").hidden = true;
+  const lp = Object.fromEntries((D.books.live?.positions || []).map(p => [p.market, p]));
+  el.innerHTML = `<p class="when">Op je pc zie je de volledige handelsvloer in 3D. Laatste run ${clock(D.generated_ts)}.</p>
+    <section class="cashp" style="margin-top:12px">${moneyHTML()}</section>
+    <h2>HQ</h2><div class="desks-c">${D.markets.map(m => { const e = D.evaluations[m]; return `<button data-coin="${esc(m)}" class="${lp[m] ? "real" : ""}"><span class="t">${esc(base(m))}${lp[m] ? `<span class="${lp[m].unrealized >= 0 ? "up" : "down"}">${signed(lp[m].unrealized)}</span>` : ""}</span><span class="p" data-px="${esc(m)}">${price(LIVE.px[m] ?? e?.price)}</span>
+      <span class="screens">${D.agents.map(a => { const s = e?.signals[a.agent]; return `<i title="${esc(a.agent)}" style="background:${SIGNAL[s?.action || "hold"]};border-color:${TEAM[a.name]}"></i>`; }).join("")}</span></button>`; }).join("")}</div>
+    <h2>Afdelingen</h2><div class="rooms-c">${ROOMS.map(r => `<button data-room="${r.key}"><b><span class="dot" style="background:${r.color}"></span>${r.label}</b><span>${esc(roomStatus(r.key))}</span></button>`).join("")}</div>
+    <h2>Team</h2><p class="when">${D.agents.map(a => `<span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}`).join("&nbsp;&nbsp; ")}</p>`;
+  wireLinks(el);
+}
+
+/* ============ de 3D-handelsvloer ============ */
+const stage = document.getElementById("stage");
+let renderer, labels, scene, camera, controls, dyn, clockT = 0;
+const shared = {};
+const L = { cols: [-18, -9, 0, 9, 18], rows: [-5.4, 1.6, 8.6], aisles: [-24, -13.5, -4.5, 4.5, 13.5, 24], corridor: -10.6, roomZ: -15.6, roomFront: -12.6, gate: { x: -25.2, z: -3.5 } };
+const rowAisle = dz => dz + 2.55;
+
+function initFloor() {
+  document.body.classList.add("floor");
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.25;
+  stage.appendChild(renderer.domElement);
+  labels = new CSS2DRenderer(); labels.setSize(innerWidth, innerHeight);
+  labels.domElement.className = "l2d"; labels.domElement.style.cssText = "position:absolute;inset:0;pointer-events:none";
+  stage.appendChild(labels.domElement);
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color("#140D33");
+  const a = innerWidth / innerHeight, F = 34;
+  camera = new THREE.OrthographicCamera(-F * a / 2, F * a / 2, F / 2, -F / 2, 0.1, 400);
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.mouseButtons = { LEFT: THREE.MOUSE.PAN, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+  controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN };
+  controls.screenSpacePanning = true; controls.enableDamping = true; controls.dampingFactor = 0.12;
+  controls.minZoom = 0.75; controls.maxZoom = 4;
+  controls.minPolarAngle = 0.62; controls.maxPolarAngle = 1.08;
+  controls.minAzimuthAngle = Math.PI / 4 - 0.55; controls.maxAzimuthAngle = Math.PI / 4 + 0.55;
+  resetView();
+
+  scene.add(new THREE.HemisphereLight("#E6DDFF", "#2A1C6A", 1.05));
+  const sun = new THREE.DirectionalLight("#FFFFFF", 1.55);
+  sun.position.set(22, 34, 16); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -34, right: 34, top: 30, bottom: -30, near: 1, far: 100 });
+  sun.shadow.bias = -0.0005; scene.add(sun);
+
+  buildShared();
+  buildStatic();
+  dyn = new THREE.Group(); scene.add(dyn);
+
+  addEventListener("resize", onResize);
+  setupPicking();
+  document.getElementById("reset").onclick = resetView;
+  ["panel", "leftcol", "tools", "caption"].forEach(id => document.getElementById(id).hidden = false);
+  document.getElementById("loading").hidden = true;
+  renderer.setAnimationLoop(frame);
+}
+function resetView() {
+  const tx = 3.2, tz = -6.4;
+  camera.position.set(tx + 52, 50, tz + 52); controls.target.set(tx, 0, tz);
+  camera.zoom = Math.min(innerWidth / innerHeight, 1.9) * 0.43; camera.updateProjectionMatrix(); controls.update();
+}
+function onResize() {
+  const a = innerWidth / innerHeight, F = 34;
+  Object.assign(camera, { left: -F * a / 2, right: F * a / 2, top: F / 2, bottom: -F / 2 }); camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight); labels.setSize(innerWidth, innerHeight);
+  if ((innerWidth < 900) !== COMPACT) location.reload();
+}
+
+/* --- gedeelde vormen en materialen --- */
+function mat(color, extra = {}) { return new THREE.MeshStandardMaterial({ color, roughness: 0.82, metalness: 0.02, ...extra }); }
+const pcache = {};
+const pmat = c => pcache[c] || (pcache[c] = mat(c));
+function screenTexture(kind) {
+  const c = document.createElement("canvas"); c.width = 256; c.height = 128; const g = c.getContext("2d");
+  const bg = { buy: "#0E3B2E", sell: "#3D121B", hold: "#151C2C" }[kind], fg = { buy: "#5CF2B3", sell: "#FF6B78", hold: "#5B6E8F" }[kind];
+  g.fillStyle = bg; g.fillRect(0, 0, 256, 128);
+  g.strokeStyle = "rgba(255,255,255,.08)"; for (let x = 0; x < 256; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 128); g.stroke(); }
+  g.strokeStyle = fg; g.lineWidth = 5; g.beginPath();
+  for (let x = 0; x <= 256; x += 8) {
+    const b0 = kind === "buy" ? 100 - (x / 256) * 30 : kind === "sell" ? 30 + (x / 256) * 30 : 64;
+    const y = b0 + Math.sin(x / 13) * (kind === "hold" ? 6 : 14) + Math.sin(x / 5.3) * 4;
+    x ? g.lineTo(x, y) : g.moveTo(x, y);
+  }
+  g.stroke();
+  g.fillStyle = fg; g.globalAlpha = .7; for (let x = 6; x < 256; x += 22) g.fillRect(x, 112 - ((x * 7) % 26), 10, 4 + ((x * 7) % 26));
+  const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function buildShared() {
+  shared.tex = { buy: screenTexture("buy"), sell: screenTexture("sell"), hold: screenTexture("hold") };
+  shared.screenMat = Object.fromEntries(["buy", "sell", "hold"].map(k => [k, new THREE.MeshBasicMaterial({ map: shared.tex[k] })]));
+  shared.white = mat("#FFFFFF");
+  shared.deskTop = mat("#F3F0FF");
+  shared.deskSide = mat("#C9C1F0");
+  shared.dark = mat("#262046");
+  shared.chair = mat("#3B2F7A");
+  shared.skin = ["#F2C9A0", "#E0A97E", "#C68B63", "#8D5A3B", "#F6D5B8"];
+  shared.hair = ["#2B2140", "#5A3A22", "#C8A15A", "#1A1A1A", "#8E3B2C", "#D9D9E3"];
+  shared.g = {
+    body: new THREE.CapsuleGeometry(0.27, 0.42, 4, 12),
+    head: new THREE.SphereGeometry(0.25, 16, 12),
+    hair: new THREE.SphereGeometry(0.265, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+    arm: new THREE.BoxGeometry(0.13, 0.13, 0.52).translate(0, 0, -0.26),
+    leg: new THREE.BoxGeometry(0.15, 0.62, 0.17).translate(0, -0.31, 0),
+    seat: new THREE.BoxGeometry(0.64, 0.1, 0.62),
+    back: new THREE.BoxGeometry(0.64, 0.74, 0.09),
+    post: new THREE.CylinderGeometry(0.05, 0.05, 0.75, 8),
+    screen: new THREE.PlaneGeometry(1.02, 0.6),
+    frame: new THREE.BoxGeometry(1.14, 0.72, 0.06),
+    stand: new THREE.BoxGeometry(0.08, 0.38, 0.08),
+    keys: new THREE.BoxGeometry(0.62, 0.03, 0.2),
+    deskTop: new THREE.BoxGeometry(7.5, 0.1, 1.7),
+    deskSide: new THREE.BoxGeometry(0.1, 0.92, 1.55),
+    deskPanel: new THREE.BoxGeometry(7.3, 0.6, 0.06),
+    carry: new THREE.BoxGeometry(0.42, 0.06, 0.32),
+  };
+  const star = [0, 1, 2, 3, 4].map(k => new THREE.BoxGeometry(0.06, 0.05, 0.36).translate(0, 0.05, 0.18).rotateY(k * Math.PI * 2 / 5).translate(0, 0, 0.12));
+  shared.g.chair = mergeGeometries([
+    shared.g.seat.clone().translate(0, 0.78, 0.12), shared.g.back.clone().translate(0, 1.2, 0.42), shared.g.post.clone().translate(0, 0.42, 0.12), ...star]);
+  const leg = (x) => [new THREE.BoxGeometry(0.15, 0.14, 0.46).translate(x, 0.88, -0.14), new THREE.BoxGeometry(0.14, 0.68, 0.14).translate(x, 0.5, -0.36),
+                      new THREE.BoxGeometry(0.15, 0.08, 0.26).translate(x, 0.14, -0.44)];
+  shared.g.lap = mergeGeometries([...leg(-0.12), ...leg(0.12)]);
+  shared.g.privacy = new THREE.BoxGeometry(7.4, 0.42, 0.05);
+  shared.g.mug = new THREE.CylinderGeometry(0.07, 0.06, 0.16, 10);
+}
+
+/* --- het kantoor zelf (verandert niet) --- */
+function box(w, h, d, m, x, y, z, parent = scene, shadow = true) {
+  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z);
+  b.castShadow = shadow; b.receiveShadow = true; parent.add(b); return b;
+}
+function label(html, cls, x, y, z, parent = scene) {
+  const d = document.createElement("div"); d.className = cls; d.innerHTML = html;
+  const o = new CSS2DObject(d); o.position.set(x, y, z); parent.add(o); return o;
+}
+let bigScreen, ticker, gateRing, gateDisc, roomRefs = {};
+function buildStatic() {
+  // vloer, tapijt onder de bureaus, muren, ramen
+  box(56, 0.4, 40, mat("#2E2373"), 0, -0.2, -2, scene, false);
+  box(48, 0.02, 25, new THREE.MeshStandardMaterial({ map: carpetTexture(), roughness: 0.95 }), 0, 0.01, 2.2, scene, false);
+  box(56, 9, 0.5, mat("#251A63"), 0, 4.5, -22.2);
+  box(0.5, 9, 40, mat("#2A1E6E"), -28, 4.5, -2);
+  const sky = skylineTexture();
+  [[4.2, 5.2], [10.4, 5.2]].forEach(([z, w]) => {
+    const win = new THREE.Mesh(new THREE.PlaneGeometry(w, 4.6), new THREE.MeshBasicMaterial({ map: sky, toneMapped: false }));
+    win.rotation.y = Math.PI / 2; win.position.set(-27.72, 4.1, z); scene.add(win);
+    box(0.12, 4.9, 0.12, mat("#1B1346"), -27.7, 4.1, z - w / 2); box(0.12, 4.9, 0.12, mat("#1B1346"), -27.7, 4.1, z + w / 2);
+    box(0.12, 0.12, w, mat("#1B1346"), -27.7, 6.45, z); box(0.3, 0.12, w, mat("#1B1346"), -27.6, 1.8, z);
+  });
+  for (let x = -24; x <= 24; x += 8) box(0.18, 9, 0.12, new THREE.MeshBasicMaterial({ color: "#3A2C8E" }), x, 4.5, -21.9, scene, false);
+
+  // wandscherm met saldo en grafiek, en een lichtkrant met koersen
+  const c = document.createElement("canvas"); c.width = 1600; c.height = 520; shared.screenCanvas = c;
+  shared.screenTex = new THREE.CanvasTexture(c); shared.screenTex.colorSpace = THREE.SRGBColorSpace;
+  bigScreen = new THREE.Mesh(new THREE.PlaneGeometry(17, 5.5), new THREE.MeshBasicMaterial({ map: shared.screenTex, toneMapped: false }));
+  bigScreen.position.set(0, 6.6, -21.9); scene.add(bigScreen);
+  box(17.6, 6.1, 0.2, mat("#120B33"), 0, 6.6, -22.05, scene, false);
+  const tc = document.createElement("canvas"); tc.width = 4096; tc.height = 96; shared.tickerCanvas = tc;
+  shared.tickerTex = new THREE.CanvasTexture(tc); shared.tickerTex.wrapS = THREE.RepeatWrapping; shared.tickerTex.colorSpace = THREE.SRGBColorSpace;
+  ticker = new THREE.Mesh(new THREE.PlaneGeometry(52, 0.9), new THREE.MeshBasicMaterial({ map: shared.tickerTex, toneMapped: false }));
+  ticker.position.set(0, 3.25, -21.9); scene.add(ticker);
+
+  // de afdelingen
+  const glass = new THREE.MeshStandardMaterial({ color: "#B9AEFF", transparent: true, opacity: 0.16, roughness: 0.05, depthWrite: false });
+  for (const r of ROOMS) {
+    const w = r.w || 6, x = r.x, zc = L.roomZ, front = L.roomFront, depth = 6.2;
+    box(w, 0.22, depth, mat("#3B2D96"), x, 0.11, zc, scene, false);
+    box(0.08, 2.5, depth, glass, x - w / 2, 1.35, zc, scene, false);
+    const pane = (w - 1.7) / 2;
+    box(pane, 2.5, 0.08, glass, x - w / 2 + pane / 2, 1.35, front, scene, false);
+    box(pane, 2.5, 0.08, glass, x + w / 2 - pane / 2, 1.35, front, scene, false);
+    const strip = box(w, 0.08, 0.1, new THREE.MeshBasicMaterial({ color: r.color, toneMapped: false }), x, 2.62, front, scene, false);
+    box(2.8, 0.1, 1.1, shared.deskTop, x, 1.0, zc - 1.3); box(2.6, 0.9, 0.08, shared.deskSide, x, 0.5, zc - 1.8);
+    const scr = new THREE.Mesh(shared.g.screen, new THREE.MeshBasicMaterial({ color: r.color, toneMapped: false })); scr.position.set(x - 0.6, 1.55, zc - 1.6); scene.add(scr);
+    const scr2 = new THREE.Mesh(shared.g.screen, new THREE.MeshBasicMaterial({ color: r.color, toneMapped: false })); scr2.position.set(x + 0.6, 1.55, zc - 1.6); scene.add(scr2);
+    const person = makePerson(r.color, true); person.position.set(x, 0.12, zc - 0.25); scene.add(person);
+    Object.assign(person.userData, { pick: "room", key: r.key });
+    const hit = box(w, 2.6, depth, new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }), x, 1.3, zc, scene, false);
+    hit.userData = { pick: "room", key: r.key };
+    const tag = label(r.label, "room-tag", x, 3.15, front);
+    tag.element.style.background = r.color; tag.element.style.color = "#160F3A";
+    tag.element.onclick = () => selectRoom(r.key);
+    const bubble = label("", "bubble quiet", x, 4.35, zc + 0.5);
+    roomRefs[r.key] = { person, strip, bubble, hit };
+  }
+
+  // de poort naar Kraken
+  gateRing = new THREE.Mesh(new THREE.TorusGeometry(1.7, 0.16, 12, 48), new THREE.MeshBasicMaterial({ color: "#FFB547" }));
+  gateRing.position.set(-27.6, 2.0, L.gate.z); gateRing.rotation.y = Math.PI / 2; scene.add(gateRing);
+  gateDisc = new THREE.Mesh(new THREE.CircleGeometry(1.6, 40), new THREE.MeshBasicMaterial({ color: "#4B2E7E", transparent: true, opacity: 0.9 }));
+  gateDisc.position.set(-27.62, 2.0, L.gate.z); gateDisc.rotation.y = Math.PI / 2; scene.add(gateDisc);
+  label("Kraken", "gate-tag", -27.3, 4.1, L.gate.z);
+
+  // planten en koffie
+  const plant = (x, z) => { const g = new THREE.Group();
+    const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.28, 0.6, 12), mat("#E9E4FF")); pot.position.y = 0.3;
+    g.add(pot); [[0, 1.0, 0, .45], [.25, 1.35, .1, .35], [-.2, 1.3, -.1, .33]].forEach(([a, b, c2, r]) => { const l = new THREE.Mesh(new THREE.IcosahedronGeometry(r, 0), mat("#4FBF8C")); l.position.set(a, b, c2); l.castShadow = true; g.add(l); });
+    g.position.set(x, 0, z); scene.add(g); };
+  [[-25.5, 12], [25.5, 12], [25.5, -9.5], [-25.5, -9.5], [-3.8, -10.9], [3.8, -10.9]].forEach(([x, z]) => plant(x, z));
+  box(0.9, 1.4, 0.7, mat("#5B4BB8"), 25.3, 0.7, -3.5); box(0.6, 0.3, 0.5, mat("#2A2350"), 25.3, 1.55, -3.5);
+}
+
+function carpetTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 256; const g = c.getContext("2d");
+  g.fillStyle = "#33287F"; g.fillRect(0, 0, 256, 256);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${150 + Math.random() * 60},${130 + Math.random() * 60},255,${Math.random() * 0.06})`; g.fillRect(Math.random() * 256, Math.random() * 256, 2, 2); }
+  g.strokeStyle = "rgba(20,12,60,0.55)"; g.lineWidth = 2; g.strokeRect(1, 1, 254, 254);
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(24, 12.5); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function skylineTexture() {
+  const c = document.createElement("canvas"); c.width = 512; c.height = 400; const g = c.getContext("2d");
+  const grd = g.createLinearGradient(0, 0, 0, 400); grd.addColorStop(0, "#0B0826"); grd.addColorStop(0.6, "#2A1A5E"); grd.addColorStop(1, "#5B2C7A");
+  g.fillStyle = grd; g.fillRect(0, 0, 512, 400);
+  for (let i = 0; i < 60; i++) { g.fillStyle = "rgba(255,255,255,.6)"; g.fillRect(Math.random() * 512, Math.random() * 160, 1, 1); }
+  let x = 0;
+  while (x < 512) {
+    const w = 24 + Math.random() * 46, h = 90 + Math.random() * 230;
+    g.fillStyle = `rgb(${18 + Math.random() * 14},${14 + Math.random() * 10},${48 + Math.random() * 20})`; g.fillRect(x, 400 - h, w, h);
+    for (let wy = 400 - h + 8; wy < 392; wy += 11) for (let wx = x + 5; wx < x + w - 5; wx += 8)
+      if (Math.random() < 0.38) { g.fillStyle = Math.random() < 0.8 ? "rgba(255,214,140,.85)" : "rgba(160,200,255,.8)"; g.fillRect(wx, wy, 4, 5); }
+    x += w + 3;
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function lightPoolTexture() {
+  const c = document.createElement("canvas"); c.width = c.height = 128; const g = c.getContext("2d");
+  const r = g.createRadialGradient(64, 64, 4, 64, 64, 64); r.addColorStop(0, "rgba(255,240,220,0.55)"); r.addColorStop(1, "rgba(255,240,220,0)");
+  g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
+}
+function deskChartTexture(m) {
+  const c = document.createElement("canvas"); c.width = 256; c.height = 160;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.userData = { canvas: c, market: m };
+  drawDeskChart(t);
+  return t;
+}
+function drawDeskChart(t) {
+  const c = t.userData.canvas, m = t.userData.market, g = c.getContext("2d");
+  g.fillStyle = "#0A0F1E"; g.fillRect(0, 0, 256, 160);
+  g.strokeStyle = "rgba(255,255,255,.08)"; for (let y = 40; y < 160; y += 30) { g.beginPath(); g.moveTo(0, y); g.lineTo(256, y); g.stroke(); }
+  const pts = [...((D.spark && D.spark[m]) || [])];
+  if (LIVE.px[m]) pts.push(LIVE.px[m]);
+  g.fillStyle = "#FFFFFF"; g.font = "700 26px 'Saira Condensed', sans-serif"; g.fillText(base(m), 10, 28);
+  if (pts.length > 1) {
+    const lo = Math.min(...pts), hi = Math.max(...pts), chg = (pts[pts.length - 1] / pts[0] - 1) * 100;
+    g.font = "600 20px 'Saira Condensed', sans-serif"; g.fillText(`${chg >= 0 ? "+" : "−"}${num(Math.abs(chg), 1)}% 48u`, 150, 28);
+    g.strokeStyle = "#FFFFFF"; g.lineWidth = 4; g.beginPath();
+    pts.forEach((v, i) => { const x = 8 + i / (pts.length - 1) * 240, y = 150 - (v - lo) / ((hi - lo) || 1) * 100; i ? g.lineTo(x, y) : g.moveTo(x, y); });
+    g.stroke(); g.lineTo(248, 158); g.lineTo(8, 158); g.closePath(); g.fillStyle = "rgba(255,255,255,.12)"; g.fill();
+    if (LIVE.px[m]) { const y = 150 - (pts[pts.length - 1] - lo) / ((hi - lo) || 1) * 100; g.fillStyle = "#FFFFFF"; g.beginPath(); g.arc(248, y, 6, 0, 7); g.fill(); }
+  }
+  t.needsUpdate = true;
+}
+const TINT = { buy: "#7DFFC9", sell: "#FF8A95", hold: "#7F8FB0" };
+
+/* --- figuren --- */
+function makePerson(color, seated, carryColor) {
+  const g = new THREE.Group();
+  const shirt = pmat(color), skin = pmat(shared.skin[Math.floor(Math.random() * shared.skin.length)]);
+  const hairM = pmat(shared.hair[Math.floor(Math.random() * shared.hair.length)]), pants = pmat("#2B2452");
+  const body = new THREE.Mesh(shared.g.body, shirt); body.position.y = seated ? 1.18 : 1.25;
+  const head = new THREE.Mesh(shared.g.head, skin); head.position.y = seated ? 1.84 : 1.92;
+  const hair = new THREE.Mesh(shared.g.hair, hairM); hair.position.set(0, head.position.y + 0.03, 0.02);
+  const armL = new THREE.Mesh(shared.g.arm, shirt), armR = new THREE.Mesh(shared.g.arm, shirt);
+  armL.position.set(-0.33, seated ? 1.42 : 1.5, 0); armR.position.set(0.33, seated ? 1.42 : 1.5, 0);
+  [body, head].forEach(m => { m.castShadow = true; g.add(m); });
+  [hair, armL, armR].forEach(m => g.add(m));
+  g.userData.parts = { body, head, hair, armL, armR };
+  if (seated) {
+    armL.rotation.x = armR.rotation.x = -0.55;
+    const chair = new THREE.Mesh(shared.g.chair, shared.chair); chair.castShadow = true; g.add(chair);
+    const lap = new THREE.Mesh(shared.g.lap, pants); g.add(lap);
+  } else {
+    const legL = new THREE.Mesh(shared.g.leg, pants), legR = new THREE.Mesh(shared.g.leg, pants);
+    legL.position.set(-0.13, 0.82, 0); legR.position.set(0.13, 0.82, 0);
+    [legL, legR].forEach(m => { m.castShadow = true; g.add(m); });
+    g.userData.parts.legL = legL; g.userData.parts.legR = legR;
+    armL.rotation.x = armR.rotation.x = carryColor ? -0.95 : -Math.PI / 2 + 0.05;
+    const carry = new THREE.Mesh(shared.g.carry, new THREE.MeshBasicMaterial({ color: carryColor || "#FFFFFF" }));
+    carry.position.set(0, 1.22, -0.42); carry.visible = !!carryColor; g.add(carry); g.userData.parts.carry = carry;
+  }
+  return g;
+}
+
+/* --- per run: bureaus, analisten, schermen --- */
+let analysts = [], deskRefs = {}, walkers = [], screenRecs = [], hitList = [];
+function rebuildFloor() {
+  if (!renderer) initFloor();
+  dyn.traverse(o => { if (o.isCSS2DObject) o.element.remove(); });
+  scene.remove(dyn); dyn = new THREE.Group(); scene.add(dyn);
+  analysts = []; deskRefs = {}; walkers.forEach(w => w.remove()); walkers = []; screenRecs = []; events.length = 0;
+
+  const livePos = Object.fromEntries((D.books.live?.positions || []).map(p => [p.market, p]));
+  const shPos = Object.fromEntries(D.books.schaduw.positions.map(p => [p.market, p]));
+  const markets = D.markets.slice(0, 15);
+  const nScreens = { buy: 0, sell: 0, hold: 0 };
+  const plan = [];
+  markets.forEach((m, i) => {
+    const dx = L.cols[i % 5], dz = L.rows[Math.floor(i / 5)];
+    D.agents.forEach((a, k) => { const s = D.evaluations[m]?.signals[a.agent]; const act = s?.action || "hold"; nScreens[act]++; plan.push({ m, i, k, a, act, dx, dz, s }); });
+  });
+  // gebundelde vormen: weinig tekenwerk voor 75 werkplekken
+  const IM = (geo, material, n) => { const im = new THREE.InstancedMesh(geo, material, Math.max(1, n)); im.count = n; im.castShadow = true; im.receiveShadow = true; dyn.add(im); return im; };
+  const deskTop = IM(shared.g.deskTop, shared.deskTop, markets.length), deskSideL = IM(shared.g.deskSide, shared.deskSide, markets.length * 2), deskPanel = IM(shared.g.deskPanel, shared.deskSide, markets.length);
+  const privacy = IM(shared.g.privacy, new THREE.MeshStandardMaterial({ color: "#B7ACEF", transparent: true, opacity: 0.55, roughness: 0.3 }), markets.length);
+  const mugs = IM(shared.g.mug, mat("#F4F1FF"), plan.length);
+  const pool = lightPoolTexture();
+  const frames = IM(shared.g.frame, shared.dark, plan.length), stands = IM(shared.g.stand, shared.dark, plan.length), keys = IM(shared.g.keys, shared.dark, plan.length);
+  const M = new THREE.Matrix4(), set = (im, i, x, y, z) => { M.makeTranslation(x, y, z); im.setMatrixAt(i, M); };
+  markets.forEach((m, i) => {
+    const dx = L.cols[i % 5], dz = L.rows[Math.floor(i / 5)];
+    set(deskTop, i, dx, 1.0, dz); set(deskSideL, i * 2, dx - 3.6, 0.48, dz); set(deskSideL, i * 2 + 1, dx + 3.6, 0.48, dz); set(deskPanel, i, dx, 0.55, dz - 0.78);
+    set(privacy, i, dx, 1.28, dz - 0.86);
+    const lp = new THREE.Mesh(new THREE.PlaneGeometry(10, 6), new THREE.MeshBasicMaterial({ map: pool, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 }));
+    lp.rotation.x = -Math.PI / 2; lp.position.set(dx, 0.045, dz + 0.6); dyn.add(lp);
+    const chart = deskChartTexture(m);
+    deskRefs[m] = { dx, dz, chart, mats: Object.fromEntries(["buy", "sell", "hold"].map(k => [k, new THREE.MeshBasicMaterial({ map: chart, color: TINT[k], toneMapped: false })])) };
+    const live = livePos[m], sh = shPos[m];
+    if (live || sh) {
+      const ring = new THREE.Mesh(new THREE.TorusGeometry(4.6, live ? 0.09 : 0.05, 8, 72), new THREE.MeshBasicMaterial({ color: live ? "#FFB547" : "#B9AEFF" }));
+      ring.rotation.x = Math.PI / 2; ring.scale.y = 0.62; ring.position.set(dx, 0.06, dz + 0.7); dyn.add(ring);
+    }
+    const tag = label(deskTagHTML(m), "desk-tag", dx - 3.0, 2.75, dz - 0.95, dyn);
+    tag.element.onclick = () => selectCoin(m);
+    deskRefs[m].tag = tag;
+  });
+  const idx = { buy: 0, sell: 0, hold: 0 };
+  plan.forEach((p, j) => {
+    const mx = p.dx + (p.k - 2) * 1.42, mz = p.dz - 0.5;
+    const scr = new THREE.Mesh(shared.g.screen, deskRefs[p.m].mats[p.act]);
+    scr.position.set(mx, 1.56, mz + 0.035); Object.assign(scr.userData, { pick: "analyst", agent: p.a.name, coin: p.m }); dyn.add(scr); screenRecs.push(scr);
+    set(frames, j, mx, 1.56, mz); set(stands, j, mx, 1.18, mz - 0.02); set(keys, j, mx, 1.07, p.dz + 0.38);
+    if (Math.random() < 0.35) set(mugs, j, mx + 0.45, 1.13, p.dz + 0.25); else set(mugs, j, 0, -5, 0);
+    const person = makePerson(TEAM[p.a.name], true);
+    person.position.set(mx, 0, p.dz + 1.05);
+    person.userData.pick = "analyst"; person.userData.agent = p.a.name; person.userData.coin = p.m;
+    dyn.add(person);
+    analysts.push({ person, agent: p.a.name, coin: p.m, act: p.act, phase: Math.random() * 6.28, seat: { x: mx, z: p.dz + 1.05 }, aisleZ: rowAisle(p.dz), busy: false });
+    if (p.act === "buy") {
+      const mk = label("kopen", "mini", mx, 2.55, p.dz + 1.05, dyn); mk.element.style.background = "#5CF2B3";
+      analysts[analysts.length - 1].marker = mk;
+    }
+  });
+  [deskTop, deskSideL, deskPanel, frames, stands, keys, privacy, mugs].forEach(im => { im.instanceMatrix.needsUpdate = true; });
+  hitList = [deskTop, ...screenRecs, ...analysts.map(a => a.person), ...Object.values(roomRefs).flatMap(r => [r.person, r.hit])];
+  shared.deskTopIM = deskTop;
+
+  drawBigScreen(); drawTicker();
+  ROOMS.forEach(r => setBubble(r.key, roomStatus(r.key), false));
+  legend();
+  if (panelMode === "verslag") showVerslag();
+  else if (selection) reselect();
+  startCycle();
+}
+
+function drawBigScreen(flash) {
+  const c = shared.screenCanvas, g = c.getContext("2d"), live = D.books.live || D.books.schaduw, st = live.stats;
+  g.fillStyle = flash ? "#251A63" : "#120B33"; g.fillRect(0, 0, c.width, c.height);
+  g.fillStyle = "#A9A0D6"; g.font = "500 34px Saira, sans-serif"; g.fillText(D.books.live ? "Echt geld op Kraken" : "Schaduwgeld", 50, 70);
+  g.fillStyle = "#FFB547"; g.font = "700 120px 'Saira Condensed', sans-serif"; g.fillText(eur.format(st.equity), 46, 190);
+  g.fillStyle = st.return_pct >= 0 ? "#5CF2B3" : "#FF6B78"; g.font = "600 46px 'Saira Condensed', sans-serif";
+  g.fillText(`${pct(st.return_pct)} resultaat`, 50, 255);
+  g.fillStyle = "#A9A0D6"; g.font = "500 36px Saira, sans-serif";
+  g.fillText(`BTC vasthouden ${pct(st.benchmark_return_pct)}`, 50, 310);
+  g.fillText(`${live.positions.length} open positie${live.positions.length === 1 ? "" : "s"}, ${st.trades} trades`, 50, 360);
+  g.fillText(`In de markt ${eur.format(live.exposure)}, vrij ${eur.format(live.cash)}`, 50, 410);
+  g.fillText(`Markt ${D.regime.label}, laatste run ${clock(D.generated_ts)}`, 50, 460);
+  const h = live.equity_history || [];
+  const X0 = 700, X1 = 1550, Y0 = 80, Y1 = 460;
+  g.strokeStyle = "rgba(190,170,255,.18)"; g.lineWidth = 2; for (let i = 0; i <= 4; i++) { const y = Y0 + (Y1 - Y0) * i / 4; g.beginPath(); g.moveTo(X0, y); g.lineTo(X1, y); g.stroke(); }
+  if (h.length > 1) {
+    const vals = h.flatMap(p => [p.equity, p.benchmark ?? p.equity]); let lo = Math.min(...vals), hi = Math.max(...vals); const pad = (hi - lo) * 0.1 || hi * 0.01; lo -= pad; hi += pad;
+    const t0 = h[0].ts, t1 = h[h.length - 1].ts, x = t => X0 + (t - t0) / (t1 - t0 || 1) * (X1 - X0), y = v => Y1 - (v - lo) / (hi - lo) * (Y1 - Y0);
+    const line = (key, color, dash) => { g.setLineDash(dash); g.strokeStyle = color; g.lineWidth = 5; g.beginPath(); h.filter(p => p[key] != null).forEach((p, i) => i ? g.lineTo(x(p.ts), y(p[key])) : g.moveTo(x(p.ts), y(p[key]))); g.stroke(); g.setLineDash([]); };
+    line("benchmark", "#7E76B0", [14, 12]); line("equity", "#FFB547", []);
+  } else { g.fillStyle = "#A9A0D6"; g.font = "500 30px Saira"; g.fillText("De grafiek groeit met elke run", X0, 280); }
+  shared.screenTex.needsUpdate = true;
+}
+function drawTicker() {
+  const c = shared.tickerCanvas, g = c.getContext("2d");
+  g.fillStyle = "#0D0828"; g.fillRect(0, 0, c.width, c.height);
+  g.font = "600 52px 'Saira Condensed', sans-serif"; let x = 30;
+  const items = D.markets.map(m => { const e = D.evaluations[m]; const buys = e ? Object.values(e.signals).filter(s => s.action === "buy").length : 0; return { t: `${base(m)} ${price(LIVE.px[m] ?? e?.price)}`, buys }; });
+  while (x < c.width) for (const it of items) { if (x > c.width) break; g.fillStyle = it.buys ? "#5CF2B3" : "#D8D0FF"; g.fillText(it.t, x, 68); x += g.measureText(it.t).width + 70; }
+  shared.tickerTex.needsUpdate = true;
+}
+function deskTagHTML(m) {
+  const live = (D.books.live?.positions || []).find(p => p.market === m), sh = D.books.schaduw.positions.find(p => p.market === m);
+  const pr = LIVE.px[m] ?? D.evaluations[m]?.price;
+  return `${esc(base(m))}<small>${price(pr)}</small>${live ? `<span class="pos">${signed(live.unrealized)}</span>` : sh ? `<span class="pos sh">schaduw</span>` : ""}`;
+}
+
+function moneyHTML() {
+  const live = D.books.live;
+  if (!live) return `<h2>Je geld</h2><p class="src">Alleen schaduwgeld actief.</p>`;
+  const eq = live.stats.equity, inv = live.exposure, free = live.cash, L = D.risk_limits;
+  const allIn = String(D.budget_eur).toLowerCase() === "alles";
+  const pc = v => eq ? v / eq * 100 : 0;
+  const riskEur = eq * L.risk_per_trade_pct / 100;
+  const lo = Math.min(riskEur / 0.12, eq * L.max_position_pct / 100, free * 0.99), hi = Math.min(riskEur / 0.06, eq * L.max_position_pct / 100, free * 0.99);
+  const slots = L.max_open_positions - live.positions.length;
+  return `<h2>Je geld</h2>
+    <div class="total">${eur.format(eq)}</div>
+    <p class="src">${allIn ? "Heel je vrije euro-saldo op Kraken mag gebruikt worden" : `Budget ${eur.format(D.budget_eur)}`}</p>
+    <div class="split" role="img" aria-label="${num(pc(inv), 0)}% in de markt, ${num(pc(free), 0)}% vrij">${live.positions.map((p, i) => `<i class="pos${i + 1}" style="width:${pc(p.value)}%" title="${esc(p.market)}"></i>`).join("")}</div>
+    <div class="row"><span>In de markt</span><b style="color:var(--money)">${eur.format(inv)} (${num(pc(inv), 0)}%)</b></div>
+    ${live.positions.map(p => `<div class="row"><span>&nbsp;&nbsp;${esc(base(p.market))}</span><span>${eur.format(p.value)} (${num(pc(p.value), 0)}%) <span class="${p.unrealized >= 0 ? "up" : "down"}">${signed(p.unrealized)}</span></span></div>`).join("")}
+    <div class="row"><span>Vrij</span><b>${eur.format(free)} (${num(pc(free), 0)}%)</b></div>
+    <div class="rules">
+      <div class="row"><span>Max verlies per trade</span><span>${num(L.risk_per_trade_pct, 1)}% = ${eur.format(riskEur)}</span></div>
+      <div class="row"><span>Max per positie</span><span>${L.max_position_pct}% = ${eur.format(eq * L.max_position_pct / 100)}</span></div>
+      <div class="row"><span>Max posities</span><span>${L.max_open_positions} (${live.positions.length} in gebruik)</span></div>
+      <div class="row"><span>Max in de markt</span><span>${L.max_exposure_pct}%</span></div>
+      <div class="row"><span>Noodstop bij daling van</span><span>${L.max_drawdown_pct}%</span></div>
+    </div>
+    <div class="next">${slots > 0 && hi >= 1 ? `Volgende trade: ongeveer <b>${eur.format(lo)} tot ${eur.format(hi)}</b>, afhankelijk van hoe ver de stop-loss ligt. Kleiner dan het Kraken-minimum wordt afgerond naar dat minimum.` : slots <= 0 ? "Alle posities zijn bezet; nieuwe trades wachten tot er een verkocht is." : "Te weinig vrij geld voor een nieuwe trade."}</div>`;
+}
+
+function legend() {
+  document.getElementById("money").innerHTML = moneyHTML();
+  document.getElementById("legend").innerHTML = `<details><summary style="cursor:pointer;color:var(--muted)">Legenda</summary><p style="margin-top:6px">Team (kleur van het shirt)</p>${D.agents.map(a => `<div><span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}${a.status === "live" ? ` <span style="color:var(--money)">echt geld</span>` : ""}</div>`).join("")}
+    <p style="margin-top:8px">Schermen: koers van de munt, 48 uur</p><div><span class="sw" style="background:#5CF2B3"></span>agent wil kopen</div><div><span class="sw" style="background:#FF6B78"></span>negatief</div><div><span class="sw" style="background:#7F8FB0"></span>afwachten</div>
+    <p style="margin-top:8px">Ring om een bureau</p><div><span class="sw" style="background:#FFB547"></span>positie met echt geld</div><div><span class="sw" style="background:#B9AEFF"></span>schaduwpositie</div></details>`;
+}
+function setBubble(key, text, hot) {
+  const b = roomRefs[key].bubble.element; b.textContent = text; b.className = "bubble" + (hot ? " hot" : " quiet");
+}
+
+/* --- lopen over de vloer --- */
+const nearest = (arr, v) => arr.reduce((a, b) => Math.abs(b - v) < Math.abs(a - v) ? b : a);
+function route(a, b) {
+  if (Math.abs(a.z - b.z) < 0.01) return [{ x: b.x, z: b.z }];
+  const ax = nearest(L.aisles, a.x);
+  return [{ x: ax, z: a.z }, { x: ax, z: b.z }, { x: b.x, z: b.z }];
+}
+const roomDoor = (key, off = 0) => [{ x: ROOM[key].x + off, z: L.corridor }, { x: ROOM[key].x + off, z: L.roomFront + 0.6 }, { x: ROOM[key].x + off, z: L.roomFront - 1.0 }];
+class Walker {
+  constructor(color, carry, info) {
+    this.g = makePerson(color, false, carry); this.g.userData = { ...this.g.userData, ...info }; dyn.add(this.g);
+    this.path = []; this.speed = 3.0; this.wait = 0; this.t = Math.random() * 6; hitList.push(this.g); walkers.push(this);
+  }
+  at(p) { this.g.position.set(p.x, 0, p.z); return this; }
+  go(points, done) { this.path.push(...points); if (done) this.path.push({ fn: done }); return this; }
+  remove() { dyn.remove(this.g); const i = hitList.indexOf(this.g); if (i >= 0) hitList.splice(i, 1); }
+  update(dt) {
+    const P = this.g.userData.parts; this.t += dt;
+    if (this.wait > 0) { this.wait -= dt; P.legL.rotation.x = P.legR.rotation.x = 0; return; }
+    const tgt = this.path[0];
+    if (!tgt) { P.legL.rotation.x = P.legR.rotation.x = 0; return; }
+    if (tgt.fn) { this.path.shift(); tgt.fn(this); return; }
+    if (tgt.wait) { this.path.shift(); this.wait = tgt.wait; if (tgt.then) tgt.then(this); return; }
+    const pos = this.g.position, dx = tgt.x - pos.x, dz = tgt.z - pos.z, dist = Math.hypot(dx, dz);
+    const step = this.speed * dt;
+    if (dist <= step) { pos.x = tgt.x; pos.z = tgt.z; this.path.shift(); }
+    else { pos.x += dx / dist * step; pos.z += dz / dist * step; this.g.rotation.y = Math.atan2(-dx, -dz); }
+    const sw = Math.sin(this.t * 11) * 0.55;
+    P.legL.rotation.x = sw; P.legR.rotation.x = -sw;
+    if (P.carry.visible) { P.armL.rotation.x = P.armR.rotation.x = -0.95; }
+    else { P.armL.rotation.x = -Math.PI / 2 + 0.05 - sw * 0.7; P.armR.rotation.x = -Math.PI / 2 + 0.05 + sw * 0.7; }
+    P.body.position.y = 1.25 + Math.abs(Math.sin(this.t * 11)) * 0.04;
+  }
+}
+
+/* --- de cyclus: wat er op de vloer gebeurt --- */
+const CYCLE = 40;
+let events = [], cycleNo = 0, phaseName = "", typingBoost = 1;
+function at(t, fn) { events.push({ t, fn }); events.sort((a, b) => a.t - b.t); }
+function caption(phase, text) { phaseName = phase; document.getElementById("now").innerHTML = `<b>${phase}</b>${esc(text)}`; }
+function startCycle() {
+  clockT = 0; cycleNo++;
+  // vaste rondes: twee datakoeriers en de prestatie-agent
+  const courier = (offset) => {
+    const w = new Walker(ROOM.data.color, "#7FD7FF", { pick: "room", key: "data" });
+    w.at({ x: ROOM.data.x + offset, z: L.roomFront - 1.0 });
+    const loop = () => {
+      const desks = Object.entries(deskRefs).filter((_, i) => i % 2 === (offset > 0 ? 1 : 0));
+      let cur = { x: ROOM.data.x + offset, z: L.corridor };
+      const pts = [{ x: ROOM.data.x + offset, z: L.roomFront + 0.6 }, cur];
+      desks.forEach(([m, d]) => { const tgt = { x: d.dx + (offset > 0 ? 1.2 : -1.2), z: rowAisle(d.dz) }; pts.push(...route(cur, tgt), { wait: 0.5, then: () => ping(m) }); cur = tgt; });
+      pts.push(...route(cur, { x: ROOM.data.x + offset, z: L.corridor }), { x: ROOM.data.x + offset, z: L.roomFront - 1.0 }, { wait: 2 });
+      w.go(pts, loop);
+    };
+    loop();
+  };
+  if (!REDUCED) { courier(-0.8); courier(0.8); }
+  if (!REDUCED) {
+    const p = new Walker(ROOM.prestatie.color, "#FFFFFF", { pick: "room", key: "prestatie" });
+    p.speed = 2.0; p.at({ x: ROOM.prestatie.x, z: L.roomFront - 1.0 });
+    const loop = () => {
+      const pick = analysts.filter(() => Math.random() < 0.06).slice(0, 4);
+      let cur = { x: ROOM.prestatie.x, z: L.corridor };
+      const pts = [{ x: ROOM.prestatie.x, z: L.roomFront + 0.6 }, cur];
+      pick.forEach(a => { const tgt = { x: a.seat.x, z: a.aisleZ - 0.6 }; pts.push(...route(cur, { x: a.seat.x, z: a.aisleZ }), tgt, { wait: 1.6 }, { x: a.seat.x, z: a.aisleZ }); cur = { x: a.seat.x, z: a.aisleZ }; });
+      pts.push(...route(cur, { x: ROOM.prestatie.x, z: L.corridor }), { x: ROOM.prestatie.x, z: L.roomFront - 1.0 }, { wait: 4 });
+      p.go(pts, loop);
+    };
+    loop();
+  }
+  scheduleCycle(0);
+}
+function scheduleCycle(t0) {
+  const buys = buyList().slice(0, 6), ev = lastRunEvents(), scan = D.scan_history?.[0] || {};
+  const ent = ev.filter(e => e.type === "entry"), ex = ev.filter(e => e.type === "exit"),
+        val = ev.filter(e => e.type === "validated"), bl = ev.filter(e => e.type === "blocked");
+  const orders = [...ent, ...ex, ...val];
+
+  at(t0, () => {
+    caption("Radar & Data", `De receptie bekijkt de markt: ${D.scanner?.eligible_count || 0} EUR-markten gezien, ${D.scanner?.pool_count || 0} gerankt`);
+    ROOMS.forEach(r => setBubble(r.key, roomStatus(r.key), false));
+    setBubble("data", roomStatus("data"), true);
+  });
+  at(t0 + 4, () => {
+    setBubble("data", roomStatus("data"), false);
+    caption("Trading desks", "Fast 15m, Swing 1u en Trend 4u werken ieder op hun eigen klok");
+    ["fast","swing","trend"].forEach(k => setBubble(k, roomStatus(k), !!scan.desks?.[k]));
+    typingBoost = scan.desks?.fast ? 3.0 : 1.4;
+  });
+  at(t0 + 9, () => {
+    typingBoost = 1;
+    ["fast","swing","trend"].forEach(k => setBubble(k, roomStatus(k), false));
+    caption("Markt & Research", `Crypto is ${D.regime.label}; China/HK draait als aparte researchafdeling`);
+    setBubble("markt", roomStatus("markt"), true); setBubble("equity", roomStatus("equity"), true);
+  });
+  at(t0 + 14, () => {
+    setBubble("markt", roomStatus("markt"), false); setBubble("equity", roomStatus("equity"), false);
+    caption("Prestatie", "De kwaliteitsafdeling controleert welke strategieën echt geld mogen gebruiken");
+    setBubble("prestatie", roomStatus("prestatie"), true);
+  });
+  at(t0 + 18, () => {
+    setBubble("prestatie", roomStatus("prestatie"), false);
+    caption("Directie", buys.length ? `${buys.length} koopadvies${buys.length > 1 ? "en" : ""} worden gewogen` : "Er ligt geen koopadvies op tafel");
+    setBubble("beslis", roomStatus("beslis"), true);
+  });
+  at(t0 + 23, () => {
+    setBubble("beslis", roomStatus("beslis"), false);
+    caption("Risk", bl.length ? `Risk houdt ${bl.map(e => base(e.market)).join(", ")} tegen` : "Risk controleert inzet, verlieslimieten en correlatie");
+    setBubble("risico", roomStatus("risico"), true);
+  });
+  at(t0 + 27, () => {
+    setBubble("risico", roomStatus("risico"), false);
+    caption("Treasury", D.books.live ? `${eur.format(D.books.live.cash)} vrij op Kraken, ${eur.format(D.books.live.exposure)} belegd` : "Geen live kapitaal");
+    setBubble("kapitaal", roomStatus("kapitaal"), true);
+  });
+  at(t0 + 30, () => {
+    setBubble("kapitaal", roomStatus("kapitaal"), false);
+    caption("Execution", orders.length ? `${ent.length} koop, ${ex.length} verkoop; orders naar Kraken` : "Geen nieuwe order; bestaande Kraken-stops blijven bewaakt");
+    setBubble("uitvoer", roomStatus("uitvoer"), true);
+  });
+  at(t0 + 35, () => {
+    setBubble("uitvoer", roomStatus("uitvoer"), false);
+    caption("Operations", "Verslag, trades en scanlog worden bijgewerkt");
+    setBubble("monitor", roomStatus("monitor"), true);
+    drawBigScreen(true); setTimeout(() => drawBigScreen(false), 700);
+  });
+  at(t0 + CYCLE, () => {
+    setBubble("monitor", roomStatus("monitor"), false);
+    scheduleCycle(t0 + CYCLE);
+  });
+}
+function ping(m) { const t = deskRefs[m]?.tag.element; if (!t) return; t.classList.remove("ping"); void t.offsetWidth; t.classList.add("ping"); }
+let gatePulse = 0;
+
+/* --- elke frame --- */
+let lastT = performance.now();
+function frame(now) {
+  const dt = Math.min(0.05, (now - lastT) / 1000); lastT = now;
+  update(dt); draw();
+}
+function draw() {
+  const t = controls.target; t.x = Math.max(-26, Math.min(26, t.x)); t.z = Math.max(-20, Math.min(14, t.z));
+  controls.update();
+  renderer.render(scene, camera); labels.render(scene, camera);
+}
+function update(dt) {
+  clockT += dt;
+  while (events.length && events[0].t <= clockT) events.shift().fn();
+  if (!REDUCED) {
+    for (const a of analysts) {
+      if (a.busy) continue;
+      const P = a.person.userData.parts, sp = 9 * typingBoost * (a.act === "buy" ? 1.4 : 1) * (a.alert ? 2.6 : 1);
+      P.armL.rotation.x = -0.55 + Math.sin(clockT * sp + a.phase) * 0.13;
+      P.armR.rotation.x = -0.55 + Math.sin(clockT * sp + a.phase + 2.2) * 0.13;
+      P.head.position.y = 1.84 + Math.sin(clockT * 1.7 + a.phase) * 0.02;
+      P.hair.position.y = P.head.position.y + 0.03;
+      P.head.rotation.y = P.hair.rotation.y = Math.max(0, Math.sin(clockT * 0.23 + a.phase * 3) - 0.75) * 2.2 * (a.phase > 3.14 ? 1 : -1);
+      a.person.rotation.y = Math.sin(clockT * 0.4 + a.phase) * 0.08;
+    }
+    shared.tickerTex.offset.x = (shared.tickerTex.offset.x + dt * 0.012) % 1;
+    for (const w of walkers) w.update(dt);
+    Object.values(roomRefs).forEach((r, i) => { const P = r.person.userData.parts; P.armL.rotation.x = -0.55 + Math.sin(clockT * 7 + i) * 0.1; P.armR.rotation.x = -0.55 + Math.sin(clockT * 7 + i + 2) * 0.1; });
+    gatePulse = Math.max(0, gatePulse - dt);
+    gateRing.scale.setScalar(1 + gatePulse * 0.12); gateDisc.material.color.set(gatePulse > 0 ? "#FFB547" : "#4B2E7E");
+    gateDisc.material.opacity = 0.75 + Math.sin(clockT * 2) * 0.15;
+    if (selMarker) selMarker.rotation.z += dt * 1.5;
+  }
+}
+
+/* --- aanklikken --- */
+const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+let down = null, selection = null, selMarker = null;
+function pick(ev) {
+  const r = renderer.domElement.getBoundingClientRect();
+  ptr.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
+  ray.setFromCamera(ptr, camera);
+  const hits = ray.intersectObjects(hitList, true);
+  for (const h of hits) {
+    let o = h.object;
+    if (o.isInstancedMesh) {
+      if (o === shared.deskTopIM) return { kind: "coin", coin: Object.keys(deskRefs)[h.instanceId] };
+      continue;
+    }
+    while (o && !o.userData.pick) o = o.parent;
+    if (!o) continue;
+    if (o.userData.pick === "analyst") return { kind: "analyst", agent: o.userData.agent, coin: o.userData.coin };
+    if (o.userData.pick === "room") return { kind: "room", key: o.userData.key };
+  }
+  return null;
+}
+function setupPicking() {
+  const cv = renderer.domElement;
+  cv.addEventListener("pointerdown", e => { down = { x: e.clientX, y: e.clientY }; });
+  cv.addEventListener("pointerup", e => {
+    if (!down || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 6 || e.button !== 0) return;
+    const p = pick(e);
+    if (!p) return;
+    if (p.kind === "analyst") selectAnalyst(p.agent, p.coin);
+    if (p.kind === "coin") selectCoin(p.coin);
+    if (p.kind === "room") selectRoom(p.key);
+  });
+  let lastMove = 0;
+  cv.addEventListener("pointermove", e => { if (performance.now() - lastMove < 80 || e.buttons) return; lastMove = performance.now(); cv.style.cursor = pick(e) ? "pointer" : "grab"; });
+  addEventListener("keydown", e => { if (e.key === "Escape") { clearSelection(); showVerslag(); } });
+}
+function mark(x, z, r = 0.9, color = "#FFB547") {
+  if (selMarker) scene.remove(selMarker);
+  selMarker = new THREE.Mesh(new THREE.RingGeometry(r * 0.82, r, 40, 1, 0, Math.PI * 1.6), new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide }));
+  selMarker.rotation.x = -Math.PI / 2; selMarker.position.set(x, 0.08, z); scene.add(selMarker);
+}
+function clearSelection() { selection = null; if (selMarker) { scene.remove(selMarker); selMarker = null; } }
+function selectAnalyst(agent, coin) {
+  if (COMPACT) return openPanel(analystHTML(agent, coin), "analyst");
+  selection = { kind: "analyst", agent, coin };
+  const a = analysts.find(x => x.agent === agent && x.coin === coin); if (a) mark(a.seat.x, a.seat.z, 0.75);
+  openPanel(analystHTML(agent, coin), "analyst");
+}
+function selectCoin(coin) {
+  if (COMPACT) return openPanel(coinHTML(coin), "coin");
+  selection = { kind: "coin", coin };
+  const d = deskRefs[coin]; if (d) mark(d.dx, d.dz + 0.6, 4.2);
+  openPanel(coinHTML(coin), "coin");
+}
+function selectRoom(key) {
+  if (COMPACT) return openPanel(roomHTML(key), "room");
+  selection = { kind: "room", key };
+  mark(ROOM[key].x, L.roomZ, (ROOM[key].w || 6) / 2 + 0.3);
+  openPanel(roomHTML(key), "room");
+}
+function reselect() { const s = selection; if (!s) return; if (s.kind === "analyst") selectAnalyst(s.agent, s.coin); if (s.kind === "coin") selectCoin(s.coin); if (s.kind === "room") selectRoom(s.key); }
+window.selectCoin = selectCoin;
+
+/* ============ start ============ */
+setInterval(tickClocks, 1000); tickClocks();
+setInterval(applyLive, 1000);
+if (COMPACT) { document.body.classList.remove("floor"); document.getElementById("loading").hidden = true; }
+load();
+setInterval(load, 60 * 1000);
+document.fonts?.ready.then(() => { if (D && !COMPACT && shared.screenCanvas) { drawBigScreen(); drawTicker(); } });
+window.__floor = { step: sec => { for (let i = 0; i < sec / 0.05; i++) update(0.05); draw(); }, pick: (x, y) => pick({ clientX: x, clientY: y }), analysts: () => analysts, project: (x, y, z) => { const v = new THREE.Vector3(x, y, z).project(camera); return { x: (v.x + 1) / 2 * innerWidth, y: (1 - v.y) / 2 * innerHeight }; } };
+</script>
+</body>
+</html>
