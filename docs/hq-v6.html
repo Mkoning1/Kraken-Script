@@ -68,7 +68,7 @@ button{font:inherit}
 <aside class="right" id="detail"><h1>Kraken Agents HQ</h1><p class="sub">Klik op een kantoor om naar binnen te kijken.</p><div class="status"><b>Kantooroverzicht</b>Losse kantoren liggen rond echte gangen. Actieve teams lichten op en medewerkers brengen dossiers fysiek naar de volgende afdeling.</div></aside>
 <div class="caption"><div id="caption"><b>HQ</b>Live botdata wordt geladen…</div></div>
 <div class="tools">
- <button id="overview">Campus</button><button id="analysisfocus">Analyse</button><button id="managementfocus">Management</button><button id="tradefocus">Tradefloor</button><button id="ownerfocus">Owner</button>
+ <button id="overview">Campus</button><button id="commandfocus">Command Center</button><button id="analysisfocus">Analyse</button><button id="managementfocus">Management</button><button id="tradefocus">Tradefloor</button><button id="ownerfocus">Owner</button>
  <button id="follow">Volg dossier</button><button id="autocam">Autocamera</button><button id="sound">Geluid uit</button>
  <span>Links slepen = schuiven · scroll = zoomen · rechts slepen = draaien</span>
 </div>
@@ -282,11 +282,16 @@ function decorateDepartment(g,f,W,D,H){
    box(g,6.6,.22,2.5,mat("#ddd6f4"),0,.88,-.7);monitor(g,0,H-1.35,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.55,back+.12,"#ffffff","",7.0,1.0);
    loungeSeat(g,-3.2,2.4,.2);loungeSeat(g,3.2,2.4,-.2);plant(g,-W/2+1.0,2.8,1.15);plant(g,W/2-1.0,2.8,1.15);
    const boss=makePerson("#ffffff",true,1.08);boss.position.set(0,.15,.75);g.add(boss);workers.push({g:boss,key:f.key,phase:Math.random()*6.2,seated:true});
+   const assistant=makePerson("#c9bdff",false,1.03);assistant.position.set(-4.6,.15,-1.2);g.add(assistant);walkers.push({g:assistant,key:f.key,phase:Math.random()*6.2,baseX:-4.6,baseZ:-1.2,range:1.6});
  }
  if(f.trade){
-   wallBoard(g,"trade","LIVE POSITIONS",0,H-1.35,back+.12,"#ffb547","",10.5,1.05);
-   for(let i=0;i<4;i++){const b=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-2.65,back+.12,"#ffffff","",5.2,.72);tradePositionBoards.push(b)}
-   staticSign(g,"LIVE DEALING FLOOR",0,H-3.65,back+.12,"#ffb547",10,.7);
+   wallBoard(g,"trade","LIVE POSITIONS",0,H-1.25,back+.12,"#ffb547","",11.5,1.05);
+   for(let i=0;i<4;i++){const b=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-2.55,back+.12,"#ffffff","",5.2,.72);tradePositionBoards.push(b)}
+   wallBoard(g,"tradeTicker","BTC · ETH · RADAR",0,H-3.55,back+.12,"#c9bdff","",18,.66);
+   // Supervisor rail achter de dealing rows
+   box(g,13,.30,2.0,mat("#cfc8e8"),0,.95,5.7);for(let i=-1;i<=1;i++){const p=makePerson("#ffb547",false,1.06);p.position.set(i*4.2,.15,5.1);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:2.0})}
+   // Side market wall and Kraken gate
+   wallBoard(g,"tradeMarket","MARKET FLOW",W/2-1.0,4.8,-1.8,"#5cf2b3","",6.0,.8);
    const gate=new THREE.Mesh(new THREE.TorusGeometry(1.45,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.3,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);staticSign(g,"KRAKEN GATE",-W/2+2.1,4.8,-1,"#ffb547",4.2,.6);
  }
 }
@@ -339,6 +344,8 @@ function buildShaft(){
  // Hoofdingang en receptie
  box(g,28,.25,13,mat("#302655"),0,.13,-27,false);box(g,6.2,.22,22,floorMat,0,.12,-10,false);
  box(g,8.2,1.0,2.1,mat("#dcd5ed"),0,.62,-28,false);staticSign(g,"RECEPTIE",0,1.55,-27.95,"#ffb547",4.4,.58);
+ const receptionist=makePerson("#c9bdff",true,1.06);receptionist.position.set(0,.15,-26.8);g.add(receptionist);workers.push({g:receptionist,key:"ops",phase:Math.random()*6.2,seated:true});
+ for(let i=0;i<3;i++){const p=makePerson(["#8fa8e8","#d49bea","#ffffff"][i],false,1.03);p.position.set(-9+i*9,.15,4+i*.7);g.add(p);walkers.push({g:p,key:i===0?"data":i===1?"directie":"ops",phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:4.2})}
  // glazen dubbele entree
  const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.18,roughness:.04,depthWrite:false});
  box(g,5.8,4.7,.08,glass,0,2.35,-33.2,false);box(g,.09,4.7,.25,mat("#8b7bc5"),0,2.35,-33.1,false);
@@ -422,7 +429,8 @@ function focusFloor(key,fromAuto=false){
 }
 function setPreset(name){
  followCourier=false;document.getElementById("follow").classList.remove("on");selected=null;controls.enabled=true;
- if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
+ if(name==="command")setCamGoal([34,28,34],[0,1.4,6],1.25);
+ else if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
  else if(name==="management")setCamGoal([60,46,77],[0,0,27],.9);
  else if(name==="trade")focusFloor("trade");
  else if(name==="owner")focusFloor("owner");
@@ -522,6 +530,8 @@ function updateWallboards(){
  const hallTrade=(live?.trades||[])[0];setBoard("hallLast",hallTrade?`${hallTrade.market} · ${hallTrade.pnl_pct>=0?"+":""}${num(hallTrade.pnl_pct||0,1)}%`:"LAATSTE TRADE —");
  setBoard("corridorMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
  const tick=(D.scanner?.candidates||[]).slice(0,3).map(x=>`${String(x.market||"").split("/")[0]} ${(Number(x.change_pct)||0)>=0?"+":""}${num(Number(x.change_pct)||0,1)}%`).join(" · ");setBoard("ticker",tick||"RADAR —");
+ setBoard("tradeTicker",tick||"BTC · ETH · RADAR");
+ setBoard("tradeMarket",`${String(D.regime?.label||"MARKT").toUpperCase()} · STRESS ${num(marketStress()*100,0)}%`);
  const lt=(live?.trades||[])[0];setBoard("tradeTape",lt?`${lt.market} · ${lt.pnl_pct>=0?"+":""}${num(lt.pnl_pct||0,1)}% · ${eur.format(lt.pnl||0)}`:"LAST TRADE —");
  const pos=live?.positions||[];tradePositionBoards.forEach((rec,i)=>{const p=pos[i];rec.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff";renderBoard(rec,p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`)});
  const eq=st?.equity||0,cash=live?.cash||0,expo=live?.exposure||0,vals={cash:eq?cash/eq:0,exposure:eq?expo/eq:0,room:eq?Math.max(0,1-expo/eq):1};
@@ -594,6 +604,7 @@ try{
   window.__showHQBootError(err);
 }
 document.getElementById("overview").addEventListener("click",resetView);
+document.getElementById("commandfocus").addEventListener("click",()=>setPreset("command"));
 document.getElementById("analysisfocus").addEventListener("click",()=>setPreset("analysis"));
 document.getElementById("managementfocus").addEventListener("click",()=>setPreset("management"));
 document.getElementById("tradefocus").addEventListener("click",()=>setPreset("trade"));
