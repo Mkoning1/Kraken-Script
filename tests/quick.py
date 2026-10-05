@@ -143,6 +143,18 @@ def unit_checks():
     assert pos["cooldown_sec"] == 2700, "positie bewaart desk-cooldown niet"
     print("GOED  timeframe-aware positie")
 
+    from agents.learning import LearningAgent
+    fake_state = {
+        "agent_stats": {"momentum": {"r":[{"r":1.0,"book":"schaduw"}],"pnl_live":0,"pnl_schaduw":10,"trades":1,"wins":1,"live_since":None}},
+        "agent_status": {"momentum":"live"},
+        "agent_timeframes": {"momentum":60},
+    }
+    LearningAgent(fake_state, cfg_all["learning"], cfg_all["promotion"], cfg_all["agents"], {}, cfg_all["backtest"]["min_trades"])
+    assert fake_state["agent_timeframes"]["momentum"] == 15, "nieuw momentum-timeframe niet opgeslagen"
+    assert "momentum" not in fake_state["agent_stats"], "oude 1u momentum-statistiek niet gereset"
+    assert fake_state["agent_status"]["momentum"] == "schaduw", "gewijzigde agent hoort opnieuw in schaduw te starten"
+    print("GOED  timeframe-migratie reset oude agentstatistiek")
+
     from agents.equities import EquityScout, update_paper_book
     class EquityProvider:
         def history(self, symbols, period="6mo"):
