@@ -1047,7 +1047,7 @@ class Walker {
 }
 
 /* --- de cyclus: wat er op de vloer gebeurt --- */
-const CYCLE = 30;
+const CYCLE = 40;
 let events = [], cycleNo = 0, phaseName = "", typingBoost = 1;
 function at(t, fn) { events.push({ t, fn }); events.sort((a, b) => a.t - b.t); }
 function caption(phase, text) { phaseName = phase; document.getElementById("now").innerHTML = `<b>${phase}</b>${esc(text)}`; }
@@ -1084,46 +1084,63 @@ function startCycle() {
   scheduleCycle(0);
 }
 function scheduleCycle(t0) {
-  const buys = buyList().slice(0, 6), ev = lastRunEvents();
-  const ent = ev.filter(e => e.type === "entry"), ex = ev.filter(e => e.type === "exit"), val = ev.filter(e => e.type === "validated"), bl = ev.filter(e => e.type === "blocked");
+  const buys = buyList().slice(0, 6), ev = lastRunEvents(), scan = D.scan_history?.[0] || {};
+  const ent = ev.filter(e => e.type === "entry"), ex = ev.filter(e => e.type === "exit"),
+        val = ev.filter(e => e.type === "validated"), bl = ev.filter(e => e.type === "blocked");
   const orders = [...ent, ...ex, ...val];
-  at(t0, () => { caption("Waarnemen", `Data-agent brengt verse koersen van ${D.markets.length} munten naar de bureaus`); ROOMS.forEach(r => setBubble(r.key, roomStatus(r.key), false)); setBubble("data", `Koersen ophalen: ${D.markets.length} munten`, true); });
-  at(t0 + 5, () => { caption("Analyseren", `${D.agents.length} teams beoordelen elke munt: ${buys.length}× kopen`); typingBoost = 3.2; setBubble("data", roomStatus("data"), false); setBubble("markt", `Markt ${D.regime.label}`, true); });
-  at(t0 + 10, () => {
-    typingBoost = 1; setBubble("markt", roomStatus("markt"), false);
-    if (!buys.length) { caption("Beslissen", "Geen enkele agent wil kopen; de Beslis-agent heeft niets op tafel"); setBubble("beslis", "Geen koopadvies deze ronde", true); return; }
-    caption("Beslissen", `${buys.length} analist${buys.length > 1 ? "en brengen" : " brengt"} een koopadvies naar de Beslis-agent`);
-    setBubble("beslis", "Wacht op de adviezen…", true);
-    buys.forEach((b, i) => {
-      const an = analysts.find(a => a.agent === b.agent && a.coin === b.coin); if (!an || an.busy || REDUCED) return;
-      an.busy = true; an.person.visible = false; if (an.marker) an.marker.visible = false;
-      const w = new Walker(TEAM[b.agent], "#5CF2B3", { pick: "analyst", agent: b.agent, coin: b.coin });
-      w.at(an.seat); w.speed = 3.4;
-      const off = (i - (buys.length - 1) / 2) * 0.8, aisle = { x: an.seat.x, z: an.aisleZ };
-      const there = [aisle, ...route(aisle, { x: ROOM.beslis.x + off, z: L.corridor }), ...roomDoor("beslis", off).slice(1)];
-      w.go([...there, { wait: 1.4, then: () => { setBubble("beslis", `Ontvangen: ${b.label} op ${base(b.coin)}, sterkte ${num(b.s.strength, 2)}`, true); w.g.userData.parts.carry.visible = false; } }]);
-      w.go([...there.slice().reverse().slice(1), aisle, an.seat], () => { w.remove(); walkers.splice(walkers.indexOf(w), 1); an.person.visible = true; an.busy = false; if (an.marker) an.marker.visible = true; });
-    });
+
+  at(t0, () => {
+    caption("Radar & Data", `De receptie bekijkt de markt: ${D.scanner?.eligible_count || 0} EUR-markten gezien, ${D.scanner?.pool_count || 0} gerankt`);
+    ROOMS.forEach(r => setBubble(r.key, roomStatus(r.key), false));
+    setBubble("data", roomStatus("data"), true);
+  });
+  at(t0 + 4, () => {
+    setBubble("data", roomStatus("data"), false);
+    caption("Trading desks", "Fast 15m, Swing 1u en Trend 4u werken ieder op hun eigen klok");
+    ["fast","swing","trend"].forEach(k => setBubble(k, roomStatus(k), !!scan.desks?.[k]));
+    typingBoost = scan.desks?.fast ? 3.0 : 1.4;
+  });
+  at(t0 + 9, () => {
+    typingBoost = 1;
+    ["fast","swing","trend"].forEach(k => setBubble(k, roomStatus(k), false));
+    caption("Markt & Research", `Crypto is ${D.regime.label}; China/HK draait als aparte researchafdeling`);
+    setBubble("markt", roomStatus("markt"), true); setBubble("equity", roomStatus("equity"), true);
+  });
+  at(t0 + 14, () => {
+    setBubble("markt", roomStatus("markt"), false); setBubble("equity", roomStatus("equity"), false);
+    caption("Prestatie", "De kwaliteitsafdeling controleert welke strategieën echt geld mogen gebruiken");
+    setBubble("prestatie", roomStatus("prestatie"), true);
   });
   at(t0 + 18, () => {
-    caption("Controleren", ent.length ? `Risico-agent keurt goed: ${ent.map(e => base(e.market)).join(", ")}` : val.length ? `Risico-agent keurt goed: ${val.map(e => base(e.market)).join(", ")} (validatie)` : bl.length ? `Risico-agent houdt ${bl.map(e => base(e.market)).join(", ")} tegen` : "Risico-agent controleert de limieten: alles in orde");
-    setBubble("beslis", roomStatus("beslis"), false); setBubble("risico", roomStatus("risico"), true);
+    setBubble("prestatie", roomStatus("prestatie"), false);
+    caption("Directie", buys.length ? `${buys.length} koopadvies${buys.length > 1 ? "en" : ""} worden gewogen` : "Er ligt geen koopadvies op tafel");
+    setBubble("beslis", roomStatus("beslis"), true);
   });
-  at(t0 + 21, () => {
+  at(t0 + 23, () => {
+    setBubble("beslis", roomStatus("beslis"), false);
+    caption("Risk", bl.length ? `Risk houdt ${bl.map(e => base(e.market)).join(", ")} tegen` : "Risk controleert inzet, verlieslimieten en correlatie");
+    setBubble("risico", roomStatus("risico"), true);
+  });
+  at(t0 + 27, () => {
     setBubble("risico", roomStatus("risico"), false);
-    if (!orders.length) { const n = D.books.live ? D.books.live.positions.filter(p => p.stop_on_exchange).length : 0; caption("Uitvoeren", `Geen orders deze run. ${n} stop-loss${n === 1 ? "" : "es"} op Kraken bewaakt`); setBubble("uitvoer", roomStatus("uitvoer"), true); return; }
-    const live = orders.some(o => o.book === "live");
-    caption("Uitvoeren", `Uitvoer-agent brengt ${orders.map(o => (o.type === "exit" ? "verkoop " : "koop ") + base(o.market) + (o.book === "live" ? " (echt geld)" : " (schaduw)")).join(", ")} naar Kraken`);
-    setBubble("uitvoer", "Onderweg naar Kraken", true);
-    if (REDUCED) return;
-    const w = new Walker(ROOM.uitvoer.color, live ? "#FFB547" : "#B9AEFF", { pick: "room", key: "uitvoer" });
-    w.speed = 5.2; w.at({ x: ROOM.uitvoer.x, z: L.roomFront - 1.0 });
-    const there = [{ x: ROOM.uitvoer.x, z: L.roomFront + 0.6 }, { x: ROOM.uitvoer.x, z: L.corridor }, { x: L.aisles[0], z: L.corridor }, { x: L.aisles[0], z: L.gate.z }, { x: -26.4, z: L.gate.z }];
-    w.go([...there, { wait: 0.9, then: () => { gatePulse = 1.6; w.g.userData.parts.carry.visible = false; setBubble("uitvoer", roomStatus("uitvoer"), true); } }]);
-    w.go(there.slice().reverse().slice(1).concat([{ x: ROOM.uitvoer.x, z: L.roomFront - 1.0 }]), () => { w.remove(); walkers.splice(walkers.indexOf(w), 1); });
+    caption("Treasury", D.books.live ? `${eur.format(D.books.live.cash)} vrij op Kraken, ${eur.format(D.books.live.exposure)} belegd` : "Geen live kapitaal");
+    setBubble("kapitaal", roomStatus("kapitaal"), true);
   });
-  at(t0 + 27, () => { caption("Rapporteren", "Monitor-agent zet het verslag en het saldo op het grote scherm"); setBubble("uitvoer", roomStatus("uitvoer"), false); setBubble("monitor", "Verslag bijgewerkt", true); drawBigScreen(true); setTimeout(() => drawBigScreen(false), 700); });
-  at(t0 + CYCLE, () => { setBubble("monitor", roomStatus("monitor"), false); scheduleCycle(t0 + CYCLE); });
+  at(t0 + 30, () => {
+    setBubble("kapitaal", roomStatus("kapitaal"), false);
+    caption("Execution", orders.length ? `${ent.length} koop, ${ex.length} verkoop; orders naar Kraken` : "Geen nieuwe order; bestaande Kraken-stops blijven bewaakt");
+    setBubble("uitvoer", roomStatus("uitvoer"), true);
+  });
+  at(t0 + 35, () => {
+    setBubble("uitvoer", roomStatus("uitvoer"), false);
+    caption("Operations", "Verslag, trades en scanlog worden bijgewerkt");
+    setBubble("monitor", roomStatus("monitor"), true);
+    drawBigScreen(true); setTimeout(() => drawBigScreen(false), 700);
+  });
+  at(t0 + CYCLE, () => {
+    setBubble("monitor", roomStatus("monitor"), false);
+    scheduleCycle(t0 + CYCLE);
+  });
 }
 function ping(m) { const t = deskRefs[m]?.tag.element; if (!t) return; t.classList.remove("ping"); void t.offsetWidth; t.classList.add("ping"); }
 let gatePulse = 0;
