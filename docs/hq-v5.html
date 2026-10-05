@@ -33,7 +33,7 @@ button{font:inherit}
 .card h2{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:#c9bdff;margin:0 0 7px}
 .floor-nav{display:grid;gap:4px}.floor-nav button{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;text-align:left;color:var(--text);background:rgba(255,255,255,.035);border:1px solid transparent;border-radius:4px;padding:5px 7px;cursor:pointer}.floor-nav button:hover,.floor-nav button.active{border-color:var(--edge);background:rgba(143,123,255,.16)}.floor-nav .n{color:var(--muted);font-size:.72rem}.floor-nav .s{width:7px;height:7px;border-radius:50%;background:#5a527a}.floor-nav .s.hot{background:var(--buy);box-shadow:0 0 9px var(--buy)}.floor-nav .s.trade{background:var(--money);box-shadow:0 0 9px var(--money)}
 .moneybox .big{font-size:1.45rem;font-weight:800;color:var(--money)}.moneybox .row{display:flex;justify-content:space-between;gap:8px;font-size:.8rem;margin-top:3px}.moneybox .row span:first-child{color:var(--muted)}
-.right{position:fixed;z-index:6;right:14px;top:70px;width:350px;max-height:calc(100% - 84px);overflow:auto;background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:14px 15px;backdrop-filter:blur(9px)}
+.right{position:fixed;z-index:6;right:14px;top:70px;width:350px;max-height:calc(100% - 245px);overflow:auto;background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:14px 15px;backdrop-filter:blur(9px)}
 .right h1{font-size:1.25rem;margin:0 0 3px}.right .sub{color:var(--muted);font-size:.8rem;margin:0 0 10px}.status{border-left:3px solid var(--accent);background:rgba(143,123,255,.11);padding:8px 9px;margin-bottom:10px}.status b{display:block;font-size:1.05rem}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.mini{background:rgba(255,255,255,.04);border:1px solid rgba(190,170,255,.13);padding:7px}.mini small{display:block;color:var(--muted)}.mini b{font-size:.95rem}.right p{font-size:.84rem;margin:7px 0}.right ul{padding-left:18px;font-size:.83rem;color:var(--muted)}
 .tools{position:fixed;z-index:6;left:270px;bottom:14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 650px)}.tools button{color:var(--text);background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;cursor:pointer}.tools button:hover,.tools button.on{background:rgba(143,123,255,.28);border-color:#a894ff}.tools span{color:var(--muted);font-size:.75rem}
 .caption{position:fixed;z-index:6;left:270px;right:380px;top:70px;pointer-events:none}.caption>div{display:inline-block;background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;font-size:.83rem;backdrop-filter:blur(8px)}.caption b{color:var(--money);margin-right:7px}
@@ -241,7 +241,7 @@ function decorateDepartment(g,f,W,D,H){
  }
  if(f.key==="ops"){
    for(let x=-6;x<=6;x+=3){box(g,2.1,3.4,1.4,mat("#18142f"),x,1.9,-D/2+1.4,false);for(let y=.8;y<3.1;y+=.55)box(g,1.65,.08,.04,new THREE.MeshBasicMaterial({color:y%1.1<.2?"#ffb547":"#5cf2b3",toneMapped:false}),x,y,-D/2+2.12,false)}
-   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.2,back+.12,f.color);beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.2,back+.12,f.color);wallBoard(g,"tradeTape","LAST TRADE —",0,H-2.05,back+.12,"#ffb547");beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
  }
  if(f.key==="owner"){
    box(g,6.4,.22,2.4,mat("#ddd6f4"),0,.9,-1.1);monitor(g,0,H-1.4,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.7,back+.12,"#ffffff");
@@ -305,7 +305,7 @@ function buildShaft(){
  // fysieke richtingsborden
  wallBoard(g,"wingA","← ANALYSE VLEUGEL",-18,1.35,7,"#8fa8e8");wallBoard(g,"wingB","MANAGEMENT VLEUGEL →",18,1.35,7,"#d49bea");wallBoard(g,"wingC","DEALING / OPERATIONS",0,1.35,39,"#ffb547");
  // gang-wallboards
- wallBoard(g,"corridorMarket","MARKT —",-34,1.55,7,"#6fd6b4");wallBoard(g,"corridorRisk","RISK —",22,1.55,39,"#ff7d88");wallBoard(g,"corridorCash","KAPITAAL —",40,1.55,39,"#f4d35e");
+ wallBoard(g,"corridorMarket","MARKT —",-34,1.55,7,"#6fd6b4");wallBoard(g,"ticker","BTC / ETH / RADAR —",0,1.55,7,"#c9bdff");wallBoard(g,"corridorRisk","RISK —",22,1.55,39,"#ff7d88");wallBoard(g,"corridorCash","KAPITAAL —",40,1.55,39,"#f4d35e");
  // parkeer-/entree-markeringen in plaats van zwarte skylineblokken
  for(let x=-52;x<=52;x+=8){box(g,4.5,.03,.08,new THREE.MeshBasicMaterial({color:"#41356f"}),x,.02,-38,false);box(g,.08,.03,7,new THREE.MeshBasicMaterial({color:"#41356f"}),x-2.2,.02,-34.5,false)}
  // couriers: parallelle dossiers
@@ -437,6 +437,8 @@ function updateWallboards(){
  setBoard("owner",live?`EQUITY ${eur.format(st?.equity||0)} · OPEN ${live.positions?.length||0}`:"OWNER VIEW —");
  setBoard("trade",live?.positions?.length?`LIVE · ${live.positions.length} OPEN · ${eur.format(live.exposure)}`:"LIVE POSITIONS · GEEN");
  setBoard("corridorMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
+ const tick=(D.scanner?.candidates||[]).slice(0,3).map(x=>`${String(x.market||"").split("/")[0]} ${(Number(x.change_pct)||0)>=0?"+":""}${num(Number(x.change_pct)||0,1)}%`).join(" · ");setBoard("ticker",tick||"RADAR —");
+ const lt=(live?.trades||[])[0];setBoard("tradeTape",lt?`${lt.market} · ${lt.pnl_pct>=0?"+":""}${num(lt.pnl_pct||0,1)}% · ${eur.format(lt.pnl||0)}`:"LAST TRADE —");
  const pos=live?.positions||[];tradePositionBoards.forEach((el,i)=>{const p=pos[i];el.textContent=p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`;el.style.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff"});
  const eq=st?.equity||0,cash=live?.cash||0,expo=live?.exposure||0,vals={cash:eq?cash/eq:0,exposure:eq?expo/eq:0,room:eq?Math.max(0,1-expo/eq):1};
  for(const b of capitalBars){const ratio=Math.max(.04,Math.min(1,vals[b.type]??0));b.mesh.scale.y=ratio;b.mesh.position.y=b.baseY+(b.maxH*ratio)/2}
@@ -446,6 +448,7 @@ function updateWallboards(){
  const fastLight=floorGroups.fast?.userData.alert;if(fastLight)fastLight.material.color.set(latestScan?.desks?.fast?"#ffb547":"#5a527a");
  updateClocks();
 }
+function marketStress(){const c=D?.scanner?.candidates||[];if(!c.length)return 0;const m=Math.max(...c.slice(0,12).map(x=>Math.abs(Number(x.change_pct)||0)));return Math.max(0,Math.min(1,m/10))}
 function updateUI(){
  if(!D)return;const live=D.books?.live,st=live?.stats;document.getElementById("mode").textContent=D.mode==="live"&&!D.validate_only?"ECHT GELD":"PAPIER";document.getElementById("equity").textContent=st?eur.format(st.equity):"–";document.getElementById("cash").textContent=live?eur.format(live.cash):"–";document.getElementById("exposure").textContent=live?eur.format(live.exposure):"–";document.getElementById("moneytotal").textContent=st?eur.format(st.equity):"–";document.getElementById("moneyfree").textContent=live?eur.format(live.cash):"–";document.getElementById("moneyused").textContent=live?eur.format(live.exposure):"–";
  document.querySelectorAll(".floor-nav button").forEach(b=>{const ff=BYKEY[b.dataset.floor],i=b.querySelector(".s"),hot=floorHot(ff.key);i.className="s"+(ff.trade&&hot?" trade":hot?" hot":"")});document.querySelectorAll(".map-room").forEach(b=>{b.style.opacity=floorHot(b.dataset.floor)?"1":".62"});
@@ -476,7 +479,7 @@ function animateCourier(c,dt){
 }
 function animate(dt){
  clockT+=dt;
- for(const ff of FLOORS){const goal=floorHot(ff.key)?1:.2;activity[ff.key]+=(goal-activity[ff.key])*Math.min(1,dt*2.1)}
+ for(const ff of FLOORS){let goal=floorHot(ff.key)?1:.2;if(ff.key==="trade")goal=Math.max(goal,.24+.62*marketStress());if(ff.key==="market")goal=Math.max(goal,.35+.45*marketStress());activity[ff.key]+=(goal-activity[ff.key])*Math.min(1,dt*2.1)}
  for(const w of workers){const P=w.g.userData.parts,a=activity[w.key]||.2,sp=2.2+8*a;P.armL.rotation.x=-.6+Math.sin(clockT*sp+w.phase)*(.05+.15*a);P.armR.rotation.x=-.6+Math.sin(clockT*sp+w.phase+2)*(.05+.15*a);P.head.rotation.y=Math.sin(clockT*.55+w.phase)*.15}
  for(const w of walkers){const a=activity[w.key]||.2,t=clockT*.24*(.5+2.2*a)+w.phase;w.g.position.x=w.baseX+Math.sin(t)*w.range;w.g.position.z=w.baseZ+Math.cos(t*.72)*1.25;const P=w.g.userData.parts,sw=Math.sin(clockT*(7+4*a)+w.phase)*.5,legs=w.g.userData.legs||[];if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.35-sw*.4;P.armR.rotation.x=-1.35+sw*.4}
  for(const sm of screenMats){const k=.84+.16*Math.sin(clockT*3+sm.phase);sm.mesh.material.color.copy(sm.base).multiplyScalar(k)}
@@ -500,6 +503,14 @@ function connectTicker(){
  ws.onclose=()=>{document.getElementById("livestat").className="live-dot";setTimeout(connectTicker,8000)};
 }
 buildNav();createScene();load();connectTicker();setInterval(load,60000);
-document.getElementById("overview").addEventListener("click",resetView);document.getElementById("tradefocus").addEventListener("click",()=>focusFloor("trade"));
+document.getElementById("overview").addEventListener("click",resetView);
+document.getElementById("analysisfocus").addEventListener("click",()=>setPreset("analysis"));
+document.getElementById("managementfocus").addEventListener("click",()=>setPreset("management"));
+document.getElementById("tradefocus").addEventListener("click",()=>setPreset("trade"));
+document.getElementById("ownerfocus").addEventListener("click",()=>setPreset("owner"));
+document.getElementById("follow").addEventListener("click",e=>{followCourier=!followCourier;autoCamera=false;document.getElementById("autocam").classList.remove("on");e.currentTarget.classList.toggle("on",followCourier);controls.enabled=!followCourier;if(followCourier&&couriers[0]){selected=null;document.getElementById("caption").innerHTML="<b>Camera</b>Volgt het actieve dossier door de campus"}});
+document.getElementById("autocam").addEventListener("click",e=>{autoCamera=!autoCamera;followCourier=false;document.getElementById("follow").classList.remove("on");e.currentTarget.classList.toggle("on",autoCamera);controls.enabled=true;autoAt=0;if(autoCamera)document.getElementById("caption").innerHTML="<b>Autocamera</b>Volgt automatisch de drukste afdelingen"});
+document.getElementById("sound").addEventListener("click",e=>{soundOn=!soundOn;e.currentTarget.textContent=soundOn?"Geluid aan":"Geluid uit";e.currentTarget.classList.toggle("on",soundOn);if(soundOn){tone(720,.08,.03)}});
+
 </script>
 </body></html>
