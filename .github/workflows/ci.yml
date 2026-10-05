@@ -30,7 +30,7 @@ jobs:
           python - <<'PY'
           import re
           from pathlib import Path
-          for name in ("docs/index.html", "docs/details.html", "docs/opportunities.html"):
+          for name in ("docs/index.html", "docs/trades.html", "docs/details.html", "docs/opportunities.html"):
               text = Path(name).read_text()
               scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
               if not scripts:
