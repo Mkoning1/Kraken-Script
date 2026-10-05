@@ -41,10 +41,10 @@ jobs:
               Path("/tmp/dashboard.mjs").write_text("\n".join(scripts))
               subprocess.run(["node", "--check", "/tmp/dashboard.mjs"], check=True)
 
-          text = Path("docs/hq-v5.html").read_text()
+          text = Path("docs/hq-v6.html").read_text()
           scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
           if not scripts:
-              raise SystemExit("geen JavaScript gevonden in docs/hq-v5.html")
+              raise SystemExit("geen JavaScript gevonden in docs/hq-v6.html")
           Path("/tmp/hq.mjs").write_text("\n".join(scripts))
           subprocess.run(["node", "--check", "/tmp/hq.mjs"], check=True)
           PY
