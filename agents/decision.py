@@ -1,6 +1,6 @@
 """Beslis-agent: weegt alle adviezen en zet de koopkansen over alle munten op volgorde.
 
-Per munt en per horizon (kort = 15 minuten, lang = 4 uur):
+Per munt en per desk (fast = 15 minuten, swing = 1 uur, trend = 4 uur):
   score = sterkte beste koopadvies x invloed van die agent (Prestatie-agent)
           + bonus voor elke andere agent met dezelfde horizon die ook 'kopen' zegt
           x marktfase (Markt-agent), tenzij de agent is ingesteld om de marktfase te negeren.
@@ -31,7 +31,9 @@ class DecisionAgent:
     def entries(self, signals, weights, regime_mult, regime):
         """Geeft per horizon de beste koopkans (of de reden waarom niet)."""
         out = []
-        for horizon in ("lang", "kort"):
+        order = ("trend", "swing", "fast")
+        present = [h for h in order if any(self.agents[n].horizon == h for n in signals)]
+        for horizon in present:
             group = {n: s for n, s in signals.items() if self.agents[n].horizon == horizon}
             buys = [(n, s) for n, s in group.items() if s.action == "buy"]
             if not buys:
