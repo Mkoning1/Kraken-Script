@@ -32,9 +32,9 @@ jobs:
           from pathlib import Path
           for name in ("docs/index.html", "docs/details.html"):
               text = Path(name).read_text()
-              scripts = re.findall(r'<script type="module">(.*?)</script>', text, flags=re.S)
+              scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
               if not scripts:
-                  raise SystemExit(f"geen module-script gevonden in {name}")
+                  raise SystemExit(f"geen JavaScript gevonden in {name}")
               Path("/tmp/dashboard.mjs").write_text("\n".join(scripts))
               import subprocess
               subprocess.run(["node", "--check", "/tmp/dashboard.mjs"], check=True)
