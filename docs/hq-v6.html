@@ -210,98 +210,106 @@ function monitor(parent,x,y,z,color,big=false){
  const screen=box(parent,big?2.42:.96,big?1.17:.57,.02,new THREE.MeshBasicMaterial({color,toneMapped:false}),x,y,z+.055,false);
  screenMats.push({mesh:screen,base:new THREE.Color(color),phase:Math.random()*6.2});return frame;
 }
-function addDesk(parent,x,z,yBase,color,workerColor=color){
- box(parent,3.1,.12,1.25,mat("#eeeaff"),x,yBase+.88,z);
- box(parent,.1,.82,1.1,mat("#bdb2ea"),x-1.42,yBase+.43,z);box(parent,.1,.82,1.1,mat("#bdb2ea"),x+1.42,yBase+.43,z);
- monitor(parent,x,yBase+1.55,z-.38,color);
- const p=makePerson(workerColor,true);p.position.set(x,yBase,z+.72);parent.add(p);
- workers.push({g:p,key:parent.userData.key,phase:Math.random()*6.2,seated:true});
+function addDesk(parent,x,z,yBase,color,workerColor=color,dealing=false){
+ const width=dealing?3.0:2.55,depth=dealing?1.05:.92;
+ box(parent,width,.11,depth,mat("#ded9ef"),x,yBase+.84,z);
+ box(parent,.08,.78,depth-.08,mat("#9185bd"),x-width/2+.12,yBase+.42,z);box(parent,.08,.78,depth-.08,mat("#9185bd"),x+width/2-.12,yBase+.42,z);
+ if(dealing){monitor(parent,x-.62,yBase+1.52,z-.34,color);monitor(parent,x+.62,yBase+1.52,z-.34,color)}
+ else monitor(parent,x,yBase+1.52,z-.32,color);
+ const p=makePerson(workerColor,true,1.05);p.position.set(x,yBase,z+.58);parent.add(p);workers.push({g:p,key:parent.userData.key,phase:Math.random()*6.2,seated:true});
  return p;
 }
 function decorateDepartment(g,f,W,D,H){
- const back=-D/2+.26;
- plant(g,-W/2+1.0,D/2-1.2,.8);if(!f.trade)plant(g,W/2-1.0,D/2-1.2,.7);
+ const back=-D/2+.24;
+ plant(g,-W/2+1.0,D/2-1.0,.8);if(!f.trade&&f.key!=="owner")plant(g,W/2-1.0,D/2-1.0,.72);
  if(f.key==="data"){
-   monitor(g,0,H-1.35,back,f.color,true);monitor(g,-3.3,H-1.65,back,f.color);monitor(g,3.3,H-1.65,back,f.color);
-   wallBoard(g,"data","SCAN —",0,H-2.55,back+.12,f.color);wallBoard(g,"dataTop","TOP RADAR —",0,H-3.25,back+.12,f.color);
+   monitor(g,0,H-1.35,back,f.color,true);monitor(g,-3.0,H-1.65,back,f.color);monitor(g,3.0,H-1.65,back,f.color);
+   wallBoard(g,"data","SCAN —",0,H-2.55,back+.12,f.color,"",6.4,1.0);wallBoard(g,"dataTop","TOP RADAR —",0,H-3.7,back+.12,"#5cf2b3","",6.4,.85);
+   lowDivider(g,0,1.55,W-3,.08,f.color);
  }
  if(f.key==="market"){
-   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"market","MARKT —",0,H-2.55,back+.12,f.color);
-   wallBoard(g,"clockAMS","AMS —",-2.8,H-3.15,back+.12);wallBoard(g,"clockNY","NYC —",2.8,H-3.15,back+.12);
+   monitor(g,0,H-1.42,back,f.color,true);wallBoard(g,"market","MARKT —",0,H-2.6,back+.12,f.color,"",6.4,1.0);
+   wallBoard(g,"clockAMS","AMS —",-3,H-3.65,back+.12,"#ffffff","",4.9,.7);wallBoard(g,"clockNY","NYC —",3,H-3.65,back+.12,"#ffffff","",4.9,.7);
  }
  if(f.key==="fast"){
-   for(let x=-4.5;x<=4.5;x+=3)monitor(g,x,H-1.45,back,f.color);
-   wallBoard(g,"fast","FAST DESK —",0,H-2.55,back+.12,f.color);beacon(g,"alert",W/2-1,H-1,D/2-1,f.color);
+   for(let x=-4.2;x<=4.2;x+=2.8)monitor(g,x,H-1.45,back,f.color);
+   wallBoard(g,"fast","FAST DESK —",0,H-2.55,back+.12,f.color,"",6.5,1.0);beacon(g,"alert",W/2-1,H-1,D/2-1,f.color);
+   box(g,6,.04,2.2,mat("#3a2455"),0,.25,2.2,false);
  }
  if(f.key==="swing"){
-   monitor(g,-2.1,H-1.45,back,f.color,true);monitor(g,2.6,H-1.65,back,f.color);
-   wallBoard(g,"swing","SWING SETUPS —",0,H-2.7,back+.12,f.color);
-   box(g,4.8,2.1,.08,mat("#efeafd"),0,2.1,-D/2+.33,false);wallBoard(g,"swingBoard","1H SETUPS",0,2.1,-D/2+.42,"#17113d");
+   monitor(g,-2.1,H-1.42,back,f.color,true);monitor(g,2.5,H-1.62,back,f.color);
+   wallBoard(g,"swing","SWING SETUPS —",0,H-2.65,back+.12,f.color,"",6.2,1.0);
+   wallBoard(g,"swingBoard","1H SETUPS",0,H-3.72,back+.12,"#ffffff","",5.6,.75);
  }
  if(f.key==="trend"){
-   for(let x=-4.1;x<=4.1;x+=4.1)monitor(g,x,H-1.55,back,f.color,true);
-   wallBoard(g,"trend","4H RUNNERS —",0,H-2.85,back+.12,f.color);
+   for(let x=-4;x<=4;x+=4)monitor(g,x,H-1.52,back,f.color,true);
+   wallBoard(g,"trend","4H RUNNERS —",0,H-2.8,back+.12,f.color,"",6.6,1.0);
+   lowDivider(g,0,2.0,W-3,.08,"#7F9BFF");
  }
  if(f.key==="equity"){
-   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"equity","HK RESEARCH —",0,H-2.55,back+.12,f.color);
-   wallBoard(g,"clockHK","HONG KONG —",-2.8,H-3.15,back+.12);wallBoard(g,"equityPaper","PAPER —",2.8,H-3.15,back+.12);
+   monitor(g,0,H-1.42,back,f.color,true);wallBoard(g,"equity","HK RESEARCH —",0,H-2.55,back+.12,f.color,"",6.4,1.0);
+   wallBoard(g,"clockHK","HONG KONG —",-3,H-3.62,back+.12,"#ffffff","",4.8,.7);wallBoard(g,"equityPaper","PAPER —",3,H-3.62,back+.12,"#5cf2b3","",4.8,.7);
+   staticSign(g,"ASIA RESEARCH",0,.75,2.5,f.color,4.8,.55);
  }
  if(f.key==="performance"){
-   monitor(g,-2.5,H-1.5,back,f.color,true);wallBoard(g,"performance","AGENT RANKING —",-2.5,H-2.8,back+.12,f.color);
-   box(g,4.2,2.4,.08,mat("#302454"),3.5,2.2,-D/2+.33,false);wallBoard(g,"shadow","SHADOW LAB",3.5,2.8,-D/2+.42,"#c9bdff");
-   wallBoard(g,"nofomo","NO FOMO",3.5,1.8,-D/2+.42,"#ffb547");
+   monitor(g,-2.3,H-1.5,back,f.color,true);wallBoard(g,"performance","AGENT RANKING —",-2.0,H-2.75,back+.12,f.color,"",6.1,.95);
+   box(g,4.0,2.35,.10,mat("#302454"),3.5,2.1,-D/2+.32,false);staticSign(g,"SHADOW LAB",3.5,2.75,-D/2+.42,"#c9bdff",3.4,.55);staticSign(g,"NO FOMO",3.5,1.75,-D/2+.42,"#ffb547",3.4,.55);
  }
  if(f.key==="directie"){
-   box(g,9,.32,2.8,mat("#d9d0f7"),0,.88,2.0);
-   for(let i=0;i<5;i++){const p=makePerson(f.color,true);p.position.set(-4+i*2,.15,3.3);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true});}
-   monitor(g,0,H-1.35,back,f.color,true);wallBoard(g,"directie","BOARDROOM —",0,H-2.55,back+.12,f.color);
+   box(g,9.2,.28,3.1,mat("#d9d0f7"),0,.88,.8);box(g,4.5,.04,5.0,mat("#352950"),0,.25,.8,false);
+   for(let i=0;i<5;i++){const p=makePerson(i===2?"#ffffff":f.color,true,1.05);p.position.set(-4+i*2,.15,2.5);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true})}
+   monitor(g,0,H-1.32,back,f.color,true);wallBoard(g,"directie","BOARDROOM —",0,H-2.5,back+.12,f.color,"",7.0,1.05);
  }
  if(f.key==="risk"){
-   monitor(g,0,H-1.45,back,"#ff6b78",true);wallBoard(g,"risk","RISK DECISION —",0,H-2.65,back+.12,"#ff6b78");
-   beacon(g,"riskLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   monitor(g,0,H-1.4,back,"#ff6b78",true);wallBoard(g,"risk","RISK DECISION —",0,H-2.62,back+.12,"#ff6b78","",6.6,1.0);
+   beacon(g,"riskLight",W/2-1,H-1,D/2-1,"#5cf2b3");staticSign(g,"VETO AUTHORITY",0,.8,2.4,"#ff7d88",4.7,.55);
  }
  if(f.key==="capital"){
-   wallBoard(g,"capital","TREASURY —",0,H-1.3,back+.12,f.color);
+   wallBoard(g,"capital","TREASURY —",0,H-1.35,back+.12,f.color,"",6.2,.95);
    const types=["cash","exposure","room"],cols=["#5cf2b3","#ffb547","#8f7bff"];
-   for(let i=0;i<3;i++){const m=box(g,1.05,3.2,.8,mat(cols[i]),-3+i*3,2.0,-D/2+1.0,false);capitalBars.push({mesh:m,type:types[i],baseY:.4,maxH:3.2});}
-   wallBoard(g,"capitalLegend","VRIJ · BELEGD · RUIMTE",0,4.25,back+.12,f.color);
+   for(let i=0;i<3;i++){const m=box(g,.9,3.0,.7,mat(cols[i]),-3+i*3,1.9,-D/2+1.0,false);capitalBars.push({mesh:m,type:types[i],baseY:.4,maxH:3.0})}
+   staticSign(g,"VRIJ     BELEGD     RUIMTE",0,4.15,-D/2+.43,f.color,7.8,.55);
  }
  if(f.key==="execution"){
-   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"execution","ORDER QUEUE —",0,H-2.65,back+.12,f.color);
-   beacon(g,"orderLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   monitor(g,0,H-1.4,back,f.color,true);wallBoard(g,"execution","ORDER QUEUE —",0,H-2.62,back+.12,f.color,"",7.2,1.0);
+   beacon(g,"orderLight",W/2-1,H-1,D/2-1,"#5cf2b3");staticSign(g,"KRAKEN EXECUTION",0,.8,2.4,f.color,5.8,.55);
  }
  if(f.key==="ops"){
-   for(let x=-6;x<=6;x+=3){box(g,2.1,3.4,1.4,mat("#18142f"),x,1.9,-D/2+1.4,false);for(let y=.8;y<3.1;y+=.55)box(g,1.65,.08,.04,new THREE.MeshBasicMaterial({color:y%1.1<.2?"#ffb547":"#5cf2b3",toneMapped:false}),x,y,-D/2+2.12,false)}
-   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.2,back+.12,f.color);wallBoard(g,"tradeTape","LAST TRADE —",0,H-2.05,back+.12,"#ffb547");beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   for(let x=-6;x<=6;x+=3){box(g,2.0,3.35,1.2,mat("#18142f"),x,1.88,-D/2+1.25,false);for(let y=.8;y<3.0;y+=.52)box(g,1.55,.07,.04,new THREE.MeshBasicMaterial({color:y%1.04<.2?"#ffb547":"#5cf2b3"}),x,y,-D/2+1.88,false)}
+   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.18,back+.12,f.color,"",7.2,.9);wallBoard(g,"tradeTape","LAST TRADE —",0,H-2.18,back+.12,"#ffb547","",7.2,.8);beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
  }
  if(f.key==="owner"){
-   box(g,6.4,.22,2.4,mat("#ddd6f4"),0,.9,-1.1);monitor(g,0,H-1.4,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.7,back+.12,"#ffffff");
-   box(g,4,.55,1.5,mat("#4b3c6f"),0,.35,3.2);plant(g,-W/2+1.2,2.8,1.15);plant(g,W/2-1.2,2.8,1.15);
+   box(g,6.6,.22,2.5,mat("#ddd6f4"),0,.88,-.7);monitor(g,0,H-1.35,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.55,back+.12,"#ffffff","",7.0,1.0);
+   loungeSeat(g,-3.2,2.4,.2);loungeSeat(g,3.2,2.4,-.2);plant(g,-W/2+1.0,2.8,1.15);plant(g,W/2-1.0,2.8,1.15);
+   const boss=makePerson("#ffffff",true,1.08);boss.position.set(0,.15,.75);g.add(boss);workers.push({g:boss,key:f.key,phase:Math.random()*6.2,seated:true});
  }
  if(f.trade){
-   monitor(g,0,H-1.4,back,"#ffb547",true);wallBoard(g,"trade","LIVE POSITIONS",0,H-2.75,back+.12,"#ffb547");
-   for(let i=0;i<4;i++){const l=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-3.55,back+.12,"#ffffff");tradePositionBoards.push(l.element)}
-   for(let x=-16;x<=16;x+=4) box(g,3.2,.48,.03,new THREE.MeshBasicMaterial({color:iColor(x),toneMapped:false}),x,H-4.35,back+.05,false);
-   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.5,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.2,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);
-   wallBoard(g,"krakenGate","KRAKEN GATE",-W/2+2,4.8,-1,"#ffb547","event-label");
+   wallBoard(g,"trade","LIVE POSITIONS",0,H-1.35,back+.12,"#ffb547","",10.5,1.05);
+   for(let i=0;i<4;i++){const b=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-2.65,back+.12,"#ffffff","",5.2,.72);tradePositionBoards.push(b)}
+   staticSign(g,"LIVE DEALING FLOOR",0,H-3.65,back+.12,"#ffb547",10,.7);
+   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.45,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.3,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);staticSign(g,"KRAKEN GATE",-W/2+2.1,4.8,-1,"#ffb547",4.2,.6);
  }
 }
 function buildFloor(f){
  const g=new THREE.Group();g.userData={key:f.key};g.position.set(f.x,0,f.z);g.rotation.y=f.face===-1?Math.PI:0;scene.add(g);floorGroups[f.key]=g;
- const H=f.trade?7.4:5.6,W=f.w||(f.trade?40:15.5),D=f.d||(f.trade?22:13.5);
- box(g,W,.42,D,mat(f.trade?"#35236e":"#34277c"),0,0,0,false);
- box(g,W,H,.28,mat("#20164d"),0,H/2,-D/2,false);box(g,.28,H,D,mat("#271b5d"),-W/2,H/2,0,false);box(g,.28,H,D,mat("#271b5d"),W/2,H/2,0,false);
- const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.12,roughness:.06,depthWrite:false});
- const door=2.8,panel=(W-door)/2;box(g,panel,H-.35,.07,glass,-(door+panel)/2,H/2,D/2,false);box(g,panel,H-.35,.07,glass,(door+panel)/2,H/2,D/2,false);
- box(g,door,.18,.16,new THREE.MeshBasicMaterial({color:f.color,toneMapped:false}),0,H-.25,D/2-.03,false);
- const lab=cssLabel(g,f.no,"floor-label",0,H-.52,D/2+.18);lab.element.style.background=f.color;labelsByFloor[f.key]=lab;
- const count=f.staff,cols=f.trade?6:(f.key==="owner"?1:2),spacingX=f.trade?5.6:5.2;
- for(let i=0;i<count;i++){
-   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,count-row*cols),x=(col-(used-1)/2)*spacingX,z=f.trade?(-5.2+row*4.3):(-3.0+row*3.1);
-   addDesk(g,x,z,.2,f.color);
+ const H=f.trade?7.2:5.55,W=f.w||14,D=f.d||11.8;
+ box(g,W,.38,D,mat(f.trade?"#302461":"#2d245a"),0,0,0,false);box(g,W-.5,.035,D-.5,mat(f.trade?"#231a49":"#241d49"),0,.21,0,false);
+ box(g,W,H,.22,mat("#1b143e"),0,H/2,-D/2,false);box(g,.22,H,D,mat("#21184a"),-W/2,H/2,0,false);box(g,.22,H,D,mat("#21184a"),W/2,H/2,0,false);
+ const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.14,roughness:.05,metalness:.08,depthWrite:false});
+ const door=2.5,panel=(W-door)/2;box(g,panel,H-.42,.055,glass,-(door+panel)/2,H/2,D/2,false);box(g,panel,H-.42,.055,glass,(door+panel)/2,H/2,D/2,false);
+ // door frame / handles
+ box(g,.12,H-.42,.12,mat("#7567a9"),-door/2,H/2,D/2+.02,false);box(g,.12,H-.42,.12,mat("#7567a9"),door/2,H/2,D/2+.02,false);box(g,door,.12,.12,mat("#7567a9"),0,H-.22,D/2+.02,false);
+ box(g,.08,.32,.08,mat("#ffcf74"),.88,1.15,D/2+.10,false);
+ staticSign(g,`${f.no} · ${f.name.toUpperCase()}`,0,H-.62,D/2+.12,f.color,Math.min(W-1.0,f.trade?10:7.6),.68);
+ // warm suspended office lights
+ const lights=f.trade?6:2;for(let i=0;i<lights;i++){const x=f.trade?(-12+i*4.8):(i?3.0:-3.0);lightStrip(g,x,H-.18,-.4,f.trade?3.5:3.1,f.trade?"#ffd9a0":"#f6edff")}
+ const deskCount=(f.key==="directie"||f.key==="owner")?0:f.staff,cols=f.trade?6:2,spacingX=f.trade?5.1:4.45;
+ for(let i=0;i<deskCount;i++){
+   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,deskCount-row*cols),x=(col-(used-1)/2)*spacingX,z=f.trade?(-5.0+row*4.0):(-2.6+row*2.75);
+   addDesk(g,x,z,.2,f.color,f.color,f.trade);
  }
- const moving=f.trade?10:(["fast","data","execution","risk","ops"].includes(f.key)?2:1);
- for(let i=0;i<moving;i++){const p=makePerson(f.color,false);p.position.set(-W/2+2.1+i*.8,.15,D/2-2.0-i*.35);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?14:3.0})}
+ const moving=f.trade?8:(["fast","data","execution","risk","ops"].includes(f.key)?2:1);
+ for(let i=0;i<moving;i++){const p=makePerson(f.color,false,1.04);p.position.set(-W/2+1.7+i*.7,.15,D/2-1.65-i*.3);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?12:2.5})}
  decorateDepartment(g,f,W,D,H);
  const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
  return g;
