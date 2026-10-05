@@ -24,19 +24,16 @@ button{font:inherit}
 .mode{border:1px solid currentColor;padding:3px 9px;border-radius:3px;font-weight:700;color:var(--money)}
 .live-dot{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:.74rem}.live-dot:before{content:"";width:7px;height:7px;border-radius:50%;background:#575078}.live-dot.on{color:var(--buy)}.live-dot.on:before{background:var(--buy);box-shadow:0 0 12px var(--buy)}
 #stage{position:fixed;inset:0;z-index:1}#stage canvas{display:block}.l2d{pointer-events:none}
-.floor-label{pointer-events:none;padding:2px 5px;border-radius:2px;font-weight:900;font-size:9px;color:#160f3a;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.28);opacity:.82}
-.floor-label.active{opacity:1;box-shadow:0 0 0 1px #fff,0 0 12px currentColor}
-.worker-label{pointer-events:none;background:rgba(15,10,38,.82);border:1px solid rgba(200,185,255,.35);border-radius:3px;padding:2px 5px;font-size:10px;color:#fff;white-space:nowrap}
-.event-label{pointer-events:none;background:#fff4de;color:#24163d;border:1px solid var(--money);border-radius:9px;padding:4px 8px;font-size:11px;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,.3)}
+.floor-label,.worker-label,.event-label{display:none!important}
 .left{position:fixed;z-index:6;left:14px;top:70px;width:240px;max-height:calc(100% - 140px);overflow:auto;display:flex;flex-direction:column;gap:8px}
 .card{background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:10px 11px;backdrop-filter:blur(8px)}
 .card h2{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:#c9bdff;margin:0 0 7px}
 .floor-nav{display:grid;gap:4px}.floor-nav button{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;text-align:left;color:var(--text);background:rgba(255,255,255,.035);border:1px solid transparent;border-radius:4px;padding:5px 7px;cursor:pointer}.floor-nav button:hover,.floor-nav button.active{border-color:var(--edge);background:rgba(143,123,255,.16)}.floor-nav .n{color:var(--muted);font-size:.72rem}.floor-nav .s{width:7px;height:7px;border-radius:50%;background:#5a527a}.floor-nav .s.hot{background:var(--buy);box-shadow:0 0 9px var(--buy)}.floor-nav .s.trade{background:var(--money);box-shadow:0 0 9px var(--money)}
 .moneybox .big{font-size:1.45rem;font-weight:800;color:var(--money)}.moneybox .row{display:flex;justify-content:space-between;gap:8px;font-size:.8rem;margin-top:3px}.moneybox .row span:first-child{color:var(--muted)}
-.right{position:fixed;z-index:6;right:14px;top:70px;width:350px;max-height:calc(100% - 245px);overflow:auto;background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:14px 15px;backdrop-filter:blur(9px)}
+.right{position:fixed;z-index:6;right:14px;top:70px;width:330px;max-height:calc(100% - 245px);overflow:auto;background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:14px 15px;backdrop-filter:blur(9px)}
 .right h1{font-size:1.25rem;margin:0 0 3px}.right .sub{color:var(--muted);font-size:.8rem;margin:0 0 10px}.status{border-left:3px solid var(--accent);background:rgba(143,123,255,.11);padding:8px 9px;margin-bottom:10px}.status b{display:block;font-size:1.05rem}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.mini{background:rgba(255,255,255,.04);border:1px solid rgba(190,170,255,.13);padding:7px}.mini small{display:block;color:var(--muted)}.mini b{font-size:.95rem}.right p{font-size:.84rem;margin:7px 0}.right ul{padding-left:18px;font-size:.83rem;color:var(--muted)}
 .tools{position:fixed;z-index:6;left:270px;bottom:14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 650px)}.tools button{color:var(--text);background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;cursor:pointer}.tools button:hover,.tools button.on{background:rgba(143,123,255,.28);border-color:#a894ff}.tools span{color:var(--muted);font-size:.75rem}
-.caption{position:fixed;z-index:6;left:270px;right:380px;top:70px;pointer-events:none}.caption>div{display:inline-block;background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;font-size:.83rem;backdrop-filter:blur(8px)}.caption b{color:var(--money);margin-right:7px}
+.caption{position:fixed;z-index:6;left:270px;right:360px;top:70px;pointer-events:none}.caption>div{display:inline-block;background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;font-size:.83rem;backdrop-filter:blur(8px)}.caption b{color:var(--money);margin-right:7px}
 .loading{position:fixed;inset:0;z-index:4;display:grid;place-items:center;color:var(--muted);background:var(--void)}
 .hover-office{display:none;position:fixed;z-index:20;pointer-events:none;background:rgba(14,9,38,.96);border:1px solid rgba(190,170,255,.38);border-radius:5px;padding:6px 9px;font-size:.78rem;box-shadow:0 8px 25px rgba(0,0,0,.35)}
 .hover-office b{display:block;color:#fff}.hover-office small{color:var(--muted)}
@@ -55,7 +52,7 @@ button{font:inherit}
 </head>
 <body>
 <header class="bar">
- <span class="brand">Kraken Agents HQ<small>3D trading campus</small></span>
+ <span class="brand">Kraken Agents HQ<small>3D trading headquarters</small></span>
  <nav class="tabs"><a href="index.html" aria-current="page">HQ</a><a href="trades.html">Trades</a><a href="details.html">Details</a><a href="opportunities.html">Opportunities</a></nav>
  <span class="mode" id="mode">laden</span>
  <span class="live-dot" id="livestat">Kraken live</span>
@@ -71,7 +68,7 @@ button{font:inherit}
 <aside class="right" id="detail"><h1>Kraken Agents HQ</h1><p class="sub">Klik op een kantoor om naar binnen te kijken.</p><div class="status"><b>Kantooroverzicht</b>Losse kantoren liggen rond echte gangen. Actieve teams lichten op en medewerkers brengen dossiers fysiek naar de volgende afdeling.</div></aside>
 <div class="caption"><div id="caption"><b>HQ</b>Live botdata wordt geladen…</div></div>
 <div class="tools">
- <button id="overview">Campus</button><button id="analysisfocus">Analyse</button><button id="managementfocus">Management</button><button id="tradefocus">Tradefloor</button><button id="ownerfocus">Owner</button>
+ <button id="overview">Campus</button><button id="commandfocus">Command Center</button><button id="analysisfocus">Analyse</button><button id="managementfocus">Management</button><button id="tradefocus">Tradefloor</button><button id="ownerfocus">Owner</button>
  <button id="follow">Volg dossier</button><button id="autocam">Autocamera</button><button id="sound">Geluid uit</button>
  <span>Links slepen = schuiven · scroll = zoomen · rechts slepen = draaien</span>
 </div>
@@ -106,22 +103,22 @@ const clock=ts=>ts?new Date(ts*1000).toLocaleTimeString("nl-NL",{hour:"2-digit",
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const COLORS={ops:"#8FC3E8",data:"#8FA8E8",market:"#6FD6B4",fast:"#FF9A62",swing:"#45D1EE",trend:"#7F9BFF",equity:"#B7A0FF",performance:"#D49BEA",directie:"#E9E4FF",risk:"#FF7D88",capital:"#F4D35E",execution:"#FFB547",trade:"#FFB547",owner:"#FFFFFF"};
 const FLOORS=[
- {key:"data",no:"A1",name:"Radar & Data",x:-36,z:-12,face:1,color:COLORS.data,staff:8,desc:"Scant de brede Kraken-markt iedere vijf minuten.",lane:7},
- {key:"market",no:"A2",name:"Market Intelligence",x:-18,z:-12,face:1,color:COLORS.market,staff:5,desc:"Bepaalt het algemene cryptomarktklimaat en trendregime.",lane:7},
- {key:"fast",no:"A3",name:"Fast Desk 15m",x:0,z:-12,face:1,color:COLORS.fast,staff:9,desc:"Momentum, squeeze en snelle breakout; de drukste analyse-desk.",lane:7},
- {key:"swing",no:"A4",name:"Swing Desk 1u",x:18,z:-12,face:1,color:COLORS.swing,staff:7,desc:"Dip-koper en breakout werken hier op 1-uurscandles.",lane:7},
- {key:"trend",no:"A5",name:"Trend Desk 4u",x:36,z:-12,face:1,color:COLORS.trend,staff:6,desc:"Zoekt grotere uitbraken en langere runners.",lane:7},
+ {key:"data",no:"A1",name:"Radar & Data",x:-34,z:-10,face:1,color:COLORS.data,staff:8,w:14,d:11.8,desc:"Scant de brede Kraken-markt iedere vijf minuten.",lane:6},
+ {key:"market",no:"A2",name:"Market Intelligence",x:-17,z:-10,face:1,color:COLORS.market,staff:5,w:14,d:11.8,desc:"Bepaalt het algemene cryptomarktklimaat en trendregime.",lane:6},
+ {key:"fast",no:"A3",name:"Fast Desk 15m",x:0,z:-10,face:1,color:COLORS.fast,staff:9,w:15,d:11.8,desc:"Momentum, squeeze en snelle breakout; de drukste analyse-desk.",lane:6},
+ {key:"swing",no:"A4",name:"Swing Desk 1u",x:17,z:-10,face:1,color:COLORS.swing,staff:7,w:14,d:11.8,desc:"Dip-koper en breakout werken hier op 1-uurscandles.",lane:6},
+ {key:"trend",no:"A5",name:"Trend Desk 4u",x:34,z:-10,face:1,color:COLORS.trend,staff:6,w:14,d:11.8,desc:"Zoekt grotere uitbraken en langere runners.",lane:6},
 
- {key:"equity",no:"B1",name:"China / HK Research",x:-36,z:26,face:-1,color:COLORS.equity,staff:6,desc:"Research en paper trading voor Hongkong en China.",lane:7},
- {key:"performance",no:"B2",name:"Prestatie",x:-18,z:26,face:-1,color:COLORS.performance,staff:5,desc:"Meet strategieën en bepaalt wie live of schaduw handelt.",lane:7},
- {key:"directie",no:"B3",name:"Directie",x:0,z:26,face:-1,color:COLORS.directie,staff:5,desc:"Vergelijkt koopadviezen en beslist welke kansen door mogen.",lane:7},
- {key:"risk",no:"B4",name:"Risk Management",x:18,z:26,face:-1,color:COLORS.risk,staff:5,desc:"Heeft veto-recht en controleert stop, positieomvang, correlatie en verlieslimieten.",lane:7},
- {key:"capital",no:"B5",name:"Kapitaal / Treasury",x:36,z:26,face:-1,color:COLORS.capital,staff:4,desc:"Beheert vrij geld, exposure en beschikbare handelsruimte.",lane:7},
+ {key:"equity",no:"B1",name:"China / HK Research",x:-34,z:22,face:-1,color:COLORS.equity,staff:6,w:14,d:11.8,desc:"Research en paper trading voor Hongkong en China.",lane:6},
+ {key:"performance",no:"B2",name:"Prestatie",x:-17,z:22,face:-1,color:COLORS.performance,staff:5,w:14,d:11.8,desc:"Meet strategieën en bepaalt wie live of schaduw handelt.",lane:6},
+ {key:"directie",no:"B3",name:"Directie",x:0,z:22,face:-1,color:COLORS.directie,staff:5,w:15,d:11.8,desc:"Vergelijkt koopadviezen en beslist welke kansen door mogen.",lane:6},
+ {key:"risk",no:"B4",name:"Risk Management",x:17,z:22,face:-1,color:COLORS.risk,staff:5,w:14,d:11.8,desc:"Heeft veto-recht en controleert stop, positieomvang, correlatie en verlieslimieten.",lane:6},
+ {key:"capital",no:"B5",name:"Kapitaal / Treasury",x:34,z:22,face:-1,color:COLORS.capital,staff:4,w:14,d:11.8,desc:"Beheert vrij geld, exposure en beschikbare handelsruimte.",lane:6},
 
- {key:"ops",no:"C1",name:"Operations",x:-34,z:52,face:-1,color:COLORS.ops,staff:6,w:20,d:17,desc:"Monitoring, scanlog, status en rapportage van het hele bedrijf.",lane:39},
- {key:"execution",no:"C2",name:"Execution",x:34,z:52,face:-1,color:COLORS.execution,staff:6,w:20,d:17,desc:"Plaatst echte orders op Kraken en controleert exchange-stops.",lane:39},
- {key:"owner",no:"C3",name:"Owner / CEO",x:55,z:52,face:-1,color:COLORS.owner,staff:2,w:16,d:17,desc:"Managementkantoor met totaaloverzicht van vermogen, prestaties en actieve afdelingen.",lane:39},
- {key:"trade",no:"TF",name:"LIVE TRADEFLOOR",x:0,z:54,face:-1,color:COLORS.trade,staff:24,w:40,d:22,trade:true,desc:"Grote hectische dealing floor waar goedgekeurde live trades zichtbaar worden uitgevoerd.",lane:39}
+ {key:"ops",no:"C1",name:"Operations",x:-34,z:48,face:-1,color:COLORS.ops,staff:6,w:19,d:15,desc:"Monitoring, scanlog, status en rapportage van het hele bedrijf.",lane:37},
+ {key:"execution",no:"C2",name:"Execution",x:34,z:48,face:-1,color:COLORS.execution,staff:6,w:19,d:15,desc:"Plaatst echte orders op Kraken en controleert exchange-stops.",lane:37},
+ {key:"owner",no:"C3",name:"Owner / CEO",x:53,z:48,face:-1,color:COLORS.owner,staff:2,w:15,d:15,desc:"Managementkantoor met totaaloverzicht van vermogen, prestaties en actieve afdelingen.",lane:37},
+ {key:"trade",no:"TF",name:"LIVE TRADEFLOOR",x:0,z:50,face:-1,color:COLORS.trade,staff:24,w:38,d:21,trade:true,desc:"Grote hectische dealing floor waar goedgekeurde live trades zichtbaar worden uitgevoerd.",lane:37}
 ];
 const BYKEY=Object.fromEntries(FLOORS.map(f=>[f.key,f]));
 const OLDKEY={monitor:"ops",data:"data",markt:"market",fast:"fast",swing:"swing",trend:"trend",equity:"equity",prestatie:"performance",beslis:"directie",risico:"risk",kapitaal:"capital",uitvoer:"execution"};
@@ -157,8 +154,29 @@ function plant(parent,x,z,scale=1){
  const pot=mat("#5a3b65"),leaf=mat("#56b78b");box(parent,.48,.45,.48,pot,x,.22,z);
  const crown=new THREE.Mesh(new THREE.SphereGeometry(.52*scale,12,8),leaf);crown.position.set(x,.82*scale,z);parent.add(crown);return crown;
 }
-function wallBoard(parent,key,text,x,y,z,color="#ffffff",cls="worker-label"){
- const l=cssLabel(parent,text,cls,x,y,z);wallboards[key]=l.element;return l;
+function renderBoard(rec,text){
+ rec.text=String(text??"");const {ctx,canvas}=rec;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle=rec.bg;ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.strokeStyle=rec.color;ctx.lineWidth=10;ctx.strokeRect(8,8,canvas.width-16,canvas.height-16);ctx.fillStyle=rec.color;ctx.textAlign="center";ctx.textBaseline="middle";ctx.font="800 82px system-ui";
+ let size=82;while(ctx.measureText(rec.text).width>canvas.width-80&&size>32){size-=4;ctx.font=`800 ${size}px system-ui`}
+ ctx.fillText(rec.text,canvas.width/2,canvas.height/2);rec.texture.needsUpdate=true;
+}
+function wallBoard(parent,key,text,x,y,z,color="#ffffff",cls="worker-label",w=5.6,h=1.05,bg="#15102f"){
+ const canvas=document.createElement("canvas");canvas.width=1024;canvas.height=220;const ctx=canvas.getContext("2d"),texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
+ const frame=box(parent,w+.18,h+.18,.12,mat("#0e0a24"),x,y,z,false);
+ const plane=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:texture,toneMapped:false}));plane.position.set(x,y,z+.071);plane.renderOrder=3;parent.add(plane);
+ const rec={mesh:plane,frame,texture,canvas,ctx,color,bg,text:""};renderBoard(rec,text);if(key)wallboards[key]=rec;return rec;
+}
+function staticSign(parent,text,x,y,z,color,w=4.4,h=.72){
+ return wallBoard(parent,null,text,x,y,z,color,"",w,h,"#100b2a");
+}
+function lightStrip(parent,x,y,z,w,color="#fff4d8"){
+ const m=box(parent,w,.07,.36,new THREE.MeshStandardMaterial({color,emissive:color,emissiveIntensity:2.2,roughness:.2}),x,y,z,false);return m;
+}
+function lowDivider(parent,x,z,w,d,color="#6d5bc4"){
+ return box(parent,w,.9,d,new THREE.MeshStandardMaterial({color,transparent:true,opacity:.34,roughness:.08}),x,.45,z,false);
+}
+function loungeSeat(parent,x,z,rot=0){
+ const g=new THREE.Group();g.position.set(x,0,z);g.rotation.y=rot;parent.add(g);box(g,2.2,.45,.9,mat("#4d436a"),0,.35,0);box(g,2.2,.85,.18,mat("#4d436a"),0,.86,.36);return g;
 }
 function beacon(parent,key,x,y,z,color){
  const m=new THREE.Mesh(new THREE.SphereGeometry(.28,14,10),new THREE.MeshBasicMaterial({color,toneMapped:false}));m.position.set(x,y,z);parent.add(m);parent.userData[key]=m;return m;
@@ -192,98 +210,111 @@ function monitor(parent,x,y,z,color,big=false){
  const screen=box(parent,big?2.42:.96,big?1.17:.57,.02,new THREE.MeshBasicMaterial({color,toneMapped:false}),x,y,z+.055,false);
  screenMats.push({mesh:screen,base:new THREE.Color(color),phase:Math.random()*6.2});return frame;
 }
-function addDesk(parent,x,z,yBase,color,workerColor=color){
- box(parent,3.1,.12,1.25,mat("#eeeaff"),x,yBase+.88,z);
- box(parent,.1,.82,1.1,mat("#bdb2ea"),x-1.42,yBase+.43,z);box(parent,.1,.82,1.1,mat("#bdb2ea"),x+1.42,yBase+.43,z);
- monitor(parent,x,yBase+1.55,z-.38,color);
- const p=makePerson(workerColor,true);p.position.set(x,yBase,z+.72);parent.add(p);
- workers.push({g:p,key:parent.userData.key,phase:Math.random()*6.2,seated:true});
+function addDesk(parent,x,z,yBase,color,workerColor=color,dealing=false){
+ const width=dealing?3.0:2.55,depth=dealing?1.05:.92;
+ box(parent,width,.11,depth,mat("#ded9ef"),x,yBase+.84,z);
+ box(parent,.08,.78,depth-.08,mat("#9185bd"),x-width/2+.12,yBase+.42,z);box(parent,.08,.78,depth-.08,mat("#9185bd"),x+width/2-.12,yBase+.42,z);
+ if(dealing){monitor(parent,x-.62,yBase+1.52,z-.34,color);monitor(parent,x+.62,yBase+1.52,z-.34,color)}
+ else monitor(parent,x,yBase+1.52,z-.32,color);
+ const p=makePerson(workerColor,true,1.05);p.position.set(x,yBase,z+.58);parent.add(p);workers.push({g:p,key:parent.userData.key,phase:Math.random()*6.2,seated:true});
  return p;
 }
 function decorateDepartment(g,f,W,D,H){
- const back=-D/2+.26;
- plant(g,-W/2+1.0,D/2-1.2,.8);if(!f.trade)plant(g,W/2-1.0,D/2-1.2,.7);
+ const back=-D/2+.24;
+ plant(g,-W/2+1.0,D/2-1.0,.8);if(!f.trade&&f.key!=="owner")plant(g,W/2-1.0,D/2-1.0,.72);
  if(f.key==="data"){
-   monitor(g,0,H-1.35,back,f.color,true);monitor(g,-3.3,H-1.65,back,f.color);monitor(g,3.3,H-1.65,back,f.color);
-   wallBoard(g,"data","SCAN —",0,H-2.55,back+.12,f.color);wallBoard(g,"dataTop","TOP RADAR —",0,H-3.25,back+.12,f.color);
+   monitor(g,0,H-1.35,back,f.color,true);monitor(g,-3.0,H-1.65,back,f.color);monitor(g,3.0,H-1.65,back,f.color);
+   wallBoard(g,"data","SCAN —",0,H-2.55,back+.12,f.color,"",6.4,1.0);wallBoard(g,"dataTop","TOP RADAR —",0,H-3.7,back+.12,"#5cf2b3","",6.4,.85);
+   lowDivider(g,0,1.55,W-3,.08,f.color);
  }
  if(f.key==="market"){
-   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"market","MARKT —",0,H-2.55,back+.12,f.color);
-   wallBoard(g,"clockAMS","AMS —",-2.8,H-3.15,back+.12);wallBoard(g,"clockNY","NYC —",2.8,H-3.15,back+.12);
+   monitor(g,0,H-1.42,back,f.color,true);wallBoard(g,"market","MARKT —",0,H-2.6,back+.12,f.color,"",6.4,1.0);
+   wallBoard(g,"clockAMS","AMS —",-3,H-3.65,back+.12,"#ffffff","",4.9,.7);wallBoard(g,"clockNY","NYC —",3,H-3.65,back+.12,"#ffffff","",4.9,.7);
  }
  if(f.key==="fast"){
-   for(let x=-4.5;x<=4.5;x+=3)monitor(g,x,H-1.45,back,f.color);
-   wallBoard(g,"fast","FAST DESK —",0,H-2.55,back+.12,f.color);beacon(g,"alert",W/2-1,H-1,D/2-1,f.color);
+   for(let x=-4.2;x<=4.2;x+=2.8)monitor(g,x,H-1.45,back,f.color);
+   wallBoard(g,"fast","FAST DESK —",0,H-2.55,back+.12,f.color,"",6.5,1.0);beacon(g,"alert",W/2-1,H-1,D/2-1,f.color);
+   box(g,6,.04,2.2,mat("#3a2455"),0,.25,2.2,false);
  }
  if(f.key==="swing"){
-   monitor(g,-2.1,H-1.45,back,f.color,true);monitor(g,2.6,H-1.65,back,f.color);
-   wallBoard(g,"swing","SWING SETUPS —",0,H-2.7,back+.12,f.color);
-   box(g,4.8,2.1,.08,mat("#efeafd"),0,2.1,-D/2+.33,false);wallBoard(g,"swingBoard","1H SETUPS",0,2.1,-D/2+.42,"#17113d");
+   monitor(g,-2.1,H-1.42,back,f.color,true);monitor(g,2.5,H-1.62,back,f.color);
+   wallBoard(g,"swing","SWING SETUPS —",0,H-2.65,back+.12,f.color,"",6.2,1.0);
+   wallBoard(g,"swingBoard","1H SETUPS",0,H-3.72,back+.12,"#ffffff","",5.6,.75);
  }
  if(f.key==="trend"){
-   for(let x=-4.1;x<=4.1;x+=4.1)monitor(g,x,H-1.55,back,f.color,true);
-   wallBoard(g,"trend","4H RUNNERS —",0,H-2.85,back+.12,f.color);
+   for(let x=-4;x<=4;x+=4)monitor(g,x,H-1.52,back,f.color,true);
+   wallBoard(g,"trend","4H RUNNERS —",0,H-2.8,back+.12,f.color,"",6.6,1.0);
+   lowDivider(g,0,2.0,W-3,.08,"#7F9BFF");
  }
  if(f.key==="equity"){
-   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"equity","HK RESEARCH —",0,H-2.55,back+.12,f.color);
-   wallBoard(g,"clockHK","HONG KONG —",-2.8,H-3.15,back+.12);wallBoard(g,"equityPaper","PAPER —",2.8,H-3.15,back+.12);
+   monitor(g,0,H-1.42,back,f.color,true);wallBoard(g,"equity","HK RESEARCH —",0,H-2.55,back+.12,f.color,"",6.4,1.0);
+   wallBoard(g,"clockHK","HONG KONG —",-3,H-3.62,back+.12,"#ffffff","",4.8,.7);wallBoard(g,"equityPaper","PAPER —",3,H-3.62,back+.12,"#5cf2b3","",4.8,.7);
+   staticSign(g,"ASIA RESEARCH",0,.75,2.5,f.color,4.8,.55);
  }
  if(f.key==="performance"){
-   monitor(g,-2.5,H-1.5,back,f.color,true);wallBoard(g,"performance","AGENT RANKING —",-2.5,H-2.8,back+.12,f.color);
-   box(g,4.2,2.4,.08,mat("#302454"),3.5,2.2,-D/2+.33,false);wallBoard(g,"shadow","SHADOW LAB",3.5,2.8,-D/2+.42,"#c9bdff");
-   wallBoard(g,"nofomo","NO FOMO",3.5,1.8,-D/2+.42,"#ffb547");
+   monitor(g,-2.3,H-1.5,back,f.color,true);wallBoard(g,"performance","AGENT RANKING —",-2.0,H-2.75,back+.12,f.color,"",6.1,.95);
+   box(g,4.0,2.35,.10,mat("#302454"),3.5,2.1,-D/2+.32,false);staticSign(g,"SHADOW LAB",3.5,2.75,-D/2+.42,"#c9bdff",3.4,.55);staticSign(g,"NO FOMO",3.5,1.75,-D/2+.42,"#ffb547",3.4,.55);
  }
  if(f.key==="directie"){
-   box(g,9,.32,2.8,mat("#d9d0f7"),0,.88,2.0);
-   for(let i=0;i<5;i++){const p=makePerson(f.color,true);p.position.set(-4+i*2,.15,3.3);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true});}
-   monitor(g,0,H-1.35,back,f.color,true);wallBoard(g,"directie","BOARDROOM —",0,H-2.55,back+.12,f.color);
+   box(g,9.2,.28,3.1,mat("#d9d0f7"),0,.88,.8);box(g,4.5,.04,5.0,mat("#352950"),0,.25,.8,false);
+   for(let i=0;i<5;i++){const p=makePerson(i===2?"#ffffff":f.color,true,1.05);p.position.set(-4+i*2,.15,2.5);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true})}
+   monitor(g,0,H-1.32,back,f.color,true);wallBoard(g,"directie","BOARDROOM —",0,H-2.5,back+.12,f.color,"",7.0,1.05);
  }
  if(f.key==="risk"){
-   monitor(g,0,H-1.45,back,"#ff6b78",true);wallBoard(g,"risk","RISK DECISION —",0,H-2.65,back+.12,"#ff6b78");
-   beacon(g,"riskLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   monitor(g,0,H-1.4,back,"#ff6b78",true);wallBoard(g,"risk","RISK DECISION —",0,H-2.62,back+.12,"#ff6b78","",6.6,1.0);
+   beacon(g,"riskLight",W/2-1,H-1,D/2-1,"#5cf2b3");staticSign(g,"VETO AUTHORITY",0,.8,2.4,"#ff7d88",4.7,.55);
  }
  if(f.key==="capital"){
-   wallBoard(g,"capital","TREASURY —",0,H-1.3,back+.12,f.color);
+   wallBoard(g,"capital","TREASURY —",0,H-1.35,back+.12,f.color,"",6.2,.95);
    const types=["cash","exposure","room"],cols=["#5cf2b3","#ffb547","#8f7bff"];
-   for(let i=0;i<3;i++){const m=box(g,1.05,3.2,.8,mat(cols[i]),-3+i*3,2.0,-D/2+1.0,false);capitalBars.push({mesh:m,type:types[i],baseY:.4,maxH:3.2});}
-   wallBoard(g,"capitalLegend","VRIJ · BELEGD · RUIMTE",0,4.25,back+.12,f.color);
+   for(let i=0;i<3;i++){const m=box(g,.9,3.0,.7,mat(cols[i]),-3+i*3,1.9,-D/2+1.0,false);capitalBars.push({mesh:m,type:types[i],baseY:.4,maxH:3.0})}
+   staticSign(g,"VRIJ     BELEGD     RUIMTE",0,4.15,-D/2+.43,f.color,7.8,.55);
  }
  if(f.key==="execution"){
-   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"execution","ORDER QUEUE —",0,H-2.65,back+.12,f.color);
-   beacon(g,"orderLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   monitor(g,0,H-1.4,back,f.color,true);wallBoard(g,"execution","ORDER QUEUE —",0,H-2.62,back+.12,f.color,"",7.2,1.0);
+   beacon(g,"orderLight",W/2-1,H-1,D/2-1,"#5cf2b3");staticSign(g,"KRAKEN EXECUTION",0,.8,2.4,f.color,5.8,.55);
  }
  if(f.key==="ops"){
-   for(let x=-6;x<=6;x+=3){box(g,2.1,3.4,1.4,mat("#18142f"),x,1.9,-D/2+1.4,false);for(let y=.8;y<3.1;y+=.55)box(g,1.65,.08,.04,new THREE.MeshBasicMaterial({color:y%1.1<.2?"#ffb547":"#5cf2b3",toneMapped:false}),x,y,-D/2+2.12,false)}
-   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.2,back+.12,f.color);wallBoard(g,"tradeTape","LAST TRADE —",0,H-2.05,back+.12,"#ffb547");beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+   for(let x=-6;x<=6;x+=3){box(g,2.0,3.35,1.2,mat("#18142f"),x,1.88,-D/2+1.25,false);for(let y=.8;y<3.0;y+=.52)box(g,1.55,.07,.04,new THREE.MeshBasicMaterial({color:y%1.04<.2?"#ffb547":"#5cf2b3"}),x,y,-D/2+1.88,false)}
+   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.18,back+.12,f.color,"",7.2,.9);wallBoard(g,"tradeTape","LAST TRADE —",0,H-2.18,back+.12,"#ffb547","",7.2,.8);beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
  }
  if(f.key==="owner"){
-   box(g,6.4,.22,2.4,mat("#ddd6f4"),0,.9,-1.1);monitor(g,0,H-1.4,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.7,back+.12,"#ffffff");
-   box(g,4,.55,1.5,mat("#4b3c6f"),0,.35,3.2);plant(g,-W/2+1.2,2.8,1.15);plant(g,W/2-1.2,2.8,1.15);
+   box(g,6.6,.22,2.5,mat("#ddd6f4"),0,.88,-.7);monitor(g,0,H-1.35,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.55,back+.12,"#ffffff","",7.0,1.0);
+   loungeSeat(g,-3.2,2.4,.2);loungeSeat(g,3.2,2.4,-.2);plant(g,-W/2+1.0,2.8,1.15);plant(g,W/2-1.0,2.8,1.15);
+   const boss=makePerson("#ffffff",true,1.08);boss.position.set(0,.15,.75);g.add(boss);workers.push({g:boss,key:f.key,phase:Math.random()*6.2,seated:true});
+   const assistant=makePerson("#c9bdff",false,1.03);assistant.position.set(-4.6,.15,-1.2);g.add(assistant);walkers.push({g:assistant,key:f.key,phase:Math.random()*6.2,baseX:-4.6,baseZ:-1.2,range:1.6});
  }
  if(f.trade){
-   monitor(g,0,H-1.4,back,"#ffb547",true);wallBoard(g,"trade","LIVE POSITIONS",0,H-2.75,back+.12,"#ffb547");
-   for(let i=0;i<4;i++){const l=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-3.55,back+.12,"#ffffff");tradePositionBoards.push(l.element)}
-   for(let x=-16;x<=16;x+=4) box(g,3.2,.48,.03,new THREE.MeshBasicMaterial({color:iColor(x),toneMapped:false}),x,H-4.35,back+.05,false);
-   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.5,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.2,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);
-   wallBoard(g,"krakenGate","KRAKEN GATE",-W/2+2,4.8,-1,"#ffb547","event-label");
+   wallBoard(g,"trade","LIVE POSITIONS",0,H-1.25,back+.12,"#ffb547","",11.5,1.05);
+   for(let i=0;i<4;i++){const b=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-2.55,back+.12,"#ffffff","",5.2,.72);tradePositionBoards.push(b)}
+   wallBoard(g,"tradeTicker","BTC · ETH · RADAR",0,H-3.55,back+.12,"#c9bdff","",18,.66);
+   // Supervisor rail achter de dealing rows
+   box(g,13,.30,2.0,mat("#cfc8e8"),0,.95,5.7);for(let i=-1;i<=1;i++){const p=makePerson("#ffb547",false,1.06);p.position.set(i*4.2,.15,5.1);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:2.0})}
+   // Side market wall and Kraken gate
+   wallBoard(g,"tradeMarket","MARKET FLOW",W/2-1.0,4.8,-1.8,"#5cf2b3","",6.0,.8);
+   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.45,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.3,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);staticSign(g,"KRAKEN GATE",-W/2+2.1,4.8,-1,"#ffb547",4.2,.6);
  }
 }
 function buildFloor(f){
  const g=new THREE.Group();g.userData={key:f.key};g.position.set(f.x,0,f.z);g.rotation.y=f.face===-1?Math.PI:0;scene.add(g);floorGroups[f.key]=g;
- const H=f.trade?7.4:5.6,W=f.w||(f.trade?40:15.5),D=f.d||(f.trade?22:13.5);
- box(g,W,.42,D,mat(f.trade?"#35236e":"#34277c"),0,0,0,false);
- box(g,W,H,.28,mat("#20164d"),0,H/2,-D/2,false);box(g,.28,H,D,mat("#271b5d"),-W/2,H/2,0,false);box(g,.28,H,D,mat("#271b5d"),W/2,H/2,0,false);
- const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.12,roughness:.06,depthWrite:false});
- const door=2.8,panel=(W-door)/2;box(g,panel,H-.35,.07,glass,-(door+panel)/2,H/2,D/2,false);box(g,panel,H-.35,.07,glass,(door+panel)/2,H/2,D/2,false);
- box(g,door,.18,.16,new THREE.MeshBasicMaterial({color:f.color,toneMapped:false}),0,H-.25,D/2-.03,false);
- const lab=cssLabel(g,f.no,"floor-label",0,H-.52,D/2+.18);lab.element.style.background=f.color;labelsByFloor[f.key]=lab;
- const count=f.staff,cols=f.trade?6:(f.key==="owner"?1:2),spacingX=f.trade?5.6:5.2;
- for(let i=0;i<count;i++){
-   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,count-row*cols),x=(col-(used-1)/2)*spacingX,z=f.trade?(-5.2+row*4.3):(-3.0+row*3.1);
-   addDesk(g,x,z,.2,f.color);
+ const H=f.trade?7.2:5.55,W=f.w||14,D=f.d||11.8;
+ box(g,W,.38,D,mat(f.trade?"#302461":"#2d245a"),0,0,0,false);box(g,W-.5,.035,D-.5,mat(f.trade?"#231a49":"#241d49"),0,.21,0,false);
+ box(g,W,H,.22,mat("#1b143e"),0,H/2,-D/2,false);box(g,.22,H,D,mat("#21184a"),-W/2,H/2,0,false);box(g,.22,H,D,mat("#21184a"),W/2,H/2,0,false);
+ const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.14,roughness:.05,metalness:.08,depthWrite:false});
+ const door=2.5,panel=(W-door)/2;box(g,panel,H-.42,.055,glass,-(door+panel)/2,H/2,D/2,false);box(g,panel,H-.42,.055,glass,(door+panel)/2,H/2,D/2,false);
+ // door frame / handles
+ box(g,.12,H-.42,.12,mat("#7567a9"),-door/2,H/2,D/2+.02,false);box(g,.12,H-.42,.12,mat("#7567a9"),door/2,H/2,D/2+.02,false);box(g,door,.12,.12,mat("#7567a9"),0,H-.22,D/2+.02,false);
+ box(g,.08,.32,.08,mat("#ffcf74"),.88,1.15,D/2+.10,false);
+ staticSign(g,`${f.no} · ${f.name.toUpperCase()}`,0,H-.62,D/2+.12,f.color,Math.min(W-1.0,f.trade?10:7.6),.68);
+ // warm suspended office lights
+ const lights=f.trade?6:2;for(let i=0;i<lights;i++){const x=f.trade?(-12+i*4.8):(i?3.0:-3.0);lightStrip(g,x,H-.18,-.4,f.trade?3.5:3.1,f.trade?"#ffd9a0":"#f6edff")}
+ const deskCount=(f.key==="directie"||f.key==="owner")?0:f.staff,cols=f.trade?6:2,spacingX=f.trade?5.1:4.45;
+ for(let i=0;i<deskCount;i++){
+   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,deskCount-row*cols),x=(col-(used-1)/2)*spacingX,z=f.trade?(-5.0+row*4.0):(-2.6+row*2.75);
+   addDesk(g,x,z,.2,f.color,f.color,f.trade);
  }
- const moving=f.trade?10:(["fast","data","execution","risk","ops"].includes(f.key)?2:1);
- for(let i=0;i<moving;i++){const p=makePerson(f.color,false);p.position.set(-W/2+2.1+i*.8,.15,D/2-2.0-i*.35);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?14:3.0})}
+ const moving=f.trade?8:(["fast","data","execution","risk","ops"].includes(f.key)?2:1);
+ for(let i=0;i<moving;i++){const p=makePerson(f.color,false,1.04);p.position.set(-W/2+1.7+i*.7,.15,D/2-1.65-i*.3);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?12:2.5})}
  decorateDepartment(g,f,W,D,H);
  const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
  return g;
@@ -300,28 +331,67 @@ function createCourier(color,dossierColor,index){
  const c={person:p,dossier:d,glow,index,routeIndex:index,path:[],pathIndex:0,pause:index*1.8};couriers.push(c);return c;
 }
 function buildShaft(){
- const g=new THREE.Group();scene.add(g);const floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
- // hoofdgangen
- box(g,108,.28,6.4,floorMat,0,.05,7,false);box(g,122,.28,6.4,floorMat,5,.05,39,false);box(g,6.4,.28,42,floorMat,0,.05,23,false);
- // duidelijk verlichte randen
- for(let x=-52;x<=52;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,3.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,10.15,false)}
- for(let x=-55;x<=65;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,35.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,42.15,false)}
- // office connectors
- for(const f of FLOORS){const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;if(len>.5)box(g,3.4,.25,len,floorMat,d.x,.06,mid,false)}
- // lobby/entree
- box(g,24,.32,13,mat("#30236a"),0,.08,-27,false);box(g,6.4,.28,24,floorMat,0,.05,-10,false);
- box(g,8,.95,2.0,mat("#ddd6f4"),0,.55,-28,false);wallBoard(g,"lobby","KRAKEN AGENTS HQ",0,2.15,-29.2,"#ffb547","event-label");
- for(let x=-8;x<=8;x+=8)plant(g,x,-23.5,1.2);
- // central atrium + koffiehoek
- box(g,12,.32,12,mat("#30236a"),0,.08,23,false);box(g,3.6,1.1,1.2,mat("#d9d0f7"),4,.7,22,false);wallBoard(g,"coffee","COFFEE",4,2.1,22,"#c9bdff");
- plant(g,-4,20,1.15);plant(g,-4,26,1.0);
- // fysieke richtingsborden
- wallBoard(g,"wingA","← ANALYSE VLEUGEL",-18,1.35,7,"#8fa8e8");wallBoard(g,"wingB","MANAGEMENT VLEUGEL →",18,1.35,7,"#d49bea");wallBoard(g,"wingC","DEALING / OPERATIONS",0,1.35,39,"#ffb547");
- // gang-wallboards
- wallBoard(g,"corridorMarket","MARKT —",-34,1.55,7,"#6fd6b4");wallBoard(g,"ticker","BTC / ETH / RADAR —",0,1.55,7,"#c9bdff");wallBoard(g,"corridorRisk","RISK —",22,1.55,39,"#ff7d88");wallBoard(g,"corridorCash","KAPITAAL —",40,1.55,39,"#f4d35e");
- // parkeer-/entree-markeringen in plaats van zwarte skylineblokken
- for(let x=-52;x<=52;x+=8){box(g,4.5,.03,.08,new THREE.MeshBasicMaterial({color:"#41356f"}),x,.02,-38,false);box(g,.08,.03,7,new THREE.MeshBasicMaterial({color:"#41356f"}),x-2.2,.02,-34.5,false)}
- // couriers: parallelle dossiers
+ const g=new THREE.Group();scene.add(g);const floorMat=mat("#25204a"),edgeMat=new THREE.MeshBasicMaterial({color:"#7566cf",toneMapped:false});
+ // Eén doorlopende kantoorvloer met duidelijke vleugels.
+ box(g,116,.24,82,mat("#1f183e"),4,.01,13,false);
+ // primaire corridors
+ box(g,92,.22,6.2,floorMat,0,.12,6,false);box(g,112,.22,6.2,floorMat,7,.12,37,false);box(g,6.2,.22,34,floorMat,0,.12,22,false);
+ for(let x=-44;x<=44;x+=3.6){box(g,1.7,.035,.07,edgeMat,x,.25,2.95,false);box(g,1.7,.035,.07,edgeMat,x,.25,9.05,false)}
+ for(let x=-48;x<=60;x+=3.6){box(g,1.7,.035,.07,edgeMat,x,.25,33.95,false);box(g,1.7,.035,.07,edgeMat,x,.25,40.05,false)}
+ // verbindingsstroken naar alle kantoren
+ for(const f of FLOORS){const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;if(len>.35)box(g,2.8,.22,len,floorMat,d.x,.12,mid,false)}
+
+ // Hoofdingang en receptie
+ box(g,28,.25,13,mat("#302655"),0,.13,-27,false);box(g,6.2,.22,22,floorMat,0,.12,-10,false);
+ box(g,8.2,1.0,2.1,mat("#dcd5ed"),0,.62,-28,false);staticSign(g,"RECEPTIE",0,1.55,-27.95,"#ffb547",4.4,.58);
+ const receptionist=makePerson("#c9bdff",true,1.06);receptionist.position.set(0,.15,-26.8);g.add(receptionist);workers.push({g:receptionist,key:"ops",phase:Math.random()*6.2,seated:true});
+ for(let i=0;i<3;i++){const p=makePerson(["#8fa8e8","#d49bea","#ffffff"][i],false,1.03);p.position.set(-9+i*9,.15,4+i*.7);g.add(p);walkers.push({g:p,key:i===0?"data":i===1?"directie":"ops",phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:4.2})}
+ // glazen dubbele entree
+ const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.18,roughness:.04,depthWrite:false});
+ box(g,5.8,4.7,.08,glass,0,2.35,-33.2,false);box(g,.09,4.7,.25,mat("#8b7bc5"),0,2.35,-33.1,false);
+ for(let x=-9;x<=9;x+=6)plant(g,x,-24,1.0);
+
+ // CENTRALE HAL / COMMAND CENTER
+ box(g,34,.28,18,mat("#342b61"),0,.15,6,false);
+ // atrium-vloeraccent en logo-ring
+ box(g,20,.035,9,mat("#281f4e"),0,.31,3,false);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(4.2,.13,10,64),new THREE.MeshBasicMaterial({color:"#8f7bff"}));ring.rotation.x=-Math.PI/2;ring.position.set(0,.35,3);g.add(ring);
+ // command wall aan de managementzijde
+ box(g,30,5.9,.34,mat("#15102f"),0,3.0,13.8,false);
+ staticSign(g,"KRAKEN AGENTS · COMMAND CENTER",0,5.2,13.58,"#ffb547",18,.75);
+ wallBoard(g,"hallEquity","VERMOGEN —",-10,3.85,13.58,"#ffffff","",6.2,.82);
+ wallBoard(g,"hallCash","VRIJ —",-3.35,3.85,13.58,"#5cf2b3","",6.2,.82);
+ wallBoard(g,"hallExposure","BELEGD —",3.35,3.85,13.58,"#ffb547","",6.2,.82);
+ wallBoard(g,"hallOpen","OPEN —",10,3.85,13.58,"#8f7bff","",6.2,.82);
+ wallBoard(g,"hallMarket","MARKT —",-10,2.75,13.58,"#6fd6b4","",6.2,.82);
+ wallBoard(g,"hallRisk","RISK —",-3.35,2.75,13.58,"#ff7d88","",6.2,.82);
+ wallBoard(g,"hallOpportunity","BESTE KANS —",3.35,2.75,13.58,"#c9bdff","",6.2,.82);
+ wallBoard(g,"hallLast","LAATSTE TRADE —",10,2.75,13.58,"#ffb547","",6.2,.82);
+ // centrale infobalie / zitjes
+ box(g,6.5,.85,2.0,mat("#d9d0f7"),0,.58,7.5,false);staticSign(g,"STATUS & ROUTING",0,1.48,7.5,"#24163d",4.7,.5);
+ loungeSeat(g,-10,2.0,.25);loungeSeat(g,10,2.0,-.25);plant(g,-14,9,1.15);plant(g,14,9,1.15);
+ // overhead hall lights
+ for(let x=-12;x<=12;x+=6)lightStrip(g,x,5.7,3.0,4.5,"#fff0cb");
+
+ // tweede hal richting dealing floor
+ box(g,18,.25,11,mat("#302655"),0,.13,37,false);staticSign(g,"DEALING & OPERATIONS",0,1.65,37,"#ffb547",7,.58);
+ loungeSeat(g,-5,37,Math.PI/2);loungeSeat(g,5,37,-Math.PI/2);plant(g,-8,40,1.0);plant(g,8,40,1.0);
+
+ // wandwijzers die echt op pilaren zitten
+ for(const x of [-45,-23,23,45])box(g,.65,3.2,.65,mat("#33275f"),x,1.7,6,false);
+ staticSign(g,"ANALYSE ←",-24,2.9,6.36,"#8fa8e8",4.8,.55);staticSign(g,"→ MANAGEMENT",24,2.9,6.36,"#d49bea",5.5,.55);
+ staticSign(g,"TRADEFLOOR ↑",0,2.7,37.36,"#ffb547",5.5,.55);
+
+ // subtiele corridor-statusschermen
+ wallBoard(g,"corridorMarket","MARKT —",-34,1.55,9.1,"#6fd6b4","",5.2,.7);
+ wallBoard(g,"ticker","RADAR —",0,1.55,9.1,"#c9bdff","",8.0,.7);
+ wallBoard(g,"corridorRisk","RISK —",18,1.55,40.1,"#ff7d88","",5.2,.7);
+ wallBoard(g,"corridorCash","KAPITAAL —",36,1.55,40.1,"#f4d35e","",5.8,.7);
+
+ // buitenrand: lage glasbalustrade geeft één gebouw zonder inkijk te blokkeren
+ const extGlass=new THREE.MeshStandardMaterial({color:"#7465b9",transparent:true,opacity:.11,roughness:.04,depthWrite:false});
+ box(g,116,2.0,.08,extGlass,4,1.0,-34,false);box(g,116,2.0,.08,extGlass,4,1.0,60,false);box(g,.08,2.0,94,extGlass,-54,1.0,13,false);box(g,.08,2.0,94,extGlass,62,1.0,13,false);
+
  createCourier("#ffffff","#d8d0ff",0);createCourier("#6fd6b4","#5cf2b3",1);createCourier("#ffb547","#ffb547",2);
 }
 function routeWaypoints(fromKey,toKey){
@@ -359,7 +429,8 @@ function focusFloor(key,fromAuto=false){
 }
 function setPreset(name){
  followCourier=false;document.getElementById("follow").classList.remove("on");selected=null;controls.enabled=true;
- if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
+ if(name==="command")setCamGoal([34,28,34],[0,1.4,6],1.25);
+ else if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
  else if(name==="management")setCamGoal([60,46,77],[0,0,27],.9);
  else if(name==="trade")focusFloor("trade");
  else if(name==="owner")focusFloor("owner");
@@ -424,7 +495,7 @@ function showFloor(key){
  <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
 }
 function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">Een levende 3D tradingcampus in plaats van een technisch schema.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
-function setBoard(key,text){if(wallboards[key])wallboards[key].textContent=text}
+function setBoard(key,text){if(wallboards[key])renderBoard(wallboards[key],text)}
 function updateClocks(){
  const fmt=z=>new Intl.DateTimeFormat("nl-NL",{timeZone:z,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
  setBoard("clockAMS","AMS "+fmt("Europe/Amsterdam"));setBoard("clockNY","NYC "+fmt("America/New_York"));setBoard("clockHK","HONG KONG "+fmt("Asia/Hong_Kong"));
@@ -449,10 +520,20 @@ function updateWallboards(){
  setBoard("ops",D.errors?.length?`SYSTEM · ${D.errors.length} MELDING(EN)`:"SYSTEM · ALL GREEN");
  setBoard("owner",live?`EQUITY ${eur.format(st?.equity||0)} · OPEN ${live.positions?.length||0}`:"OWNER VIEW —");
  setBoard("trade",live?.positions?.length?`LIVE · ${live.positions.length} OPEN · ${eur.format(live.exposure)}`:"LIVE POSITIONS · GEEN");
+ setBoard("hallEquity",st?`VERMOGEN ${eur.format(st.equity||0)}`:"VERMOGEN —");
+ setBoard("hallCash",live?`VRIJ ${eur.format(live.cash||0)}`:"VRIJ —");
+ setBoard("hallExposure",live?`BELEGD ${eur.format(live.exposure||0)}`:"BELEGD —");
+ setBoard("hallOpen",`OPEN ${live?.positions?.length||0}`);
+ setBoard("hallMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
+ setBoard("hallRisk",riskText);
+ setBoard("hallOpportunity",top?`BESTE ${top.market} · ${num((top.score||0)*100,0)}/100`:"BESTE KANS —");
+ const hallTrade=(live?.trades||[])[0];setBoard("hallLast",hallTrade?`${hallTrade.market} · ${hallTrade.pnl_pct>=0?"+":""}${num(hallTrade.pnl_pct||0,1)}%`:"LAATSTE TRADE —");
  setBoard("corridorMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
  const tick=(D.scanner?.candidates||[]).slice(0,3).map(x=>`${String(x.market||"").split("/")[0]} ${(Number(x.change_pct)||0)>=0?"+":""}${num(Number(x.change_pct)||0,1)}%`).join(" · ");setBoard("ticker",tick||"RADAR —");
+ setBoard("tradeTicker",tick||"BTC · ETH · RADAR");
+ setBoard("tradeMarket",`${String(D.regime?.label||"MARKT").toUpperCase()} · STRESS ${num(marketStress()*100,0)}%`);
  const lt=(live?.trades||[])[0];setBoard("tradeTape",lt?`${lt.market} · ${lt.pnl_pct>=0?"+":""}${num(lt.pnl_pct||0,1)}% · ${eur.format(lt.pnl||0)}`:"LAST TRADE —");
- const pos=live?.positions||[];tradePositionBoards.forEach((el,i)=>{const p=pos[i];el.textContent=p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`;el.style.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff"});
+ const pos=live?.positions||[];tradePositionBoards.forEach((rec,i)=>{const p=pos[i];rec.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff";renderBoard(rec,p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`)});
  const eq=st?.equity||0,cash=live?.cash||0,expo=live?.exposure||0,vals={cash:eq?cash/eq:0,exposure:eq?expo/eq:0,room:eq?Math.max(0,1-expo/eq):1};
  for(const b of capitalBars){const ratio=Math.max(.04,Math.min(1,vals[b.type]??0));b.mesh.scale.y=ratio;b.mesh.position.y=b.baseY+(b.maxH*ratio)/2}
  const riskLight=floorGroups.risk?.userData.riskLight;if(riskLight)riskLight.material.color.set(live?.risk?.halted?"#ff3344":blocked&&(!approved||blocked.ts>=approved.ts)?"#ff6b78":"#5cf2b3");
@@ -523,6 +604,7 @@ try{
   window.__showHQBootError(err);
 }
 document.getElementById("overview").addEventListener("click",resetView);
+document.getElementById("commandfocus").addEventListener("click",()=>setPreset("command"));
 document.getElementById("analysisfocus").addEventListener("click",()=>setPreset("analysis"));
 document.getElementById("managementfocus").addEventListener("click",()=>setPreset("management"));
 document.getElementById("tradefocus").addEventListener("click",()=>setPreset("trade"));
