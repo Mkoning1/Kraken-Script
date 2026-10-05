@@ -178,7 +178,7 @@ function render(d) {
     : `<span class="mode paper">Alleen papier</span>`;
 
   document.getElementById("app").innerHTML = `
-    <p style="margin:0 0 12px;display:flex;gap:16px"><a href="index.html">Handelsvloer</a><b>Details</b><a href="opportunities.html">Opportunities</a></p>
+    <p style="margin:0 0 12px;display:flex;gap:16px"><a href="index.html">Handelsvloer</a><a href="trades.html">Trades</a><b>Details</b><a href="opportunities.html">Opportunities</a></p>
     ${modeHtml}
     <p class="intro">Laatste run: <strong>${when(d.generated_ts)}</strong>${d.last_run_ok ? "" : ", met meldingen (zie onderaan)"}.
       Markt: <strong class="regime-${d.regime.label}">${d.regime.label}</strong>. Profiel: <strong>${esc(d.profile)}</strong>. ${d.markets.length} munten gevolgd.</p>

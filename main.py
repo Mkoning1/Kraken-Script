@@ -591,6 +591,45 @@ def run(now_ts=None, exchange=None):
     scan_report = dict(scan_report)
     scan_report["active_markets"] = list(markets)
     scan_report["active_discovery_markets"] = sorted(discovery_markets)
+
+    # Compact scanlog: iedere worker-run wordt vastgelegd, ook als er geen trade is.
+    # We bewaren zeven dagen op 5-minutencadans (max. 2016 scans) in de operationele state.
+    scan_history = state.setdefault("scan_history", [])
+    top_scan = []
+    for row in (scan_report.get("candidates") or [])[:5]:
+        top_scan.append({
+            "market": row.get("market"),
+            "score": round(float(row.get("score", 0)) * 100, 1),
+            "change_pct": round(float(row.get("change_pct", 0)), 2),
+            "selected": bool(row.get("selected")),
+        })
+    scan_history.append({
+        "ts": now_ts,
+        "ok": not errors,
+        "eligible": int(scan_report.get("eligible_count", 0) or 0),
+        "ranked": int(scan_report.get("pool_count", 0) or 0),
+        "active": len(markets),
+        "discovery": len(discovery_markets),
+        "top": top_scan,
+        "regime": regime,
+        "live_positions": len(state["books"].get("live", {}).get("positions", {}) if state["books"].get("live") else {}),
+        "shadow_positions": len(state["books"]["schaduw"]["positions"]),
+        "actions": {
+            "buy": sum(1 for e in events if e.get("type") == "entry"),
+            "sell": sum(1 for e in events if e.get("type") == "exit"),
+            "blocked": sum(1 for e in events if e.get("type") == "blocked"),
+        },
+        "desks": {
+            "monitor": True,
+            "discovery": bool(new_discovery),
+            "fast": bool(new_fast),
+            "swing": bool(new_hour),
+            "trend": bool(h4),
+        },
+        "errors": len(errors),
+    })
+    state["scan_history"] = scan_history[-2016:]
+
     monitor.record(state, now_ts, prices, prices.get(cfg["benchmark_market"]))
     desk_status = {
         "monitor_minutes": int(cadence.get("monitor_minutes", 5)),
