@@ -1,15 +1,535 @@
-<!doctype html>
-<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Kraken Agents HQ</title>
-<style>html,body{height:100%;margin:0;background:#0d0924;color:#f3efff;font:16px system-ui,sans-serif}.load{height:100%;display:grid;place-items:center;text-align:center;padding:24px}.load b{color:#ffb547}.load a{color:#c9bdff}</style></head>
-<body><div class="load" id="loading"><div><b>KRAKEN AGENTS HQ</b><p>Het levende kantoorpand wordt geopend…</p></div></div>
-<script type="module">
-try {
-  const res=await fetch("hq-v5.html?t="+Date.now(),{cache:"no-store"});
-  if(!res.ok) throw new Error("HQ-kantoorcampus "+res.status);
-  const html=await res.text();
-  document.open();document.write(html);document.close();
-} catch(e) {
-  document.getElementById("loading").innerHTML='<div><b>HQ kon niet laden</b><p>'+String(e.message||e)+'</p><p><a href="hq-v1.html">Open vorige HQ</a> · <a href="trades.html">Open Trades</a></p></div>';
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Kraken Agents HQ · 3D</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+<style>
+:root{
+ --void:#140D33;--glass:rgba(24,16,62,.90);--edge:rgba(190,170,255,.28);
+ --text:#EEEAFF;--muted:#A9A0D6;--buy:#5CF2B3;--neg:#FF6B78;--money:#FFB547;--accent:#8F7BFF;
+ box-sizing:border-box
 }
-</script></body></html>
+*,*:before,*:after{box-sizing:inherit}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--void);color:var(--text);font:15px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
+a{color:#c9bdff;text-decoration:none}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--money);outline-offset:2px}
+.up{color:var(--buy)}.down{color:var(--neg)}.money{color:var(--money)}
+.bar{position:fixed;z-index:10;top:0;left:0;right:0;display:flex;align-items:center;gap:20px;padding:10px 18px;background:rgba(16,10,44,.93);border-bottom:1px solid var(--edge);backdrop-filter:blur(10px)}
+.brand{font-weight:800;font-size:1.12rem;letter-spacing:.03em}.brand small{display:block;font-size:.68rem;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.tabs{display:flex;gap:4px;margin-right:auto}.tabs a{color:var(--muted);padding:5px 10px;border-radius:4px}.tabs a[aria-current=page]{color:#fff;background:rgba(143,123,255,.25)}
+.kpi{display:flex;flex-direction:column;line-height:1.05}.kpi span{font-size:.69rem;color:var(--muted)}.kpi b{font-size:1rem}
+.mode{border:1px solid currentColor;padding:3px 9px;border-radius:3px;font-weight:700;color:var(--money)}
+.live-dot{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:.74rem}.live-dot:before{content:"";width:7px;height:7px;border-radius:50%;background:#575078}.live-dot.on{color:var(--buy)}.live-dot.on:before{background:var(--buy);box-shadow:0 0 12px var(--buy)}
+#stage{position:fixed;inset:0;z-index:1}#stage canvas{display:block}.l2d{pointer-events:none}
+.floor-label{pointer-events:none;padding:2px 5px;border-radius:2px;font-weight:900;font-size:9px;color:#160f3a;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.28);opacity:.82}
+.floor-label.active{opacity:1;box-shadow:0 0 0 1px #fff,0 0 12px currentColor}
+.worker-label{pointer-events:none;background:rgba(15,10,38,.82);border:1px solid rgba(200,185,255,.35);border-radius:3px;padding:2px 5px;font-size:10px;color:#fff;white-space:nowrap}
+.event-label{pointer-events:none;background:#fff4de;color:#24163d;border:1px solid var(--money);border-radius:9px;padding:4px 8px;font-size:11px;font-weight:700;box-shadow:0 4px 15px rgba(0,0,0,.3)}
+.left{position:fixed;z-index:6;left:14px;top:70px;width:240px;max-height:calc(100% - 140px);overflow:auto;display:flex;flex-direction:column;gap:8px}
+.card{background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:10px 11px;backdrop-filter:blur(8px)}
+.card h2{font-size:.82rem;text-transform:uppercase;letter-spacing:.06em;color:#c9bdff;margin:0 0 7px}
+.floor-nav{display:grid;gap:4px}.floor-nav button{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;text-align:left;color:var(--text);background:rgba(255,255,255,.035);border:1px solid transparent;border-radius:4px;padding:5px 7px;cursor:pointer}.floor-nav button:hover,.floor-nav button.active{border-color:var(--edge);background:rgba(143,123,255,.16)}.floor-nav .n{color:var(--muted);font-size:.72rem}.floor-nav .s{width:7px;height:7px;border-radius:50%;background:#5a527a}.floor-nav .s.hot{background:var(--buy);box-shadow:0 0 9px var(--buy)}.floor-nav .s.trade{background:var(--money);box-shadow:0 0 9px var(--money)}
+.moneybox .big{font-size:1.45rem;font-weight:800;color:var(--money)}.moneybox .row{display:flex;justify-content:space-between;gap:8px;font-size:.8rem;margin-top:3px}.moneybox .row span:first-child{color:var(--muted)}
+.right{position:fixed;z-index:6;right:14px;top:70px;width:350px;max-height:calc(100% - 245px);overflow:auto;background:var(--glass);border:1px solid var(--edge);border-radius:5px;padding:14px 15px;backdrop-filter:blur(9px)}
+.right h1{font-size:1.25rem;margin:0 0 3px}.right .sub{color:var(--muted);font-size:.8rem;margin:0 0 10px}.status{border-left:3px solid var(--accent);background:rgba(143,123,255,.11);padding:8px 9px;margin-bottom:10px}.status b{display:block;font-size:1.05rem}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:9px 0}.mini{background:rgba(255,255,255,.04);border:1px solid rgba(190,170,255,.13);padding:7px}.mini small{display:block;color:var(--muted)}.mini b{font-size:.95rem}.right p{font-size:.84rem;margin:7px 0}.right ul{padding-left:18px;font-size:.83rem;color:var(--muted)}
+.tools{position:fixed;z-index:6;left:270px;bottom:14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;max-width:calc(100% - 650px)}.tools button{color:var(--text);background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;cursor:pointer}.tools button:hover,.tools button.on{background:rgba(143,123,255,.28);border-color:#a894ff}.tools span{color:var(--muted);font-size:.75rem}
+.caption{position:fixed;z-index:6;left:270px;right:380px;top:70px;pointer-events:none}.caption>div{display:inline-block;background:var(--glass);border:1px solid var(--edge);border-radius:4px;padding:7px 10px;font-size:.83rem;backdrop-filter:blur(8px)}.caption b{color:var(--money);margin-right:7px}
+.loading{position:fixed;inset:0;z-index:4;display:grid;place-items:center;color:var(--muted);background:var(--void)}
+.hover-office{display:none;position:fixed;z-index:20;pointer-events:none;background:rgba(14,9,38,.96);border:1px solid rgba(190,170,255,.38);border-radius:5px;padding:6px 9px;font-size:.78rem;box-shadow:0 8px 25px rgba(0,0,0,.35)}
+.hover-office b{display:block;color:#fff}.hover-office small{color:var(--muted)}
+.minimap{position:fixed;z-index:6;right:14px;bottom:14px;width:235px;height:150px;padding:8px;background:rgba(16,10,44,.88)}
+.minimap h2{margin:0 0 4px;font-size:.7rem}.map-area{position:relative;height:116px;border:1px solid rgba(190,170,255,.16);background:rgba(0,0,0,.14);overflow:hidden}
+.map-line{position:absolute;background:rgba(143,123,255,.22)}.map-line.h{height:4px}.map-line.v{width:4px}
+.map-room{position:absolute;border:1px solid rgba(255,255,255,.4);border-radius:2px;cursor:pointer;min-width:12px;min-height:10px;padding:0;background:#8f7bff;opacity:.78;transition:.15s}.map-room:hover,.map-room.active{opacity:1;transform:scale(1.18);box-shadow:0 0 8px currentColor}
+.map-room.trade{border-width:2px}.map-room.owner{border-radius:50%}
+
+.compact{display:none;padding:74px 14px 30px}.compact h2{color:#c9bdff;font-size:1rem}.compact .c-floor{margin:7px 0;padding:10px;background:rgba(143,123,255,.09);border:1px solid var(--edge);border-radius:5px}.compact b{display:block}.compact small{color:var(--muted)}
+@media(max-width:1050px){.left{width:210px}.right{width:310px}.tools{left:232px}.caption{left:232px;right:335px}.minimap{display:none}}
+@media(max-width:820px){body{overflow:auto}.bar{position:sticky;flex-wrap:wrap}.kpi{display:none}#stage,.left,.right,.tools,.caption{display:none!important}.compact{display:block}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<header class="bar">
+ <span class="brand">Kraken Agents HQ<small>3D trading campus</small></span>
+ <nav class="tabs"><a href="index.html" aria-current="page">HQ</a><a href="trades.html">Trades</a><a href="details.html">Details</a><a href="opportunities.html">Opportunities</a></nav>
+ <span class="mode" id="mode">laden</span>
+ <span class="live-dot" id="livestat">Kraken live</span>
+ <span class="kpi"><span>Vermogen</span><b id="equity">–</b></span>
+ <span class="kpi"><span>Vrij</span><b id="cash">–</b></span>
+ <span class="kpi"><span>Belegd</span><b id="exposure">–</b></span>
+</header>
+<div id="stage"></div>
+<aside class="left">
+ <section class="card moneybox"><h2>Kapitaal</h2><div class="big" id="moneytotal">–</div><div class="row"><span>Vrij op Kraken</span><b id="moneyfree">–</b></div><div class="row"><span>Belegd</span><b id="moneyused">–</b></div><div class="row"><span>Budget</span><b>ALLES</b></div></section>
+ <section class="card"><h2>Afdelingen</h2><div class="floor-nav" id="floornav"></div></section>
+</aside>
+<aside class="right" id="detail"><h1>Kraken Agents HQ</h1><p class="sub">Klik op een kantoor om naar binnen te kijken.</p><div class="status"><b>Kantooroverzicht</b>Losse kantoren liggen rond echte gangen. Actieve teams lichten op en medewerkers brengen dossiers fysiek naar de volgende afdeling.</div></aside>
+<div class="caption"><div id="caption"><b>HQ</b>Live botdata wordt geladen…</div></div>
+<div class="tools">
+ <button id="overview">Campus</button><button id="analysisfocus">Analyse</button><button id="managementfocus">Management</button><button id="tradefocus">Tradefloor</button><button id="ownerfocus">Owner</button>
+ <button id="follow">Volg dossier</button><button id="autocam">Autocamera</button><button id="sound">Geluid uit</button>
+ <span>Links slepen = schuiven · scroll = zoomen · rechts slepen = draaien</span>
+</div>
+<div class="minimap card" id="minimap"><h2>Plattegrond</h2><div class="map-area" id="maparea"></div></div>
+<div class="hover-office" id="hoverOffice"></div>
+<div class="loading" id="loading">3D-kantoorcampus wordt opgebouwd…</div>
+<main class="compact" id="compact"></main>
+
+<script>
+window.__hqReady=false;
+window.__showHQBootError=function(err){
+  const el=document.getElementById("loading");
+  if(!el)return;
+  const msg=(err&&err.message)||String(err||"onbekende fout");
+  el.style.display="grid";
+  el.innerHTML='<div style="max-width:620px;padding:24px;text-align:center"><b style="color:#ffb547">HQ kon niet starten</b><p style="color:#c9bdff">'+msg.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))+'</p><p><a style="color:#c9bdff" href="hq-v4.html">Open vorige 3D-campus</a> · <a style="color:#c9bdff" href="trades.html">Open Trades</a></p></div>';
+};
+window.addEventListener("error",e=>window.__showHQBootError(e.error||e.message));
+window.addEventListener("unhandledrejection",e=>window.__showHQBootError(e.reason));
+setTimeout(()=>{if(!window.__hqReady)window.__showHQBootError("De 3D-campus reageerde niet binnen 12 seconden.")},12000);
+</script>
+<script type="module">
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import {CSS2DRenderer,CSS2DObject} from "three/addons/renderers/CSS2DRenderer.js";
+
+const eur=new Intl.NumberFormat("nl-NL",{style:"currency",currency:"EUR"});
+const num=(v,d=1)=>new Intl.NumberFormat("nl-NL",{minimumFractionDigits:d,maximumFractionDigits:d}).format(v??0);
+const pct=v=>v==null?"–":(v>0?"+":"")+num(v,1)+"%";
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const clock=ts=>ts?new Date(ts*1000).toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"}):"–";
+const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const COLORS={ops:"#8FC3E8",data:"#8FA8E8",market:"#6FD6B4",fast:"#FF9A62",swing:"#45D1EE",trend:"#7F9BFF",equity:"#B7A0FF",performance:"#D49BEA",directie:"#E9E4FF",risk:"#FF7D88",capital:"#F4D35E",execution:"#FFB547",trade:"#FFB547",owner:"#FFFFFF"};
+const FLOORS=[
+ {key:"data",no:"A1",name:"Radar & Data",x:-36,z:-12,face:1,color:COLORS.data,staff:8,desc:"Scant de brede Kraken-markt iedere vijf minuten.",lane:7},
+ {key:"market",no:"A2",name:"Market Intelligence",x:-18,z:-12,face:1,color:COLORS.market,staff:5,desc:"Bepaalt het algemene cryptomarktklimaat en trendregime.",lane:7},
+ {key:"fast",no:"A3",name:"Fast Desk 15m",x:0,z:-12,face:1,color:COLORS.fast,staff:9,desc:"Momentum, squeeze en snelle breakout; de drukste analyse-desk.",lane:7},
+ {key:"swing",no:"A4",name:"Swing Desk 1u",x:18,z:-12,face:1,color:COLORS.swing,staff:7,desc:"Dip-koper en breakout werken hier op 1-uurscandles.",lane:7},
+ {key:"trend",no:"A5",name:"Trend Desk 4u",x:36,z:-12,face:1,color:COLORS.trend,staff:6,desc:"Zoekt grotere uitbraken en langere runners.",lane:7},
+
+ {key:"equity",no:"B1",name:"China / HK Research",x:-36,z:26,face:-1,color:COLORS.equity,staff:6,desc:"Research en paper trading voor Hongkong en China.",lane:7},
+ {key:"performance",no:"B2",name:"Prestatie",x:-18,z:26,face:-1,color:COLORS.performance,staff:5,desc:"Meet strategieën en bepaalt wie live of schaduw handelt.",lane:7},
+ {key:"directie",no:"B3",name:"Directie",x:0,z:26,face:-1,color:COLORS.directie,staff:5,desc:"Vergelijkt koopadviezen en beslist welke kansen door mogen.",lane:7},
+ {key:"risk",no:"B4",name:"Risk Management",x:18,z:26,face:-1,color:COLORS.risk,staff:5,desc:"Heeft veto-recht en controleert stop, positieomvang, correlatie en verlieslimieten.",lane:7},
+ {key:"capital",no:"B5",name:"Kapitaal / Treasury",x:36,z:26,face:-1,color:COLORS.capital,staff:4,desc:"Beheert vrij geld, exposure en beschikbare handelsruimte.",lane:7},
+
+ {key:"ops",no:"C1",name:"Operations",x:-34,z:52,face:-1,color:COLORS.ops,staff:6,w:20,d:17,desc:"Monitoring, scanlog, status en rapportage van het hele bedrijf.",lane:39},
+ {key:"execution",no:"C2",name:"Execution",x:34,z:52,face:-1,color:COLORS.execution,staff:6,w:20,d:17,desc:"Plaatst echte orders op Kraken en controleert exchange-stops.",lane:39},
+ {key:"owner",no:"C3",name:"Owner / CEO",x:55,z:52,face:-1,color:COLORS.owner,staff:2,w:16,d:17,desc:"Managementkantoor met totaaloverzicht van vermogen, prestaties en actieve afdelingen.",lane:39},
+ {key:"trade",no:"TF",name:"LIVE TRADEFLOOR",x:0,z:54,face:-1,color:COLORS.trade,staff:24,w:40,d:22,trade:true,desc:"Grote hectische dealing floor waar goedgekeurde live trades zichtbaar worden uitgevoerd.",lane:39}
+];
+const BYKEY=Object.fromEntries(FLOORS.map(f=>[f.key,f]));
+const OLDKEY={monitor:"ops",data:"data",markt:"market",fast:"fast",swing:"swing",trend:"trend",equity:"equity",prestatie:"performance",beslis:"directie",risico:"risk",kapitaal:"capital",uitvoer:"execution"};
+let D=null,EQ=null,lastKey="",latestScan=null;
+const activity=Object.fromEntries(FLOORS.map(f=>[f.key,.18]));
+const floorGroups={},workers=[],walkers=[],screenMats=[],clickables=[],labelsByFloor={},wallboards={},capitalBars=[],tradePositionBoards=[];
+const couriers=[];let courierRoute=[],lastRouteAt=0,scene,camera,renderer,labelRenderer,controls,clockT=0,selected=null,hovered=null;
+let followCourier=false,autoCamera=false,autoAt=0,soundOn=false,audioCtx=null,lastSoundEvent="",camGoal=null;
+const stage=document.getElementById("stage");
+
+function mat(color,extra={}){return new THREE.MeshStandardMaterial({color,roughness:.74,metalness:.04,...extra})}
+function box(parent,w,h,d,material,x,y,z,shadow=true){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material);m.position.set(x,y,z);m.castShadow=shadow;m.receiveShadow=true;parent.add(m);return m;
+}
+function cssLabel(parent,html,cls,x,y,z){
+ const d=document.createElement("div");d.className=cls;d.innerHTML=html;const o=new CSS2DObject(d);o.position.set(x,y,z);parent.add(o);return {object:o,element:d};
+}
+function makePerson(color,seated=false,scale=1){
+ const g=new THREE.Group(),skin=mat(["#F2C9A0","#E0A97E","#C68B63","#8D5A3B","#F6D5B8"][Math.floor(Math.random()*5)]),cloth=mat(color),dark=mat("#292047");
+ const body=new THREE.Mesh(new THREE.CapsuleGeometry(.25,.45,4,10),cloth);body.position.y=1.35;
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.23,14,10),skin);head.position.y=1.95;
+ const hair=new THREE.Mesh(new THREE.SphereGeometry(.245,14,7,0,Math.PI*2,0,Math.PI/2),mat(["#1a1721","#5a3822","#c99f55","#2a2340"][Math.floor(Math.random()*4)]));hair.position.y=1.99;
+ const armGeo=new THREE.BoxGeometry(.12,.12,.52);armGeo.translate(0,0,-.26);
+ const armL=new THREE.Mesh(armGeo,cloth),armR=new THREE.Mesh(armGeo,cloth);armL.position.set(-.32,1.5,-.05);armR.position.set(.32,1.5,-.05);
+ if(seated){armL.rotation.x=armR.rotation.x=-.6;
+   const seat=box(g,.68,.1,.65,dark,0,.72,.15);box(g,.68,.68,.09,dark,0,1.06,.45);box(g,.08,.7,.08,dark,0,.36,.15);
+ } else {
+   const legGeo=new THREE.BoxGeometry(.14,.68,.16),l=new THREE.Mesh(legGeo,dark),r=new THREE.Mesh(legGeo,dark);l.position.set(-.13,.48,0);r.position.set(.13,.48,0);g.add(l,r);g.userData.legs=[l,r];
+ }
+ g.add(body,head,hair,armL,armR);g.scale.setScalar(scale);g.userData.parts={body,head,hair,armL,armR};return g;
+}
+function plant(parent,x,z,scale=1){
+ const pot=mat("#5a3b65"),leaf=mat("#56b78b");box(parent,.48,.45,.48,pot,x,.22,z);
+ const crown=new THREE.Mesh(new THREE.SphereGeometry(.52*scale,12,8),leaf);crown.position.set(x,.82*scale,z);parent.add(crown);return crown;
+}
+function wallBoard(parent,key,text,x,y,z,color="#ffffff",cls="worker-label"){
+ const l=cssLabel(parent,text,cls,x,y,z);wallboards[key]=l.element;return l;
+}
+function beacon(parent,key,x,y,z,color){
+ const m=new THREE.Mesh(new THREE.SphereGeometry(.28,14,10),new THREE.MeshBasicMaterial({color,toneMapped:false}));m.position.set(x,y,z);parent.add(m);parent.userData[key]=m;return m;
+}
+function setCamGoal(pos,target,zoom){
+ camGoal={pos:new THREE.Vector3(...pos),target:new THREE.Vector3(...target),zoom};controls.enabled=!followCourier;
+}
+function updateCamera(dt){
+ if(followCourier&&couriers[0]){
+   const p=couriers[0].person.position,t=new THREE.Vector3(p.x,1.2,p.z);
+   controls.target.lerp(t,Math.min(1,dt*2.5));
+   const desired=new THREE.Vector3(p.x+16,15,p.z+20);camera.position.lerp(desired,Math.min(1,dt*1.8));
+   camera.zoom+=(1.7-camera.zoom)*Math.min(1,dt*2);camera.updateProjectionMatrix();
+ }else if(camGoal){
+   const k=Math.min(1,dt*2.4);camera.position.lerp(camGoal.pos,k);controls.target.lerp(camGoal.target,k);camera.zoom+=(camGoal.zoom-camera.zoom)*k;camera.updateProjectionMatrix();
+   if(camera.position.distanceTo(camGoal.pos)<.15&&controls.target.distanceTo(camGoal.target)<.15&&Math.abs(camera.zoom-camGoal.zoom)<.01)camGoal=null;
+ }
+ if(autoCamera&&!followCourier&&clockT>autoAt){
+   autoAt=clockT+9;const hot=FLOORS.filter(f=>floorHot(f.key)&&f.key!=="ops");const f=hot.length?hot[Math.floor(Math.random()*hot.length)]:BYKEY.data;focusFloor(f.key,true);
+ }
+}
+function tone(freq=660,dur=.09,vol=.035){
+ if(!soundOn)return;try{audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=freq;g.gain.value=vol;o.connect(g);g.connect(audioCtx.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+dur);o.stop(audioCtx.currentTime+dur)}catch{}
+}
+function hkOpen(){
+ const p=new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Hong_Kong",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false}).formatToParts(new Date());
+ const get=t=>p.find(x=>x.type===t)?.value;const day=get("weekday"),mins=(+get("hour"))*60+(+get("minute"));return !["Sat","Sun"].includes(day)&&mins>=570&&mins<960;
+}
+function monitor(parent,x,y,z,color,big=false){
+ const frame=box(parent,big?2.6:1.1,big?1.35:.72,.09,mat("#21193f"),x,y,z);
+ const screen=box(parent,big?2.42:.96,big?1.17:.57,.02,new THREE.MeshBasicMaterial({color,toneMapped:false}),x,y,z+.055,false);
+ screenMats.push({mesh:screen,base:new THREE.Color(color),phase:Math.random()*6.2});return frame;
+}
+function addDesk(parent,x,z,yBase,color,workerColor=color){
+ box(parent,3.1,.12,1.25,mat("#eeeaff"),x,yBase+.88,z);
+ box(parent,.1,.82,1.1,mat("#bdb2ea"),x-1.42,yBase+.43,z);box(parent,.1,.82,1.1,mat("#bdb2ea"),x+1.42,yBase+.43,z);
+ monitor(parent,x,yBase+1.55,z-.38,color);
+ const p=makePerson(workerColor,true);p.position.set(x,yBase,z+.72);parent.add(p);
+ workers.push({g:p,key:parent.userData.key,phase:Math.random()*6.2,seated:true});
+ return p;
+}
+function decorateDepartment(g,f,W,D,H){
+ const back=-D/2+.26;
+ plant(g,-W/2+1.0,D/2-1.2,.8);if(!f.trade)plant(g,W/2-1.0,D/2-1.2,.7);
+ if(f.key==="data"){
+   monitor(g,0,H-1.35,back,f.color,true);monitor(g,-3.3,H-1.65,back,f.color);monitor(g,3.3,H-1.65,back,f.color);
+   wallBoard(g,"data","SCAN —",0,H-2.55,back+.12,f.color);wallBoard(g,"dataTop","TOP RADAR —",0,H-3.25,back+.12,f.color);
+ }
+ if(f.key==="market"){
+   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"market","MARKT —",0,H-2.55,back+.12,f.color);
+   wallBoard(g,"clockAMS","AMS —",-2.8,H-3.15,back+.12);wallBoard(g,"clockNY","NYC —",2.8,H-3.15,back+.12);
+ }
+ if(f.key==="fast"){
+   for(let x=-4.5;x<=4.5;x+=3)monitor(g,x,H-1.45,back,f.color);
+   wallBoard(g,"fast","FAST DESK —",0,H-2.55,back+.12,f.color);beacon(g,"alert",W/2-1,H-1,D/2-1,f.color);
+ }
+ if(f.key==="swing"){
+   monitor(g,-2.1,H-1.45,back,f.color,true);monitor(g,2.6,H-1.65,back,f.color);
+   wallBoard(g,"swing","SWING SETUPS —",0,H-2.7,back+.12,f.color);
+   box(g,4.8,2.1,.08,mat("#efeafd"),0,2.1,-D/2+.33,false);wallBoard(g,"swingBoard","1H SETUPS",0,2.1,-D/2+.42,"#17113d");
+ }
+ if(f.key==="trend"){
+   for(let x=-4.1;x<=4.1;x+=4.1)monitor(g,x,H-1.55,back,f.color,true);
+   wallBoard(g,"trend","4H RUNNERS —",0,H-2.85,back+.12,f.color);
+ }
+ if(f.key==="equity"){
+   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"equity","HK RESEARCH —",0,H-2.55,back+.12,f.color);
+   wallBoard(g,"clockHK","HONG KONG —",-2.8,H-3.15,back+.12);wallBoard(g,"equityPaper","PAPER —",2.8,H-3.15,back+.12);
+ }
+ if(f.key==="performance"){
+   monitor(g,-2.5,H-1.5,back,f.color,true);wallBoard(g,"performance","AGENT RANKING —",-2.5,H-2.8,back+.12,f.color);
+   box(g,4.2,2.4,.08,mat("#302454"),3.5,2.2,-D/2+.33,false);wallBoard(g,"shadow","SHADOW LAB",3.5,2.8,-D/2+.42,"#c9bdff");
+   wallBoard(g,"nofomo","NO FOMO",3.5,1.8,-D/2+.42,"#ffb547");
+ }
+ if(f.key==="directie"){
+   box(g,9,.32,2.8,mat("#d9d0f7"),0,.88,2.0);
+   for(let i=0;i<5;i++){const p=makePerson(f.color,true);p.position.set(-4+i*2,.15,3.3);g.add(p);workers.push({g:p,key:f.key,phase:Math.random()*6.2,seated:true});}
+   monitor(g,0,H-1.35,back,f.color,true);wallBoard(g,"directie","BOARDROOM —",0,H-2.55,back+.12,f.color);
+ }
+ if(f.key==="risk"){
+   monitor(g,0,H-1.45,back,"#ff6b78",true);wallBoard(g,"risk","RISK DECISION —",0,H-2.65,back+.12,"#ff6b78");
+   beacon(g,"riskLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+ }
+ if(f.key==="capital"){
+   wallBoard(g,"capital","TREASURY —",0,H-1.3,back+.12,f.color);
+   const types=["cash","exposure","room"],cols=["#5cf2b3","#ffb547","#8f7bff"];
+   for(let i=0;i<3;i++){const m=box(g,1.05,3.2,.8,mat(cols[i]),-3+i*3,2.0,-D/2+1.0,false);capitalBars.push({mesh:m,type:types[i],baseY:.4,maxH:3.2});}
+   wallBoard(g,"capitalLegend","VRIJ · BELEGD · RUIMTE",0,4.25,back+.12,f.color);
+ }
+ if(f.key==="execution"){
+   monitor(g,0,H-1.45,back,f.color,true);wallBoard(g,"execution","ORDER QUEUE —",0,H-2.65,back+.12,f.color);
+   beacon(g,"orderLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+ }
+ if(f.key==="ops"){
+   for(let x=-6;x<=6;x+=3){box(g,2.1,3.4,1.4,mat("#18142f"),x,1.9,-D/2+1.4,false);for(let y=.8;y<3.1;y+=.55)box(g,1.65,.08,.04,new THREE.MeshBasicMaterial({color:y%1.1<.2?"#ffb547":"#5cf2b3",toneMapped:false}),x,y,-D/2+2.12,false)}
+   wallBoard(g,"ops","SYSTEM STATUS —",0,H-1.2,back+.12,f.color);wallBoard(g,"tradeTape","LAST TRADE —",0,H-2.05,back+.12,"#ffb547");beacon(g,"opsLight",W/2-1,H-1,D/2-1,"#5cf2b3");
+ }
+ if(f.key==="owner"){
+   box(g,6.4,.22,2.4,mat("#ddd6f4"),0,.9,-1.1);monitor(g,0,H-1.4,back,"#ffffff",true);wallBoard(g,"owner","OWNER VIEW —",0,H-2.7,back+.12,"#ffffff");
+   box(g,4,.55,1.5,mat("#4b3c6f"),0,.35,3.2);plant(g,-W/2+1.2,2.8,1.15);plant(g,W/2-1.2,2.8,1.15);
+ }
+ if(f.trade){
+   monitor(g,0,H-1.4,back,"#ffb547",true);wallBoard(g,"trade","LIVE POSITIONS",0,H-2.75,back+.12,"#ffb547");
+   for(let i=0;i<4;i++){const l=wallBoard(g,"tradePos"+i,"DESK "+(i+1)+" · VRIJ",-9+i*6,H-3.55,back+.12,"#ffffff");tradePositionBoards.push(l.element)}
+   for(let x=-16;x<=16;x+=4) box(g,3.2,.48,.03,new THREE.MeshBasicMaterial({color:iColor(x),toneMapped:false}),x,H-4.35,back+.05,false);
+   const gate=new THREE.Mesh(new THREE.TorusGeometry(1.5,.14,12,48),new THREE.MeshBasicMaterial({color:"#ffb547"}));gate.position.set(-W/2+1.2,3,-1);gate.rotation.y=Math.PI/2;g.add(gate);
+   wallBoard(g,"krakenGate","KRAKEN GATE",-W/2+2,4.8,-1,"#ffb547","event-label");
+ }
+}
+function buildFloor(f){
+ const g=new THREE.Group();g.userData={key:f.key};g.position.set(f.x,0,f.z);g.rotation.y=f.face===-1?Math.PI:0;scene.add(g);floorGroups[f.key]=g;
+ const H=f.trade?7.4:5.6,W=f.w||(f.trade?40:15.5),D=f.d||(f.trade?22:13.5);
+ box(g,W,.42,D,mat(f.trade?"#35236e":"#34277c"),0,0,0,false);
+ box(g,W,H,.28,mat("#20164d"),0,H/2,-D/2,false);box(g,.28,H,D,mat("#271b5d"),-W/2,H/2,0,false);box(g,.28,H,D,mat("#271b5d"),W/2,H/2,0,false);
+ const glass=new THREE.MeshStandardMaterial({color:"#b9aeff",transparent:true,opacity:.12,roughness:.06,depthWrite:false});
+ const door=2.8,panel=(W-door)/2;box(g,panel,H-.35,.07,glass,-(door+panel)/2,H/2,D/2,false);box(g,panel,H-.35,.07,glass,(door+panel)/2,H/2,D/2,false);
+ box(g,door,.18,.16,new THREE.MeshBasicMaterial({color:f.color,toneMapped:false}),0,H-.25,D/2-.03,false);
+ const lab=cssLabel(g,f.no,"floor-label",0,H-.52,D/2+.18);lab.element.style.background=f.color;labelsByFloor[f.key]=lab;
+ const count=f.staff,cols=f.trade?6:(f.key==="owner"?1:2),spacingX=f.trade?5.6:5.2;
+ for(let i=0;i<count;i++){
+   const row=Math.floor(i/cols),col=i%cols,used=Math.min(cols,count-row*cols),x=(col-(used-1)/2)*spacingX,z=f.trade?(-5.2+row*4.3):(-3.0+row*3.1);
+   addDesk(g,x,z,.2,f.color);
+ }
+ const moving=f.trade?10:(["fast","data","execution","risk","ops"].includes(f.key)?2:1);
+ for(let i=0;i<moving;i++){const p=makePerson(f.color,false);p.position.set(-W/2+2.1+i*.8,.15,D/2-2.0-i*.35);g.add(p);walkers.push({g:p,key:f.key,phase:Math.random()*6.2,baseX:p.position.x,baseZ:p.position.z,range:f.trade?14:3.0})}
+ decorateDepartment(g,f,W,D,H);
+ const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
+ return g;
+}
+function iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
+function officeDoor(f){
+ const D=f.d||(f.trade?22:13.5),front=(D/2)+1.4;
+ return {x:f.x,z:f.z+(f.face===1?front:-front),lane:f.lane};
+}
+function createCourier(color,dossierColor,index){
+ const p=makePerson(color,false,.92);p.position.set(-36,.16,7);scene.add(p);
+ const d=box(p,.38,.28,.5,new THREE.MeshBasicMaterial({color:dossierColor,toneMapped:false}),.52,1.35,-.05,false);
+ const glow=new THREE.PointLight(dossierColor,.7,4);glow.position.set(.52,1.4,-.05);p.add(glow);
+ const c={person:p,dossier:d,glow,index,routeIndex:index,path:[],pathIndex:0,pause:index*1.8};couriers.push(c);return c;
+}
+function buildShaft(){
+ const g=new THREE.Group();scene.add(g),floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
+ // hoofdgangen
+ box(g,108,.28,6.4,floorMat,0,.05,7,false);box(g,122,.28,6.4,floorMat,5,.05,39,false);box(g,6.4,.28,42,floorMat,0,.05,23,false);
+ // duidelijk verlichte randen
+ for(let x=-52;x<=52;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,3.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,10.15,false)}
+ for(let x=-55;x<=65;x+=4){box(g,1.8,.04,.09,edgeMat,x,.23,35.85,false);box(g,1.8,.04,.09,edgeMat,x,.23,42.15,false)}
+ // office connectors
+ for(const f of FLOORS){const d=officeDoor(f),len=Math.abs(d.z-f.lane),mid=(d.z+f.lane)/2;if(len>.5)box(g,3.4,.25,len,floorMat,d.x,.06,mid,false)}
+ // lobby/entree
+ box(g,24,.32,13,mat("#30236a"),0,.08,-27,false);box(g,6.4,.28,24,floorMat,0,.05,-10,false);
+ box(g,8,.95,2.0,mat("#ddd6f4"),0,.55,-28,false);wallBoard(g,"lobby","KRAKEN AGENTS HQ",0,2.15,-29.2,"#ffb547","event-label");
+ for(let x=-8;x<=8;x+=8)plant(g,x,-23.5,1.2);
+ // central atrium + koffiehoek
+ box(g,12,.32,12,mat("#30236a"),0,.08,23,false);box(g,3.6,1.1,1.2,mat("#d9d0f7"),4,.7,22,false);wallBoard(g,"coffee","COFFEE",4,2.1,22,"#c9bdff");
+ plant(g,-4,20,1.15);plant(g,-4,26,1.0);
+ // fysieke richtingsborden
+ wallBoard(g,"wingA","← ANALYSE VLEUGEL",-18,1.35,7,"#8fa8e8");wallBoard(g,"wingB","MANAGEMENT VLEUGEL →",18,1.35,7,"#d49bea");wallBoard(g,"wingC","DEALING / OPERATIONS",0,1.35,39,"#ffb547");
+ // gang-wallboards
+ wallBoard(g,"corridorMarket","MARKT —",-34,1.55,7,"#6fd6b4");wallBoard(g,"ticker","BTC / ETH / RADAR —",0,1.55,7,"#c9bdff");wallBoard(g,"corridorRisk","RISK —",22,1.55,39,"#ff7d88");wallBoard(g,"corridorCash","KAPITAAL —",40,1.55,39,"#f4d35e");
+ // parkeer-/entree-markeringen in plaats van zwarte skylineblokken
+ for(let x=-52;x<=52;x+=8){box(g,4.5,.03,.08,new THREE.MeshBasicMaterial({color:"#41356f"}),x,.02,-38,false);box(g,.08,.03,7,new THREE.MeshBasicMaterial({color:"#41356f"}),x-2.2,.02,-34.5,false)}
+ // couriers: parallelle dossiers
+ createCourier("#ffffff","#d8d0ff",0);createCourier("#6fd6b4","#5cf2b3",1);createCourier("#ffb547","#ffb547",2);
+}
+function routeWaypoints(fromKey,toKey){
+ const a=officeDoor(BYKEY[fromKey]),b=officeDoor(BYKEY[toKey]),pts=[];
+ pts.push(new THREE.Vector3(a.x,.16,a.z));
+ pts.push(new THREE.Vector3(a.x,.16,a.lane));
+ if(a.lane!==b.lane){
+   pts.push(new THREE.Vector3(0,.16,a.lane));
+   pts.push(new THREE.Vector3(0,.16,b.lane));
+ }
+ pts.push(new THREE.Vector3(b.x,.16,b.lane));
+ pts.push(new THREE.Vector3(b.x,.16,b.z));
+ return pts;
+}
+function createScene(){
+ renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.16;stage.appendChild(renderer.domElement);
+ labelRenderer=new CSS2DRenderer();labelRenderer.setSize(innerWidth,innerHeight);labelRenderer.domElement.className="l2d";labelRenderer.domElement.style.cssText="position:absolute;inset:0;pointer-events:none";stage.appendChild(labelRenderer.domElement);
+ scene=new THREE.Scene();scene.background=new THREE.Color("#140D33");scene.fog=new THREE.Fog("#140D33",145,235);
+ const a=innerWidth/innerHeight,F=76;camera=new THREE.OrthographicCamera(-F*a/2,F*a/2,F/2,-F/2,.1,420);
+ controls=new OrbitControls(camera,renderer.domElement);controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};controls.screenSpacePanning=true;controls.enableDamping=true;controls.dampingFactor=.09;controls.minZoom=.16;controls.maxZoom=4.2;controls.minPolarAngle=.3;controls.maxPolarAngle=1.4;
+ scene.add(new THREE.HemisphereLight("#e6ddff","#241750",1.2));const sun=new THREE.DirectionalLight("#fff",1.6);sun.position.set(48,92,68);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-90,right:90,top:95,bottom:-55,near:1,far:260});scene.add(sun);
+ // nette campusgrond; de oude zwarte skylineblokken zijn bewust verwijderd.
+ box(scene,136,.7,112,mat("#1d153e"),4,-.55,17,false);
+ FLOORS.forEach(buildFloor);buildShaft();buildMinimap();resetView();setupPicking();window.addEventListener("resize",resize);renderer.setAnimationLoop(frame);document.getElementById("loading").style.display="none";
+}
+function resetView(){
+ selected=null;followCourier=false;document.getElementById("follow").classList.remove("on");controls.enabled=true;
+ document.querySelectorAll(".floor-nav button,.map-room").forEach(b=>b.classList.remove("active"));Object.values(labelsByFloor).forEach(l=>l.element.classList.remove("active"));
+ setCamGoal([98,86,120],[2,0,17],Math.max(.46,Math.min(.62,innerWidth/1900)));showOverview();
+}
+function focusFloor(key,fromAuto=false){
+ const f=BYKEY[key];if(!f)return;selected=key;if(!fromAuto){followCourier=false;document.getElementById("follow").classList.remove("on")}controls.enabled=!followCourier;
+ document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));document.querySelectorAll(".map-room").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));Object.entries(labelsByFloor).forEach(([k,l])=>l.element.classList.toggle("active",k===key));
+ const off=f.face===1?24:-24;setCamGoal([f.x+20,16,f.z+off],[f.x,1.35,f.z],f.trade?1.32:1.7);showFloor(key);
+}
+function setPreset(name){
+ followCourier=false;document.getElementById("follow").classList.remove("on");selected=null;controls.enabled=true;
+ if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
+ else if(name==="management")setCamGoal([60,46,77],[0,0,27],.9);
+ else if(name==="trade")focusFloor("trade");
+ else if(name==="owner")focusFloor("owner");
+ else resetView();
+}
+function resize(){const a=innerWidth/innerHeight,F=76;Object.assign(camera,{left:-F*a/2,right:F*a/2,top:F/2,bottom:-F/2});camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
+function setupPicking(){
+ const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),hover=document.getElementById("hoverOffice");let down;
+ const hitAt=e=>{const r=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));ray.setFromCamera(mouse,camera);return ray.intersectObjects(clickables,false)[0]};
+ renderer.domElement.addEventListener("pointerdown",e=>down={x:e.clientX,y:e.clientY});
+ renderer.domElement.addEventListener("pointermove",e=>{const h=hitAt(e),key=h?.object?.userData?.floor;if(key){hovered=key;renderer.domElement.style.cursor="pointer";const f=BYKEY[key];hover.style.display="block";hover.style.left=(e.clientX+14)+"px";hover.style.top=(e.clientY+12)+"px";hover.innerHTML="<b>"+esc(f.no+" · "+f.name)+"</b><small>"+esc(statusText(key))+"</small>"}else{hovered=null;renderer.domElement.style.cursor="default";hover.style.display="none"}});
+ renderer.domElement.addEventListener("pointerleave",()=>{hover.style.display="none";renderer.domElement.style.cursor="default"});
+ renderer.domElement.addEventListener("pointerup",e=>{if(!down||Math.hypot(e.clientX-down.x,e.clientY-down.y)>7||e.button!==0)return;const h=hitAt(e);if(h?.object?.userData?.floor)focusFloor(h.object.userData.floor)});
+}
+function buildNav(){
+ const nav=document.getElementById("floornav");nav.innerHTML=FLOORS.map(f=>`<button data-floor="${f.key}"><span class="n">${f.no}</span><b>${esc(f.name)}</b><i class="s"></i></button>`).join("");
+ nav.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>focusFloor(b.dataset.floor)));
+}
+function buildMinimap(){
+ const root=document.getElementById("maparea"),xmin=-66,xmax=68,zmin=-38,zmax=67;
+ root.innerHTML='<span class="map-line h" style="left:8%;right:8%;top:69%"></span><span class="map-line h" style="left:8%;right:4%;top:28%"></span><span class="map-line v" style="top:28%;bottom:31%;left:49%"></span>';
+ for(const f of FLOORS){const x=(f.x-xmin)/(xmax-xmin)*100,z=100-(f.z-zmin)/(zmax-zmin)*100,w=f.trade?18:(f.w?9:7),h=f.trade?13:8;const b=document.createElement("button");b.className="map-room"+(f.trade?" trade":"")+(f.key==="owner"?" owner":"");b.dataset.floor=f.key;b.title=f.no+" · "+f.name;b.style.cssText=`left:${x-w/2}%;top:${z-h/2}%;width:${w}%;height:${h}%;background:${f.color}`;b.addEventListener("click",()=>focusFloor(f.key));root.appendChild(b)}
+}
+function floorHot(key){
+ if(!D)return false;const ds=latestScan?.desks||{},ev=(D.events||[]).filter(e=>e.ts>=D.generated_ts-1200);
+ if(key==="data"||key==="ops"||key==="market"||key==="performance"||key==="owner")return true;
+ if(key==="fast")return !!ds.fast;if(key==="swing")return !!ds.swing;if(key==="trend")return !!ds.trend;if(key==="equity")return !!EQ&&hkOpen();
+ if(key==="risk")return ev.some(e=>e.type==="blocked"||e.type==="entry");if(key==="execution"||key==="trade")return ev.some(e=>["entry","exit","validated"].includes(e.type))||!!D.books?.live?.positions?.length;
+ if(key==="capital")return !!D.books?.live;if(key==="directie")return buyList().length>0;return false;
+}
+function buyList(){
+ if(!D)return[];const out=[];for(const [m,e] of Object.entries(D.evaluations||{})){for(const a of D.agents||[]){const sg=e.signals?.[a.agent];if(sg?.action==="buy")out.push({market:m,agent:a.agent})}}return out;
+}
+function latestEvent(types=[]){return (D?.events||[]).filter(e=>e.ts>=D.generated_ts-1800&&(!types.length||types.includes(e.type))).sort((a,b)=>(b.ts||0)-(a.ts||0))[0]}
+function statusText(key){
+ if(!D)return"Data laden…";const live=D.books?.live,ds=latestScan?.desks||{},ev=(D.events||[]).filter(e=>e.ts>=D.generated_ts-1200),buys=buyList(),st=live?.stats;
+ const map={
+  data:`${D.scanner?.eligible_count||0} gezien · ${D.scanner?.pool_count||0} gerankt · ${(D.scanner?.active_discovery_markets||[]).length} discovery`,
+  market:`Markt: ${D.regime?.label||"onbekend"}`,
+  fast:ds.fast?"Nieuwe 15m-candle wordt beoordeeld.":"Wacht op volgende 15m-candle.",
+  swing:ds.swing?"Nieuwe 1u-candle wordt beoordeeld.":"Wacht op volgende 1u-candle.",
+  trend:ds.trend?"Nieuwe 4u-candle wordt beoordeeld.":"Wacht op volgende 4u-candle.",
+  equity:EQ?.candidates?.length?`${hkOpen()?"HK-sessie open":"HK-sessie dicht"} · beste ${EQ.candidates[0].name} ${num(EQ.candidates[0].score,0)}/100`:"Geen equityscan geladen.",
+  performance:`${(D.agents||[]).filter(a=>a.status==="live").length}/${(D.agents||[]).length} strategieën live`,
+  directie:buys.length?`${buys.length} koopadvies${buys.length===1?"":"en"} op tafel.`:"Geen koopadvies op tafel.",
+  risk:live?.risk?.halted?"NOODSTOP ACTIEF":latestEvent(["blocked"])?`Laatste blokkade: ${latestEvent(["blocked"]).market||"trade"}`:`Dagverlies ${num(live?.risk?.daily_loss_pct||0,1)}%`,
+  capital:live?`${eur.format(live.cash)} vrij · ${eur.format(live.exposure)} belegd`:"Geen live kapitaalboek.",
+  execution:latestEvent(["entry","exit","validated"])?`Laatste order: ${latestEvent(["entry","exit","validated"]).type.toUpperCase()} ${latestEvent(["entry","exit","validated"]).market||""}`:`${live?.positions?.filter(p=>p.stop_on_exchange).length||0} stops bewaakt`,
+  trade:live?.positions?.length?`${live.positions.length} open · ${eur.format(live.exposure)} exposure`:"Geen live positie; monitoring loopt.",
+  ops:D.errors?.length?`${D.errors.length} melding(en) · laatste run ${clock(D.generated_ts)}`:`Systemen groen · ${D.scan_history?.length||0} scans`,
+  owner:st?`${eur.format(st.equity)} vermogen · vandaag ${pct(st.today_pct||0)} · ${live?.positions?.length||0} open`:"Managementoverzicht wordt geladen."
+ };return map[key]||"Actief.";
+}
+function showFloor(key){
+ const f=BYKEY[key],live=D?.books?.live,hot=floorHot(key),deptAgents=(D?.agents||[]).filter(a=>f.key==="fast"?a.horizon==="fast":f.key==="swing"?a.horizon==="swing":f.key==="trend"?a.horizon==="trend":false);
+ document.getElementById("detail").innerHTML=`<h1>${esc(f.no+" · "+f.name)}</h1><p class="sub">${esc(f.desc)}</p><div class="status"><b>${hot?"Afdeling actief":"Normale bezetting"}</b>${esc(statusText(key))}</div>
+ <div class="grid"><div class="mini"><small>Medewerkers</small><b>${f.staff}${f.trade?" + runners":""}</b></div><div class="mini"><small>Activiteit</small><b>${hot?"HOOG":"NORMAAL"}</b></div></div>
+ ${deptAgents.length?`<p><b>Strategieën:</b></p><ul>${deptAgents.map(a=>`<li>${esc(a.agent)} · ${a.status==="live"?"echt geld":"schaduw"} · ${a.trades} trades</li>`).join("")}</ul>`:""}
+ ${key==="capital"&&live?`<div class="grid"><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div><p><b>Budget:</b> ALLES; Risk bepaalt de daadwerkelijke inzet.</p>`:""}
+ ${key==="trade"&&live?`<p><b>Open posities:</b></p><ul>${live.positions.length?live.positions.map(p=>`<li>${esc(p.market)} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}</li>`).join(""):"<li>Geen open posities.</li>"}</ul>`:""}
+ ${key==="owner"&&live?`<div class="grid"><div class="mini"><small>Vermogen</small><b>${eur.format(live.stats?.equity||0)}</b></div><div class="mini"><small>Open</small><b>${live.positions?.length||0}</b></div><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div>`:""}
+ <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
+}
+function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">Een levende 3D tradingcampus in plaats van een technisch schema.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
+function setBoard(key,text){if(wallboards[key])wallboards[key].textContent=text}
+function updateClocks(){
+ const fmt=z=>new Intl.DateTimeFormat("nl-NL",{timeZone:z,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
+ setBoard("clockAMS","AMS "+fmt("Europe/Amsterdam"));setBoard("clockNY","NYC "+fmt("America/New_York"));setBoard("clockHK","HONG KONG "+fmt("Asia/Hong_Kong"));
+}
+function updateWallboards(){
+ if(!D)return;const live=D.books?.live,st=live?.stats,buys=buyList(),top=D.scanner?.candidates?.[0],agents=[...(D.agents||[])].sort((a,b)=>(b.expectancy_r??-99)-(a.expectancy_r??-99));
+ setBoard("data",`SCAN ${D.scanner?.eligible_count||0} → ${D.scanner?.pool_count||0} → ${D.markets?.length||0}`);
+ setBoard("dataTop",top?`TOP ${top.market} · ${num((top.score||0)*100,0)}/100`:"TOP RADAR —");
+ setBoard("market",`MARKT ${String(D.regime?.label||"onbekend").toUpperCase()}`);
+ setBoard("fast",latestScan?.desks?.fast?`FAST ACTIEF · ${buys.filter(x=>(D.agents||[]).find(a=>a.agent===x.agent)?.horizon==="fast").length} koop`:"FAST · WACHT 15M");
+ setBoard("swing",latestScan?.desks?.swing?"SWING · NIEUWE 1U":"SWING · WACHT 1U");
+ setBoard("trend",latestScan?.desks?.trend?"TREND · NIEUWE 4U":"TREND · WACHT 4U");
+ setBoard("equity",EQ?.candidates?.[0]?`HK · ${EQ.candidates[0].name} ${num(EQ.candidates[0].score,0)}/100`:"HK RESEARCH —");
+ setBoard("equityPaper",EQ?.paper?`PAPER ${pct(EQ.paper.return_pct||0)}`:"PAPER —");
+ setBoard("performance",agents.length?`#1 ${agents[0].agent} · ${agents[0].expectancy_r==null?"–":num(agents[0].expectancy_r,2)+"R"}`:"AGENT RANKING —");
+ setBoard("directie",buys.length?`BOARD · ${buys.length} ADVIES${buys.length===1?"":"ZEN"}`:"BOARD · GEEN ADVIES");
+ const blocked=latestEvent(["blocked"]),approved=latestEvent(["entry","validated"]);
+ const riskText=live?.risk?.halted?"RISK · NOODSTOP":blocked&&(!approved||blocked.ts>=approved.ts)?`BLOCKED · ${blocked.market||"TRADE"}`:approved?`APPROVED · ${approved.market||"TRADE"}`:"RISK · OK";
+ setBoard("risk",riskText);setBoard("corridorRisk",riskText);
+ setBoard("capital",live?`TREASURY · ${eur.format(st?.equity||0)}`:"TREASURY —");setBoard("corridorCash",live?`VRIJ ${eur.format(live.cash)}`:"KAPITAAL —");
+ const oe=latestEvent(["entry","exit","validated"]);setBoard("execution",oe?`${oe.type.toUpperCase()} · ${oe.market||""}`:"ORDER QUEUE · RUSTIG");
+ setBoard("ops",D.errors?.length?`SYSTEM · ${D.errors.length} MELDING(EN)`:"SYSTEM · ALL GREEN");
+ setBoard("owner",live?`EQUITY ${eur.format(st?.equity||0)} · OPEN ${live.positions?.length||0}`:"OWNER VIEW —");
+ setBoard("trade",live?.positions?.length?`LIVE · ${live.positions.length} OPEN · ${eur.format(live.exposure)}`:"LIVE POSITIONS · GEEN");
+ setBoard("corridorMarket",`MARKT ${String(D.regime?.label||"—").toUpperCase()}`);
+ const tick=(D.scanner?.candidates||[]).slice(0,3).map(x=>`${String(x.market||"").split("/")[0]} ${(Number(x.change_pct)||0)>=0?"+":""}${num(Number(x.change_pct)||0,1)}%`).join(" · ");setBoard("ticker",tick||"RADAR —");
+ const lt=(live?.trades||[])[0];setBoard("tradeTape",lt?`${lt.market} · ${lt.pnl_pct>=0?"+":""}${num(lt.pnl_pct||0,1)}% · ${eur.format(lt.pnl||0)}`:"LAST TRADE —");
+ const pos=live?.positions||[];tradePositionBoards.forEach((el,i)=>{const p=pos[i];el.textContent=p?`${p.market} · ${eur.format(p.value)} · ${p.unrealized>=0?"+":""}${eur.format(p.unrealized)}`:`DESK ${i+1} · VRIJ`;el.style.color=p?(p.unrealized>=0?"#5cf2b3":"#ff6b78"):"#ffffff"});
+ const eq=st?.equity||0,cash=live?.cash||0,expo=live?.exposure||0,vals={cash:eq?cash/eq:0,exposure:eq?expo/eq:0,room:eq?Math.max(0,1-expo/eq):1};
+ for(const b of capitalBars){const ratio=Math.max(.04,Math.min(1,vals[b.type]??0));b.mesh.scale.y=ratio;b.mesh.position.y=b.baseY+(b.maxH*ratio)/2}
+ const riskLight=floorGroups.risk?.userData.riskLight;if(riskLight)riskLight.material.color.set(live?.risk?.halted?"#ff3344":blocked&&(!approved||blocked.ts>=approved.ts)?"#ff6b78":"#5cf2b3");
+ const orderLight=floorGroups.execution?.userData.orderLight;if(orderLight)orderLight.material.color.set(oe?"#ffb547":"#5cf2b3");
+ const opsLight=floorGroups.ops?.userData.opsLight;if(opsLight)opsLight.material.color.set(D.errors?.length?"#ffb547":"#5cf2b3");
+ const fastLight=floorGroups.fast?.userData.alert;if(fastLight)fastLight.material.color.set(latestScan?.desks?.fast?"#ffb547":"#5a527a");
+ updateClocks();
+}
+function marketStress(){const c=D?.scanner?.candidates||[];if(!c.length)return 0;const m=Math.max(...c.slice(0,12).map(x=>Math.abs(Number(x.change_pct)||0)));return Math.max(0,Math.min(1,m/10))}
+function updateUI(){
+ if(!D)return;const live=D.books?.live,st=live?.stats;document.getElementById("mode").textContent=D.mode==="live"&&!D.validate_only?"ECHT GELD":"PAPIER";document.getElementById("equity").textContent=st?eur.format(st.equity):"–";document.getElementById("cash").textContent=live?eur.format(live.cash):"–";document.getElementById("exposure").textContent=live?eur.format(live.exposure):"–";document.getElementById("moneytotal").textContent=st?eur.format(st.equity):"–";document.getElementById("moneyfree").textContent=live?eur.format(live.cash):"–";document.getElementById("moneyused").textContent=live?eur.format(live.exposure):"–";
+ document.querySelectorAll(".floor-nav button").forEach(b=>{const ff=BYKEY[b.dataset.floor],i=b.querySelector(".s"),hot=floorHot(ff.key);i.className="s"+(ff.trade&&hot?" trade":hot?" hot":"")});document.querySelectorAll(".map-room").forEach(b=>{b.style.opacity=floorHot(b.dataset.floor)?"1":".62"});
+ updateWallboards();
+ const e=latestEvent(["entry","exit","blocked"]);if(e){const k=`${e.ts}:${e.type}:${e.market||""}`;if(k!==lastSoundEvent){if(e.type==="entry")tone(880,.12,.04);else if(e.type==="exit")tone(520,.11,.035);else tone(220,.14,.035);lastSoundEvent=k}}
+ if(selected)showFloor(selected);
+}
+function routeForScan(){
+ const ds=latestScan?.desks||{},r=["data","market"];if(ds.fast)r.push("fast");if(ds.swing)r.push("swing");if(ds.trend)r.push("trend");if(EQ)r.push("equity");r.push("performance","directie","risk","capital","execution");if(D?.books?.live?.positions?.length||lastRunOrder())r.push("trade");r.push("ops","owner");return r;
+}
+function lastRunOrder(){return (D?.events||[]).some(e=>e.ts>=D.generated_ts-1200&&["entry","exit","validated"].includes(e.type))}
+function setCourierTarget(c){
+ if(!courierRoute.length)return;const from=courierRoute[c.routeIndex%courierRoute.length],to=courierRoute[(c.routeIndex+1)%courierRoute.length];
+ c.path=routeWaypoints(from,to);c.pathIndex=1;c.pause=0;c.from=from;c.to=to;c.routeIndex=(c.routeIndex+1)%courierRoute.length;
+ if(c.index===0)document.getElementById("caption").innerHTML=`<b>Dossier onderweg</b>${esc(BYKEY[from].name)} → ${esc(BYKEY[to].name)}`;
+}
+function startRoute(){
+ courierRoute=routeForScan();if(!courierRoute.length)return;
+ const blocked=!!latestEvent(["blocked"]),order=lastRunOrder(),buys=buyList().length>0,cols=[buys?"#5cf2b3":"#d8d0ff",blocked?"#ff6b78":"#b7a0ff",order?"#ffb547":"#ffffff"];
+ couriers.forEach((c,i)=>{c.routeIndex=(i*4)%courierRoute.length;c.path=[];c.pathIndex=0;c.pause=i*1.25;c.dossier.material.color.set(cols[i]);c.glow.color.set(cols[i]);const d=officeDoor(BYKEY[courierRoute[c.routeIndex]]);c.person.position.set(d.x,.16,d.z);setCourierTarget(c)});
+}
+function animateCourier(c,dt){
+ if(!c.path.length)return;if(c.pause>0){c.pause-=dt;if(c.pause<=0)setCourierTarget(c);return}
+ const target=c.path[c.pathIndex];if(!target){c.pause=1;return}const p=c.person.position,dx=target.x-p.x,dz=target.z-p.z,dist=Math.hypot(dx,dz);
+ if(dist<.18){c.pathIndex++;if(c.pathIndex>=c.path.length){c.pause=1.0+(.35*c.index);lastRouteAt=clockT}return}
+ const speed=6.3+c.index*.7,step=Math.min(dist,dt*speed);p.x+=dx/dist*step;p.z+=dz/dist*step;c.person.rotation.y=Math.atan2(dx,dz);
+ const P=c.person.userData.parts,sw=Math.sin(clockT*(9+c.index)+c.index)*.55,legs=c.person.userData.legs||[];if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.25-sw*.35;P.armR.rotation.x=-1.25+sw*.35;
+}
+function animate(dt){
+ clockT+=dt;
+ for(const ff of FLOORS){let goal=floorHot(ff.key)?1:.2;if(ff.key==="trade")goal=Math.max(goal,.24+.62*marketStress());if(ff.key==="market")goal=Math.max(goal,.35+.45*marketStress());activity[ff.key]+=(goal-activity[ff.key])*Math.min(1,dt*2.1)}
+ for(const w of workers){const P=w.g.userData.parts,a=activity[w.key]||.2,sp=2.2+8*a;P.armL.rotation.x=-.6+Math.sin(clockT*sp+w.phase)*(.05+.15*a);P.armR.rotation.x=-.6+Math.sin(clockT*sp+w.phase+2)*(.05+.15*a);P.head.rotation.y=Math.sin(clockT*.55+w.phase)*.15}
+ for(const w of walkers){const a=activity[w.key]||.2,t=clockT*.24*(.5+2.2*a)+w.phase;w.g.position.x=w.baseX+Math.sin(t)*w.range;w.g.position.z=w.baseZ+Math.cos(t*.72)*1.25;const P=w.g.userData.parts,sw=Math.sin(clockT*(7+4*a)+w.phase)*.5,legs=w.g.userData.legs||[];if(legs.length){legs[0].rotation.x=sw;legs[1].rotation.x=-sw}P.armL.rotation.x=-1.35-sw*.4;P.armR.rotation.x=-1.35+sw*.4}
+ for(const sm of screenMats){const k=.84+.16*Math.sin(clockT*3+sm.phase);sm.mesh.material.color.copy(sm.base).multiplyScalar(k)}
+ couriers.forEach(c=>animateCourier(c,dt));updateCamera(dt);
+ for(const [key,lightKey] of [["fast","alert"],["risk","riskLight"],["execution","orderLight"],["ops","opsLight"]]){const l=floorGroups[key]?.userData[lightKey];if(l&&floorHot(key))l.scale.setScalar(1+.15*Math.sin(clockT*7))}
+}
+let last=performance.now();function frame(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(!REDUCED)animate(dt);else updateCamera(dt);controls.update();renderer.render(scene,camera);labelRenderer.render(scene,camera)}
+async function load(){
+ try{
+  const [r,e]=await Promise.all([fetch("data.json?t="+Date.now(),{cache:"no-store"}),fetch("equities.json?t="+Date.now(),{cache:"no-store"}).catch(()=>null)]);
+  if(!r.ok)throw new Error(r.status);const d=await r.json(),eq=e&&e.ok?await e.json():null,key=d.generated_ts+":"+(eq?.generated_ts||0);
+  if(key===lastKey){updateClocks();return}D=d;EQ=eq;lastKey=key;latestScan=D.scan_history?.[0]||null;updateUI();startRoute();if(innerWidth<=820)buildCompact();
+ }catch(err){document.getElementById("caption").innerHTML=`<b>Data</b>${esc(err.message||err)}`}
+}
+function buildCompact(){
+ const root=document.getElementById("compact");root.innerHTML=`<h2>Kraken Agents HQ</h2><p>Op mobiel krijg je de eenvoudige lijst. Open op desktop voor de volledige 3D-kantoorcampus.</p>${FLOORS.map(f=>`<div class="c-floor"><b>${f.no} · ${esc(f.name)}</b><small>${esc(statusText(f.key))}</small></div>`).join("")}`;
+}
+function connectTicker(){
+ if(!("WebSocket" in window))return;let ws;try{ws=new WebSocket("wss://ws.kraken.com/v2")}catch{return}
+ ws.onopen=()=>{document.getElementById("livestat").className="live-dot on";const syms=[...new Set([...(D?.markets||[]),...((D?.books?.live?.positions||[]).map(p=>p.market))])].slice(0,30);if(syms.length)ws.send(JSON.stringify({method:"subscribe",params:{channel:"ticker",symbol:syms}}))};
+ ws.onclose=()=>{document.getElementById("livestat").className="live-dot";setTimeout(connectTicker,8000)};
+}
+try{
+  buildNav();createScene();load();connectTicker();setInterval(load,60000);
+  window.__hqReady=true;
+}catch(err){
+  console.error("HQ boot failed",err);
+  window.__showHQBootError(err);
+}
+document.getElementById("overview").addEventListener("click",resetView);
+document.getElementById("analysisfocus").addEventListener("click",()=>setPreset("analysis"));
+document.getElementById("managementfocus").addEventListener("click",()=>setPreset("management"));
+document.getElementById("tradefocus").addEventListener("click",()=>setPreset("trade"));
+document.getElementById("ownerfocus").addEventListener("click",()=>setPreset("owner"));
+document.getElementById("follow").addEventListener("click",e=>{followCourier=!followCourier;autoCamera=false;document.getElementById("autocam").classList.remove("on");e.currentTarget.classList.toggle("on",followCourier);controls.enabled=!followCourier;if(followCourier&&couriers[0]){selected=null;document.getElementById("caption").innerHTML="<b>Camera</b>Volgt het actieve dossier door de campus"}});
+document.getElementById("autocam").addEventListener("click",e=>{autoCamera=!autoCamera;followCourier=false;document.getElementById("follow").classList.remove("on");e.currentTarget.classList.toggle("on",autoCamera);controls.enabled=true;autoAt=0;if(autoCamera)document.getElementById("caption").innerHTML="<b>Autocamera</b>Volgt automatisch de drukste afdelingen"});
+document.getElementById("sound").addEventListener("click",e=>{soundOn=!soundOn;e.currentTarget.textContent=soundOn?"Geluid aan":"Geluid uit";e.currentTarget.classList.toggle("on",soundOn);if(soundOn){tone(720,.08,.03)}});
+
+</script>
+</body></html>

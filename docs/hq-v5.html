@@ -80,6 +80,19 @@ button{font:inherit}
 <div class="loading" id="loading">3D-kantoorcampus wordt opgebouwd…</div>
 <main class="compact" id="compact"></main>
 
+<script>
+window.__hqReady=false;
+window.__showHQBootError=function(err){
+  const el=document.getElementById("loading");
+  if(!el)return;
+  const msg=(err&&err.message)||String(err||"onbekende fout");
+  el.style.display="grid";
+  el.innerHTML='<div style="max-width:620px;padding:24px;text-align:center"><b style="color:#ffb547">HQ kon niet starten</b><p style="color:#c9bdff">'+msg.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]))+'</p><p><a style="color:#c9bdff" href="hq-v4.html">Open vorige 3D-campus</a> · <a style="color:#c9bdff" href="trades.html">Open Trades</a></p></div>';
+};
+window.addEventListener("error",e=>window.__showHQBootError(e.error||e.message));
+window.addEventListener("unhandledrejection",e=>window.__showHQBootError(e.reason));
+setTimeout(()=>{if(!window.__hqReady)window.__showHQBootError("De 3D-campus reageerde niet binnen 12 seconden.")},12000);
+</script>
 <script type="module">
 import * as THREE from "three";
 import {OrbitControls} from "three/addons/controls/OrbitControls.js";
@@ -502,7 +515,13 @@ function connectTicker(){
  ws.onopen=()=>{document.getElementById("livestat").className="live-dot on";const syms=[...new Set([...(D?.markets||[]),...((D?.books?.live?.positions||[]).map(p=>p.market))])].slice(0,30);if(syms.length)ws.send(JSON.stringify({method:"subscribe",params:{channel:"ticker",symbol:syms}}))};
  ws.onclose=()=>{document.getElementById("livestat").className="live-dot";setTimeout(connectTicker,8000)};
 }
-buildNav();createScene();load();connectTicker();setInterval(load,60000);
+try{
+  buildNav();createScene();load();connectTicker();setInterval(load,60000);
+  window.__hqReady=true;
+}catch(err){
+  console.error("HQ boot failed",err);
+  window.__showHQBootError(err);
+}
 document.getElementById("overview").addEventListener("click",resetView);
 document.getElementById("analysisfocus").addEventListener("click",()=>setPreset("analysis"));
 document.getElementById("managementfocus").addEventListener("click",()=>setPreset("management"));
