@@ -1,0 +1,42 @@
+name: Equity Scout
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # Hong Kong: rond open, midden sessie, close en Europese ochtendcheck op weekdagen.
+    - cron: "20 0,4,8,12 * * 1-5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: equity-scout
+  cancel-in-progress: true
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install equity data stack
+        run: pip install -r requirements-equities.txt
+
+      - name: Scan China and Hong Kong opportunities
+        run: python equity_scan.py
+
+      - name: Save equity research and paper state
+        run: |
+          git config user.name "equity-scout"
+          git config user.email "equity-scout@users.noreply.github.com"
+          git add data/equity_state.json data/equity_fundamentals.json docs/equities.json 2>/dev/null || true
+          if git diff --cached --quiet; then echo "No equity changes"; exit 0; fi
+          git commit -m "Equity scout update [skip ci]"
+          for i in 1 2 3; do git pull --rebase --autostash && git push && exit 0; sleep 5; done
+          exit 1
