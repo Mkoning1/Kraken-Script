@@ -23,8 +23,17 @@ class LearningAgent:
         self.bt_min_trades = bt_min_trades
         self.stats = state.setdefault("agent_stats", {})
         self.status_map = state.setdefault("agent_status", {})
+        self.timeframe_map = state.setdefault("agent_timeframes", {})
         self.l, self.p, self.acfg = learning, promotion, agent_cfgs
         for name, c in agent_cfgs.items():
+            tf = int(c.get("timeframe_minutes", 240 if name == "trend4h" else 60))
+            previous_tf = self.timeframe_map.get(name)
+            if previous_tf is not None and int(previous_tf) != tf:
+                # Een strategie op een ander timeframe is statistisch een nieuwe strategie.
+                # Oude R/trades mogen dus niet zorgen voor een onterechte promotie.
+                self.stats.pop(name, None)
+                self.status_map[name] = "live" if (promotion.get("all_agents_live") or c.get("start") == "live") else "schaduw"
+            self.timeframe_map[name] = tf
             if name not in self.status_map:
                 self.status_map[name] = "live" if (promotion.get("all_agents_live") or c.get("start") == "live") else "schaduw"
 
