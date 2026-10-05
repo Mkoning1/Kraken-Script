@@ -2,20 +2,21 @@ name: Trader
 
 on:
   schedule:
-    - cron: "3,18,33,48 * * * *"   # reserve; GitHub voert dit maar een paar keer per dag uit. De echte wekker is cron-job.org
-  workflow_dispatch: {}              # handmatig starten via de Actions-tab
+    - cron: "3,18,33,48 * * * *"   # vangnet: start de keten opnieuw als die ooit uitvalt
+  workflow_dispatch: {}
 
 permissions:
-  contents: write                    # nodig om data/ en het dashboard terug te zetten
+  contents: write   # resultaten opslaan
+  actions: write    # de volgende run starten
 
 concurrency:
-  group: trader                      # nooit twee runs tegelijk: voorkomt dubbele orders
+  group: trader     # nooit twee runs tegelijk: voorkomt dubbele orders
   cancel-in-progress: false
 
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 14
+    timeout-minutes: 355
     steps:
       - uses: actions/checkout@v4
 
@@ -27,22 +28,15 @@ jobs:
       - name: Installeren
         run: pip install -r requirements.txt
 
-      - name: Veiligheidstest (bij een fout wordt er niet gehandeld)
-        run: python -m tests.quick
-
-      - name: Agents draaien
+      - name: Bot aan het werk (elk kwartier, bijna 6 uur lang)
         env:
           KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
           KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
-        run: python main.py
+          LOOP_MINUTES: "340"
+        run: python loop.py
 
-      - name: Resultaten opslaan
-        if: always()
-        run: |
-          git config user.name "trading-bot"
-          git config user.email "trading-bot@users.noreply.github.com"
-          git add data docs/data.json
-          if git diff --cached --quiet; then echo "Niets nieuws"; exit 0; fi
-          git commit -m "Bot update [skip ci]"
-          for i in 1 2 3; do git pull --rebase && git push && exit 0; sleep 5; done
-          exit 1
+      - name: Volgende run starten
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run trading-bot.yml --ref main

@@ -117,7 +117,7 @@ class MonitorAgent:
                 price = prices.get(m, p["entry_price"])
                 value = p["qty"] * price
                 positions.append({
-                    "market": m, "agent": p["agent"], "entry_price": p["entry_price"], "entry_ts": p["entry_ts"],
+                    "market": m, "agent": p["agent"], "qty": p["qty"], "entry_price": p["entry_price"], "entry_ts": p["entry_ts"],
                     "entry_cost": round(p["entry_cost"], 2), "price": price, "value": round(value, 2),
                     "unrealized": round(value - p["entry_cost"], 2), "stop": p["stop"], "hard_stop": p.get("hard_stop"),
                     "exit_style": p["exit_style"], "is_runner": p.get("is_runner"), "peak": p.get("peak"),
@@ -139,6 +139,7 @@ class MonitorAgent:
             "evaluations": state["evaluations"], "events": state["events"][-50:][::-1],
             "narrative": state["narrative"], "errors": state["errors"][-10:][::-1],
             "last_run_ok": state["last_run"]["ok"], "legacy_trades": state.get("legacy_trades", [])[::-1],
+            "levels": {m: v for m, v in state.get("levels", {}).items() if m in extra.get("markets", [])},
             **extra,
         }
         self.dashboard_path.parent.mkdir(parents=True, exist_ok=True)

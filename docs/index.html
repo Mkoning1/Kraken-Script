@@ -40,6 +40,13 @@ button { font: inherit; }
 .tabs a[aria-current="page"] { color: var(--text); background: rgba(143, 123, 255, 0.25); }
 .mode { font-family: var(--cond); font-weight: 600; padding: 2px 12px; border: 1px solid currentColor; border-radius: 3px; }
 .mode.live { color: var(--money); }
+.live-dot { font-size: .8rem; color: var(--muted); display: inline-flex; align-items: center; gap: 6px; }
+.live-dot::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #5B5480; }
+.live-dot.on { color: var(--buy); }
+.live-dot.on::before { background: var(--buy); box-shadow: 0 0 0 0 rgba(92, 242, 179, .7); animation: pulse 1.6s infinite; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 7px rgba(92, 242, 179, 0); } 100% { box-shadow: 0 0 0 0 rgba(92, 242, 179, 0); } }
+.desk-tag.up { border-color: var(--buy); } .desk-tag.down { border-color: var(--neg); }
+.mini.alert { background: var(--money) !important; }
 .mode.other { color: #C9BDFF; }
 .kpi { display: flex; flex-direction: column; line-height: 1.12; }
 .kpi span { font-size: .75rem; color: var(--muted); }
@@ -144,6 +151,7 @@ button { font: inherit; }
     <a href="details.html">Details</a>
   </nav>
   <span class="mode other" id="mode">Laden</span>
+  <span class="live-dot" id="livestat" title="Live koersen van Kraken: verbinden">Live</span>
   <div class="kpi"><span>Echt geld</span><b class="money" id="eq">–</b></div>
   <div class="kpi"><span>Resultaat</span><b id="ret">–</b></div>
   <div class="kpi"><span>BTC vasthouden</span><b id="bench">–</b></div>
@@ -239,6 +247,7 @@ async function load() {
     try { const b = await fetch("backtest.json?t=" + Date.now(), { cache: "no-store" }); BT = b.ok ? await b.json() : null; } catch { BT = null; }
     header();
     if (COMPACT) buildCompact(); else rebuildFloor();
+    if (!LIVE.ws) connectLive(); else resubscribe();
   } catch (e) {
     if (!D) document.getElementById("loading").textContent = "Nog geen gegevens. Start een run via Actions, Trader, Run workflow.";
   }
@@ -263,6 +272,86 @@ function tickClocks() {
   document.getElementById("nextrun").textContent = `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
   const n4 = Math.ceil(now / 14400) * 14400 - now;
   document.getElementById("next4h").textContent = `${Math.floor(n4 / 3600)}:${String(Math.floor((n4 % 3600) / 60)).padStart(2, "0")}`;
+}
+
+/* ============ live koersen van Kraken (alleen lezen, geen sleutels) ============ */
+const LIVE = { px: {}, prev: {}, ok: false, last: 0, ws: null, tries: 0, subs: new Set() };
+function liveSymbols() {
+  return [...new Set([...(D?.markets || []), ...((D?.books.live?.positions || []).map(p => p.market)), D?.benchmark_market || "BTC/EUR"])];
+}
+function connectLive() {
+  if (typeof WebSocket === "undefined") return;
+  let ws;
+  try { ws = new WebSocket("wss://ws.kraken.com/v2"); } catch { setTimeout(connectLive, 15000); return; }
+  LIVE.ws = ws; LIVE.subs = new Set();
+  ws.onopen = () => { LIVE.tries = 0; resubscribe(); };
+  ws.onmessage = ev => {
+    let msg; try { msg = JSON.parse(ev.data); } catch { return; }
+    if (msg.channel !== "ticker" || !Array.isArray(msg.data)) return;
+    for (const t of msg.data) {
+      const sym = String(t.symbol).replace(/^XBT\//, "BTC/").replace(/^XDG\//, "DOGE/");
+      if (t.last) LIVE.px[sym] = +t.last;
+    }
+    LIVE.last = Date.now(); LIVE.ok = true;
+  };
+  ws.onclose = () => { LIVE.ok = false; setTimeout(connectLive, Math.min(30000, 2000 * 2 ** LIVE.tries++)); };
+  ws.onerror = () => { try { ws.close(); } catch {} };
+}
+function resubscribe() {
+  if (!LIVE.ws || LIVE.ws.readyState !== 1 || !D) return;
+  const want = liveSymbols().filter(s => !LIVE.subs.has(s));
+  if (!want.length) return;
+  LIVE.ws.send(JSON.stringify({ method: "subscribe", params: { channel: "ticker", symbol: want } }));
+  want.forEach(s => LIVE.subs.add(s));
+}
+let liveTick = 0;
+function applyLive() {
+  const st = document.getElementById("livestat"), fresh = LIVE.ok && Date.now() - LIVE.last < 30000;
+  st.className = "live-dot" + (fresh ? " on" : "");
+  st.title = fresh ? "Live koersen van Kraken, elke seconde bijgewerkt" : "Live koersen niet verbonden; je ziet de stand van de laatste run";
+  if (!D || !Object.keys(LIVE.px).length) return;
+  liveTick++;
+  const live = D.books.live;
+  if (live) {
+    let inv = 0;
+    for (const p of live.positions) {
+      const lp = LIVE.px[p.market], q = p.qty ?? (p.price ? p.value / p.price : 0);
+      if (lp) { p.price = lp; p.value = +(q * lp).toFixed(2); p.unrealized = +(p.value - p.entry_cost).toFixed(2); }
+      inv += p.value;
+    }
+    live.exposure = +inv.toFixed(2);
+    live.stats.equity = +(live.cash + inv).toFixed(2);
+    live.stats.return_pct = (live.stats.equity / (live.stats.start || 1) - 1) * 100;
+  }
+  header();
+  if (COMPACT) {
+    const c = document.querySelector("#compact .cashp"); if (c) c.innerHTML = moneyHTML();
+    document.querySelectorAll("#compact [data-px]").forEach(el => { const v = LIVE.px[el.dataset.px]; if (v) el.textContent = price(v); });
+    return;
+  }
+  if (!renderer || !dyn) return;
+  document.getElementById("money").innerHTML = moneyHTML();
+  for (const [m, d] of Object.entries(deskRefs)) {
+    const p = LIVE.px[m]; if (!p || !d.tag) continue;
+    const prev = LIVE.prev[m];
+    d.tag.element.innerHTML = deskTagHTML(m);
+    if (prev && p !== prev) { d.tag.element.classList.remove("up", "down"); void d.tag.element.offsetWidth; d.tag.element.classList.add(p > prev ? "up" : "down"); }
+    LIVE.prev[m] = p;
+    if (liveTick % 15 === 0 && d.chart) drawDeskChart(d.chart);
+  }
+  for (const a of analysts) {
+    if (a.agent !== "trend4h") continue;
+    const lvl = D.levels?.[a.coin]?.breakout, p = LIVE.px[a.coin];
+    const dist = lvl && p ? (p / lvl - 1) * 100 : null;
+    const alert = dist == null ? null : dist >= 0 ? "boven het uitbraakniveau" : dist > -1.5 ? `${num(-dist, 1)}% onder uitbraak` : null;
+    if (alert !== a.alert) {
+      a.alert = alert;
+      if (a.alertTag) { dyn.remove(a.alertTag); a.alertTag.element.remove(); a.alertTag = null; }
+      if (alert) { a.alertTag = label(alert, "mini alert", a.seat.x, 2.95, a.seat.z, dyn); }
+    }
+  }
+  if (liveTick % 15 === 0) drawBigScreen();
+  if (liveTick % 30 === 0) drawTicker();
 }
 
 /* ============ dossiers (wat doet deze agent?) ============ */
@@ -302,6 +391,7 @@ function analystHTML(name, coin) {
       <div class="act act-${s ? s.action : "hold"}">${s ? (s.action === "buy" ? `Wil ${esc(base(coin))} kopen` : s.action === "sell" ? `Negatief over ${esc(base(coin))}` : `Wacht af bij ${esc(base(coin))}`) : "Nog niet beoordeeld"}</div>
       <p style="margin:4px 0 0">${s ? esc(s.reason) : ""}${s && s.strength ? `. Sterkte ${num(s.strength, 2)}.` : ""}</p>
       ${e ? `<p class="when" style="margin:4px 0 0">Beoordeeld ${when(e.ts)}</p>` : ""}</div>
+    ${name === "trend4h" && D.levels?.[coin] ? `<p class="when" style="margin:-6px 0 12px">Uitbraakniveau ${price(D.levels[coin].breakout)}; ${LIVE.px[coin] ? `nu live ${price(LIVE.px[coin])}, ${num((LIVE.px[coin] / D.levels[coin].breakout - 1) * 100, 1)}%` : "live koers nog niet binnen"}. Kopen gebeurt pas bij een 4-uursslot erboven.</p>` : ""}
     <section><h2>Zijn methode</h2><p>${esc(METHOD[name] || "")}</p></section>
     <section><h2>Zijn cijfers</h2><dl class="kv">
       <dt>Geld</dt><dd>${real ? "echt geld" : "schaduwgeld"}</dd>
@@ -404,7 +494,7 @@ function buildCompact() {
   const lp = Object.fromEntries((D.books.live?.positions || []).map(p => [p.market, p]));
   el.innerHTML = `<p class="when">Op je pc zie je de volledige handelsvloer in 3D. Laatste run ${clock(D.generated_ts)}.</p>
     <section class="cashp" style="margin-top:12px">${moneyHTML()}</section>
-    <h2>Handelsvloer</h2><div class="desks-c">${D.markets.map(m => { const e = D.evaluations[m]; return `<button data-coin="${esc(m)}" class="${lp[m] ? "real" : ""}"><span class="t">${esc(base(m))}${lp[m] ? `<span class="${lp[m].unrealized >= 0 ? "up" : "down"}">${signed(lp[m].unrealized)}</span>` : ""}</span><span class="p">${price(e?.price)}</span>
+    <h2>Handelsvloer</h2><div class="desks-c">${D.markets.map(m => { const e = D.evaluations[m]; return `<button data-coin="${esc(m)}" class="${lp[m] ? "real" : ""}"><span class="t">${esc(base(m))}${lp[m] ? `<span class="${lp[m].unrealized >= 0 ? "up" : "down"}">${signed(lp[m].unrealized)}</span>` : ""}</span><span class="p" data-px="${esc(m)}">${price(LIVE.px[m] ?? e?.price)}</span>
       <span class="screens">${D.agents.map(a => { const s = e?.signals[a.agent]; return `<i title="${esc(a.agent)}" style="background:${SIGNAL[s?.action || "hold"]};border-color:${TEAM[a.name]}"></i>`; }).join("")}</span></button>`; }).join("")}</div>
     <h2>Afdelingen</h2><div class="rooms-c">${ROOMS.map(r => `<button data-room="${r.key}"><b><span class="dot" style="background:${r.color}"></span>${r.label}</b><span>${esc(roomStatus(r.key))}</span></button>`).join("")}</div>
     <h2>Team</h2><p class="when">${D.agents.map(a => `<span class="dot" style="background:${TEAM[a.name]}"></span>${esc(a.agent)}`).join("&nbsp;&nbsp; ")}</p>`;
@@ -634,10 +724,18 @@ function lightPoolTexture() {
   g.fillStyle = r; g.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c);
 }
 function deskChartTexture(m) {
-  const c = document.createElement("canvas"); c.width = 256; c.height = 160; const g = c.getContext("2d");
+  const c = document.createElement("canvas"); c.width = 256; c.height = 160;
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  t.userData = { canvas: c, market: m };
+  drawDeskChart(t);
+  return t;
+}
+function drawDeskChart(t) {
+  const c = t.userData.canvas, m = t.userData.market, g = c.getContext("2d");
   g.fillStyle = "#0A0F1E"; g.fillRect(0, 0, 256, 160);
   g.strokeStyle = "rgba(255,255,255,.08)"; for (let y = 40; y < 160; y += 30) { g.beginPath(); g.moveTo(0, y); g.lineTo(256, y); g.stroke(); }
-  const pts = (D.spark && D.spark[m]) || [];
+  const pts = [...((D.spark && D.spark[m]) || [])];
+  if (LIVE.px[m]) pts.push(LIVE.px[m]);
   g.fillStyle = "#FFFFFF"; g.font = "700 26px 'Saira Condensed', sans-serif"; g.fillText(base(m), 10, 28);
   if (pts.length > 1) {
     const lo = Math.min(...pts), hi = Math.max(...pts), chg = (pts[pts.length - 1] / pts[0] - 1) * 100;
@@ -645,8 +743,9 @@ function deskChartTexture(m) {
     g.strokeStyle = "#FFFFFF"; g.lineWidth = 4; g.beginPath();
     pts.forEach((v, i) => { const x = 8 + i / (pts.length - 1) * 240, y = 150 - (v - lo) / ((hi - lo) || 1) * 100; i ? g.lineTo(x, y) : g.moveTo(x, y); });
     g.stroke(); g.lineTo(248, 158); g.lineTo(8, 158); g.closePath(); g.fillStyle = "rgba(255,255,255,.12)"; g.fill();
+    if (LIVE.px[m]) { const y = 150 - (pts[pts.length - 1] - lo) / ((hi - lo) || 1) * 100; g.fillStyle = "#FFFFFF"; g.beginPath(); g.arc(248, y, 6, 0, 7); g.fill(); }
   }
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  t.needsUpdate = true;
 }
 const TINT = { buy: "#7DFFC9", sell: "#FF8A95", hold: "#7F8FB0" };
 
@@ -711,13 +810,13 @@ function rebuildFloor() {
     const lp = new THREE.Mesh(new THREE.PlaneGeometry(10, 6), new THREE.MeshBasicMaterial({ map: pool, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0.5 }));
     lp.rotation.x = -Math.PI / 2; lp.position.set(dx, 0.045, dz + 0.6); dyn.add(lp);
     const chart = deskChartTexture(m);
-    deskRefs[m] = { dx, dz, mats: Object.fromEntries(["buy", "sell", "hold"].map(k => [k, new THREE.MeshBasicMaterial({ map: chart, color: TINT[k], toneMapped: false })])) };
+    deskRefs[m] = { dx, dz, chart, mats: Object.fromEntries(["buy", "sell", "hold"].map(k => [k, new THREE.MeshBasicMaterial({ map: chart, color: TINT[k], toneMapped: false })])) };
     const live = livePos[m], sh = shPos[m];
     if (live || sh) {
       const ring = new THREE.Mesh(new THREE.TorusGeometry(4.6, live ? 0.09 : 0.05, 8, 72), new THREE.MeshBasicMaterial({ color: live ? "#FFB547" : "#B9AEFF" }));
       ring.rotation.x = Math.PI / 2; ring.scale.y = 0.62; ring.position.set(dx, 0.06, dz + 0.7); dyn.add(ring);
     }
-    const tag = label(`${esc(base(m))}<small>${price(D.evaluations[m]?.price)}</small>${live ? `<span class="pos">${signed(live.unrealized)}</span>` : sh ? `<span class="pos sh">schaduw</span>` : ""}`, "desk-tag", dx - 3.0, 2.75, dz - 0.95, dyn);
+    const tag = label(deskTagHTML(m), "desk-tag", dx - 3.0, 2.75, dz - 0.95, dyn);
     tag.element.onclick = () => selectCoin(m);
     deskRefs[m].tag = tag;
   });
@@ -777,10 +876,16 @@ function drawTicker() {
   const c = shared.tickerCanvas, g = c.getContext("2d");
   g.fillStyle = "#0D0828"; g.fillRect(0, 0, c.width, c.height);
   g.font = "600 52px 'Saira Condensed', sans-serif"; let x = 30;
-  const items = D.markets.map(m => { const e = D.evaluations[m]; const buys = e ? Object.values(e.signals).filter(s => s.action === "buy").length : 0; return { t: `${base(m)} ${price(e?.price)}`, buys }; });
+  const items = D.markets.map(m => { const e = D.evaluations[m]; const buys = e ? Object.values(e.signals).filter(s => s.action === "buy").length : 0; return { t: `${base(m)} ${price(LIVE.px[m] ?? e?.price)}`, buys }; });
   while (x < c.width) for (const it of items) { if (x > c.width) break; g.fillStyle = it.buys ? "#5CF2B3" : "#D8D0FF"; g.fillText(it.t, x, 68); x += g.measureText(it.t).width + 70; }
   shared.tickerTex.needsUpdate = true;
 }
+function deskTagHTML(m) {
+  const live = (D.books.live?.positions || []).find(p => p.market === m), sh = D.books.schaduw.positions.find(p => p.market === m);
+  const pr = LIVE.px[m] ?? D.evaluations[m]?.price;
+  return `${esc(base(m))}<small>${price(pr)}</small>${live ? `<span class="pos">${signed(live.unrealized)}</span>` : sh ? `<span class="pos sh">schaduw</span>` : ""}`;
+}
+
 function moneyHTML() {
   const live = D.books.live;
   if (!live) return `<h2>Je geld</h2><p class="src">Alleen schaduwgeld actief.</p>`;
@@ -951,7 +1056,7 @@ function update(dt) {
   if (!REDUCED) {
     for (const a of analysts) {
       if (a.busy) continue;
-      const P = a.person.userData.parts, sp = 9 * typingBoost * (a.act === "buy" ? 1.4 : 1);
+      const P = a.person.userData.parts, sp = 9 * typingBoost * (a.act === "buy" ? 1.4 : 1) * (a.alert ? 2.6 : 1);
       P.armL.rotation.x = -0.55 + Math.sin(clockT * sp + a.phase) * 0.13;
       P.armR.rotation.x = -0.55 + Math.sin(clockT * sp + a.phase + 2.2) * 0.13;
       P.head.position.y = 1.84 + Math.sin(clockT * 1.7 + a.phase) * 0.02;
@@ -1034,6 +1139,7 @@ window.selectCoin = selectCoin;
 
 /* ============ start ============ */
 setInterval(tickClocks, 1000); tickClocks();
+setInterval(applyLive, 1000);
 if (COMPACT) { document.body.classList.remove("floor"); document.getElementById("loading").hidden = true; }
 load();
 setInterval(load, 60 * 1000);

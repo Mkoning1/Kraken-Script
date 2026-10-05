@@ -222,6 +222,10 @@ def run(now_ts=None, exchange=None):
     # Elke munt waarvan sinds de vorige beoordeling een 4-uurscandle gesloten is (ook na een gemiste run)
     lookback = cfg["agents"].get("trend4h", {}).get("lookback", 55)
     last4 = state.setdefault("last_4h_eval", {})
+    levels = state.setdefault("levels", {})
+    for m, c4 in slow.items():  # niveau waar de volgende 4-uurscandle bovenuit moet sluiten om te kopen
+        if len(c4) >= lookback:
+            levels[m] = {"breakout": max(c["high"] for c in c4[-lookback:]), "ts": c4[-1]["ts"]}
     for m, c4 in slow.items():
         if c4 and c4[-1]["ts"] > last4.get(m, 0):
             try:

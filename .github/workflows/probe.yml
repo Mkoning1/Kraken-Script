@@ -1,0 +1,43 @@
+name: Probe
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: probe
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Installeren
+        run: pip install -r requirements.txt
+
+      - name: Onderzoek (alleen lezen en validate, nooit een echte order)
+        env:
+          KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
+          KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
+        run: python tools/probe.py
+
+      - name: Resultaat opslaan
+        if: always()
+        run: |
+          git config user.name "trading-bot"
+          git config user.email "trading-bot@users.noreply.github.com"
+          git add data/probe.json
+          if git diff --cached --quiet; then echo "Niets nieuws"; exit 0; fi
+          git commit -m "Probe-resultaat [skip ci]"
+          for i in 1 2 3; do git pull -q --rebase --autostash && git push -q && exit 0; sleep 5; done
+          exit 1
