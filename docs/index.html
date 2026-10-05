@@ -149,6 +149,7 @@ button { font: inherit; }
   <nav class="tabs" aria-label="Weergave">
     <a href="index.html" aria-current="page">Handelsvloer</a>
     <a href="details.html">Details</a>
+    <a href="opportunities.html">Opportunities</a>
   </nav>
   <span class="mode other" id="mode">Laden</span>
   <span class="live-dot" id="livestat" title="Live koersen van Kraken: verbinden">Live</span>
@@ -157,6 +158,7 @@ button { font: inherit; }
   <div class="kpi"><span>BTC vasthouden</span><b id="bench">–</b></div>
   <div class="kpi"><span>Markt</span><b id="regime">–</b></div>
   <div class="kpi"><span>Radar</span><b id="radar">–</b></div>
+  <div class="kpi"><span>China/HK</span><b id="equityradar">–</b></div>
   <div class="kpi"><span>Volgende run</span><b id="nextrun">–</b></div>
   <div class="kpi"><span>4-uurssluiting</span><b id="next4h">–</b></div>
 </header>
@@ -210,7 +212,7 @@ const ROOMS = [
 const ROOM = Object.fromEntries(ROOMS.map(r => [r.key, r]));
 
 /* ============ data ============ */
-let D = null, lastGen = null, BT = null;
+let D = null, lastGen = null, BT = null, EQ = null;
 const agentByName = n => D.agents.find(a => a.name === n);
 const lastRunEvents = () => D.events.filter(e => e.ts >= D.generated_ts - 20 * 60);
 function buyList() {
@@ -240,11 +242,16 @@ function roomStatus(key) {
 
 async function load() {
   try {
-    const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
+    const [res, eqr] = await Promise.all([
+      fetch("data.json?t=" + Date.now(), { cache: "no-store" }),
+      fetch("equities.json?t=" + Date.now(), { cache: "no-store" }).catch(() => null)
+    ]);
     if (!res.ok) throw new Error(res.status);
     const d = await res.json();
-    if (d.generated_ts === lastGen) return;
-    D = d; lastGen = d.generated_ts;
+    const eq = eqr && eqr.ok ? await eqr.json() : null;
+    const key = d.generated_ts + ":" + (eq?.generated_ts || eq?.last_attempt_ts || 0);
+    if (key === lastGen) return;
+    D = d; EQ = eq; lastGen = key;
     try { const b = await fetch("backtest.json?t=" + Date.now(), { cache: "no-store" }); BT = b.ok ? await b.json() : null; } catch { BT = null; }
     header();
     if (COMPACT) buildCompact(); else rebuildFloor();
@@ -267,6 +274,9 @@ function header() {
   rg.className = D.regime.label === "stijgend" ? "up" : D.regime.label === "dalend" ? "down" : "";
   const radar = document.getElementById("radar");
   if (radar) radar.textContent = D.scanner?.enabled ? `${(D.scanner.active_discovery_markets || []).length} kansen` : "uit";
+  const eqradar = document.getElementById("equityradar");
+  const topEq = EQ?.candidates?.[0];
+  if (eqradar) eqradar.textContent = topEq ? `${topEq.symbol.replace(".HK","")} · ${num(topEq.score,0)}` : "wacht";
 }
 function tickClocks() {
   const now = Date.now() / 1000, d = new Date(), m = d.getUTCMinutes(), s = d.getUTCSeconds();
@@ -453,10 +463,20 @@ function scannerHTML() {
     <ul class="list">${rows || "<li>Geen geschikte discovery-kansen.</li>"}</ul></section>`;
 }
 
+function equityRadarHTML() {
+  if (!EQ?.enabled) return "";
+  const rows = (EQ.candidates || []).slice(0, 5).map(x => `<li><b>${esc(x.name)}</b> <span class="chip">paper</span><br>
+    <span class="when">${esc(x.symbol)} · score ${num(x.score,0)}/100 · 20d ${pct(x.m20_pct)}</span></li>`).join("");
+  return `<section><h2>China/HK research desk</h2>
+    <p>De aandelenlaag draait los van Kraken en kan je cryptobot niet blokkeren. Live aandelenorders staan uit; de beste kandidaten worden paper-only gevolgd.</p>
+    <ul class="list">${rows || "<li>Eerste equity-scan moet nog draaien.</li>"}</ul>
+    <p><a href="opportunities.html">Open Global Opportunities →</a></p></section>`;
+}
+
 function roomHTML(key) {
   const r = ROOM[key], live = D.books.live, L = D.risk_limits, risk = live?.risk || {};
   let extra = "";
-  if (key === "data") extra = scannerHTML() + `<section><h2>Actieve munten deze uurcyclus</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
+  if (key === "data") extra = scannerHTML() + equityRadarHTML() + `<section><h2>Actieve munten deze uurcyclus</h2><ul class="list">${D.markets.map(m => `<li><button class="link" data-coin="${esc(m)}">${esc(m)}</button> ${price(D.evaluations[m]?.price)}</li>`).join("")}</ul></section>`;
   if (key === "markt") extra = `<div class="doing"><div class="act ${D.regime.label === "stijgend" ? "act-buy" : D.regime.label === "dalend" ? "act-sell" : "act-hold"}">Markt ${esc(D.regime.label)}</div><p>${esc(D.regime.reason)}. Koopkansen tellen voor ${num(D.regime.multiplier * 100, 0)}% mee.</p></div>`;
   if (key === "prestatie") extra = (BT ? `<section><h2>Backtest van het hele team</h2><dl class="kv">
       <dt>Periode</dt><dd>${new Date(BT.period.start * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })} tot ${new Date(BT.period.end * 1000).toLocaleDateString("nl-NL", { month: "short", year: "numeric" })}</dd>
