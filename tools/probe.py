@@ -46,38 +46,44 @@ for sym in ("XBTEUR", "ETHEUR"):
     p = next((p for p in pairs.values() if p.get("altname") == sym), {})
     out[f"margin_{sym}"] = {"leverage_buy": p.get("leverage_buy"), "leverage_sell": p.get("leverage_sell"), "ordermin": p.get("ordermin")}
 
-# lijst met de aanvullende klasse voor getokeniseerde aandelen
-variants, xs_pairs = {}, {}
-for key, val in (("asset_class", "tokenized_asset"), ("aclass_base", "tokenized_asset")):
-    ok, res = call("publicGetAssetPairs", {key: val})
-    if ok:
-        pp = res["result"]
-        variants[f"{key}={val}"] = {"ok": True, "count": len(pp),
-                                    "eur": sorted(p["altname"] for p in pp.values() if str(p.get("quote", "")).endswith("EUR"))[:80],
-                                    "usd_sample": sorted(p["altname"] for p in pp.values() if str(p.get("quote", "")).endswith("USD"))[:20]}
-        if pp and not xs_pairs:
-            xs_pairs = pp
-    else:
-        variants[f"{key}={val}"] = {"ok": False, "error": res}
-out["tokenized_lists"] = variants
+# getokeniseerde aandelen (xStocks): aparte lijst via aclass_base
+from collections import Counter
+ok, res = call("publicGetAssetPairs", {"aclass_base": "tokenized_asset"})
+xs_pairs = {}
+if ok:
+    xs_pairs = res["result"]
+    alts = sorted({p["altname"] for p in xs_pairs.values()})
+    out["tokenized"] = {"ok": True, "entries": len(xs_pairs), "unique_pairs": len(alts),
+                        "quotes": dict(Counter(str(p.get("quote")) for p in xs_pairs.values())),
+                        "eur_pairs": [a for a in alts if a.endswith("EUR")][:50], "pairs": alts}
+else:
+    out["tokenized"] = {"ok": False, "error": res}
+
+# andere klassen? Een ongeldige waarde geeft meestal een foutmelding met de toegestane waarden.
+classes = {}
+for val in ("equity", "stock", "etf", "commodity", "fx", "currency"):
+    ok2, r2 = call("publicGetAssetPairs", {"aclass_base": val})
+    classes[val] = {"ok": ok2, "count": len(r2["result"]) if ok2 else None, "error": None if ok2 else r2}
+out["other_asset_classes"] = classes
 
 # controle: een gewone munt moet goed gekeurd worden
 out["validate_control_btc"] = validate_order("XBTEUR", "buy", 0.0001)
+# hefboom (margin) voor dit account? Alleen validate.
+out["validate_margin_2x"] = validate_order("XBTEUR", "buy", 0.0001, {"leverage": "2"})
 
-# een getokeniseerd aandeel proberen te valideren (nooit uitgevoerd)
-source = xs_pairs or {k: v for k, v in pairs.items() if k in xs or v.get("altname") in xs}
+# een getokeniseerd aandeel valideren (nooit uitgevoerd)
 target = None
-for pref in ("AAPLxEUR", "TSLAxEUR", "NVDAxEUR", "AAPLxUSD", "TSLAxUSD", "NVDAxUSD"):
-    target = next((p for p in source.values() if p.get("altname") == pref), None)
+for pref in ("AAPLxUSD", "TSLAxUSD", "NVDAxUSD", "MSFTxUSD", "SPYxUSD"):
+    target = next((p for p in xs_pairs.values() if p.get("altname") == pref), None)
     if target:
         break
-target = target or next(iter(source.values()), None)
+target = target or next(iter(xs_pairs.values()), None)
 if target:
-    out["stock_pair_info"] = {k: target.get(k) for k in ("altname", "wsname", "quote", "aclass_base", "aclass_quote", "ordermin", "costmin", "lot_decimals", "status")}
+    out["stock_pair_info"] = {k: target.get(k) for k in ("altname", "wsname", "quote", "aclass_base", "aclass_quote", "ordermin", "costmin", "lot_decimals", "status", "fees")}
     om = float(target.get("ordermin") or 0.001)
     attempts = []
-    for vol in (om * 10, om * 100, 1):
-        for extra in ({}, {"asset_class": "tokenized_asset"}):
+    for vol in (om * 10, 1):
+        for extra in ({"asset_class": "tokenized_asset"}, {}):
             r = validate_order(target["altname"], "buy", round(vol, 8), extra)
             attempts.append(r)
             if r["ok"]:
@@ -86,15 +92,8 @@ if target:
             break
     out["validate_stock"] = attempts
 else:
-    out["validate_stock"] = "geen getokeniseerd aandeel gevonden in de lijsten"
-
-# gewone aandelen via de API? Even kijken welke klassen Kraken kent.
-classes = {}
-for val in ("equity", "equity_pair", "stock", "us_equity"):
-    ok, res = call("publicGetAssetPairs", {"asset_class": val})
-    classes[val] = {"ok": ok, "count": len(res["result"]) if ok else None, "error": None if ok else res}
-out["other_asset_classes"] = classes
+    out["validate_stock"] = "geen getokeniseerd aandeel gevonden"
 
 (ROOT / "data").mkdir(exist_ok=True)
 (ROOT / "data" / "probe.json").write_text(json.dumps(out, indent=1, ensure_ascii=False))
-print(json.dumps({k: v for k, v in out.items() if k in ("default_list", "xstocks_in_default_list", "stock_pair_info", "validate_control_btc")}, indent=1)[:3000])
+print(json.dumps({k: v for k, v in out.items() if k in ("default_list", "stock_pair_info", "validate_control_btc", "validate_margin_2x")}, indent=1)[:3000])
