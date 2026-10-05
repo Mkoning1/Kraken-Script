@@ -309,6 +309,7 @@
         "name": "RoboTechnik",
         "theme": "Automation / semiconductor equipment"
       }
-    ]
+    ],
+    "min_profit_margin": 0
   }
 }
