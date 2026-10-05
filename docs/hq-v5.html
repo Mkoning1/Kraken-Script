@@ -300,7 +300,7 @@ function createCourier(color,dossierColor,index){
  const c={person:p,dossier:d,glow,index,routeIndex:index,path:[],pathIndex:0,pause:index*1.8};couriers.push(c);return c;
 }
 function buildShaft(){
- const g=new THREE.Group();scene.add(g),floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
+ const g=new THREE.Group();scene.add(g);const floorMat=mat("#261b58"),edgeMat=new THREE.MeshBasicMaterial({color:"#6858c7",toneMapped:false});
  // hoofdgangen
  box(g,108,.28,6.4,floorMat,0,.05,7,false);box(g,122,.28,6.4,floorMat,5,.05,39,false);box(g,6.4,.28,42,floorMat,0,.05,23,false);
  // duidelijk verlichte randen
