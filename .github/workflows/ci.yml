@@ -28,7 +28,7 @@ jobs:
       - name: Dashboard JavaScript syntax
         run: |
           python - <<'PY'
-                    import re
+          import re
           import subprocess
           from pathlib import Path
 
