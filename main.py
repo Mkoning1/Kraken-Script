@@ -200,46 +200,66 @@ def run(now_ts=None, exchange=None):
     monitor = MonitorAgent(STATE_PATH, DASHBOARD_PATH)
     data = DataAgent(ex, cfg)
 
-    # 1. Data
+    # 1. Data + opportunity scanner
     held = {m for b in state["books"].values() if b for m in b["positions"]}
+    scan_report = {"enabled": False, "candidates": [], "core_markets": [], "discovery_markets": []}
     try:
-        markets, prices, _ = data.universe(held)
+        proposed_markets, _, _ = data.universe(held)
+        scan_report = data.scan_report
     except Exception as e:
-        markets, prices = list(dict.fromkeys(list(cfg["universe"]["always_include"]) + list(held))), {}
+        proposed_markets = list(dict.fromkeys(list(cfg["universe"]["always_include"]) + list(held)))
         errors.append(f"Marktlijst ophalen mislukt ({e}), alleen vaste munten")
+
+    # De wekker loopt elk kwartier, maar nieuwe strategiesignalen ontstaan pas op een gesloten uurcandle.
+    # Houd het actieve universum een uur vast en bespaar op tussentijdse OHLCV-calls.
+    new_hour = state.get("last_hour_scan") is None or now_ts // 3600 > state["last_hour_scan"] // 3600
+    if new_hour or not state.get("active_markets"):
+        markets = list(proposed_markets)
+        state["active_markets"] = list(markets)
+        state["discovery_markets"] = list(scan_report.get("discovery_markets", []))
+    else:
+        markets = list(dict.fromkeys(list(state.get("active_markets", proposed_markets)) + list(held)))
+    discovery_markets = set(state.get("discovery_markets", []))
+
+    prices = {m: data.all_prices[m] for m in markets if m in data.all_prices}
     fast, slow, h4list, h4 = {}, {}, {}, {}
-    for m in markets:
-        try:
-            c1 = data.candles(m, 60, now_ts)
-            if not DataAgent.is_fresh(c1, 60, now_ts):
-                raise RuntimeError("koersdata is verouderd")
-            c4 = data.candles(m, 240, now_ts)
-            fast[m], slow[m] = c1, c4
-            h4list[m] = h4_series(c4)
-            prices.setdefault(m, c1[-1]["close"])
-        except Exception as e:
-            errors.append(f"{m}: {e}")
-    # Elke munt waarvan sinds de vorige beoordeling een 4-uurscandle gesloten is (ook na een gemiste run)
     lookback = cfg["agents"].get("trend4h", {}).get("lookback", 55)
     last4 = state.setdefault("last_4h_eval", {})
     levels = state.setdefault("levels", {})
-    for m, c4 in slow.items():  # niveau waar de volgende 4-uurscandle bovenuit moet sluiten om te kopen
-        if len(c4) >= lookback:
-            levels[m] = {"breakout": max(c["high"] for c in c4[-lookback:]), "ts": c4[-1]["ts"]}
-    for m, c4 in slow.items():
-        if c4 and c4[-1]["ts"] > last4.get(m, 0):
+
+    if new_hour:
+        for m in markets:
             try:
-                h4[m] = snapshot_4h(c4, lookback)
-            except ValueError:
-                pass  # te nieuw op Kraken: nog niet genoeg historie
+                c1 = data.candles(m, 60, now_ts)
+                if not DataAgent.is_fresh(c1, 60, now_ts):
+                    raise RuntimeError("koersdata is verouderd")
+                c4 = data.candles(m, 240, now_ts)
+                fast[m], slow[m] = c1, c4
+                h4list[m] = h4_series(c4)
+                prices.setdefault(m, c1[-1]["close"])
             except Exception as e:
-                errors.append(f"{m} (4 uur): {e}")
-    if h4:
-        state["last_4h_scan"] = now_ts
-    for b in state["books"].values():
-        if b:
-            for m, p in b["positions"].items():
-                prices.setdefault(m, p["entry_price"])
+                errors.append(f"{m}: {e}")
+        state["last_hour_scan"] = now_ts
+
+        for m, c4 in slow.items():
+            if len(c4) >= lookback:
+                levels[m] = {"breakout": max(c["high"] for c in c4[-lookback:]), "ts": c4[-1]["ts"]}
+        for m, c4 in slow.items():
+            if c4 and c4[-1]["ts"] > last4.get(m, 0):
+                try:
+                    h4[m] = snapshot_4h(c4, lookback)
+                except ValueError:
+                    pass
+                except Exception as e:
+                    errors.append(f"{m} (4 uur): {e}")
+        if h4:
+            state["last_4h_scan"] = now_ts
+        state["spark"] = {m: [c["close"] for c in fast[m][-48:]] for m in fast}
+
+    for book in state["books"].values():
+        if book:
+            for m, p in book["positions"].items():
+                prices.setdefault(m, data.all_prices.get(m, p["entry_price"]))
 
     # 2. Open posities bewaken
     exited = {"live": set(), "schaduw": set()}
@@ -296,10 +316,15 @@ def run(now_ts=None, exchange=None):
                     errors.append(f"{m}: noodverkoop mislukt: {e}")
 
     # 4. Markt-agent
-    try:
-        regime, regime_reason = MarketRegimeAgent().assess(trend_snapshot(slow[cfg["regime_market"]]))
-    except Exception as e:
-        regime, regime_reason = "neutraal", f"Onbekend ({e}), neutraal aangenomen"
+    if cfg["regime_market"] in slow:
+        try:
+            regime, regime_reason = MarketRegimeAgent().assess(trend_snapshot(slow[cfg["regime_market"]]))
+        except Exception as e:
+            regime, regime_reason = "neutraal", f"Onbekend ({e}), neutraal aangenomen"
+    else:
+        previous = state.get("last_run", {}).get("regime") or {}
+        regime = previous.get("label", "neutraal")
+        regime_reason = previous.get("reason", "Nog geen gesloten uurcandle beschikbaar")
     regime_mult = cfg["regime_multiplier"][regime]
 
     # 5. Prestatie-agent
@@ -349,6 +374,9 @@ def run(now_ts=None, exchange=None):
                 notes.append(d["reason"])
                 continue
             bname = "live" if learner.status(d["agent"]) == "live" and state["books"].get("live") else "schaduw"
+            if m in discovery_markets and cfg.get("scanner", {}).get("shadow_only", True):
+                bname = "schaduw"
+                notes.append("Opportunity scanner: discovery-markt blijft voorlopig schaduw-only")
             book = state["books"][bname]
             if m in book["positions"] or m in exited[bname]:
                 notes.append(f"{d['reason']} (al een positie of net verkocht)")
@@ -416,10 +444,20 @@ def run(now_ts=None, exchange=None):
     regime_info = {"label": regime, "reason": regime_reason, "multiplier": regime_mult}
     state["last_run"] = {"ts": now_ts, "ok": not errors, "regime": regime_info,
                          "prices": {m: prices[m] for m in prices if any(b and m in b["positions"] for b in state["books"].values()) or m == cfg["benchmark_market"]}}
-    state["narrative"] = MonitorAgent.narrative(state, cfg, regime_info, len(fast), events, bool(h4), errors, validate)
+    state["narrative"] = MonitorAgent.narrative(state, cfg, regime_info, len(markets), events, bool(h4), errors, validate)
+    if scan_report.get("enabled"):
+        active_discovery = sorted(discovery_markets)
+        state["narrative"].insert(
+            1,
+            f"Opportunity scanner: {scan_report.get('pool_count', 0)} liquide EUR-markten voorselecteerd; "
+            f"{len(active_discovery)} extra kans(en) draaien {'alleen in schaduw' if scan_report.get('shadow_only') else 'mee in de handel'}."
+        )
+    scan_report = dict(scan_report)
+    scan_report["active_markets"] = list(markets)
+    scan_report["active_discovery_markets"] = sorted(discovery_markets)
     monitor.record(state, now_ts, prices, prices.get(cfg["benchmark_market"]))
     monitor.save(state, cfg, profile, prices, learner.summary(strategies),
-                 {"markets": markets, "spark": {m: [c["close"] for c in fast[m][-48:]] for m in fast}})
+                 {"markets": markets, "spark": state.get("spark", {}), "scanner": scan_report})
 
     for line in state["narrative"]:
         print(line)
