@@ -123,6 +123,26 @@ def unit_checks():
     assert chosen[-1] == "ALT/EUR", "discovery-markt niet toegevoegd"
     print("GOED  opportunity-scanner")
 
+    cfg_all = json.loads((ROOT / "config.json").read_text())
+    from agents.strategies import build_agents, Signal
+    desks = {a.name: (a.horizon, a.timeframe_minutes) for a in build_agents(cfg_all["agents"])}
+    assert desks["momentum"] == ("fast", 15), "momentum hoort op de 15m fast desk"
+    assert desks["squeeze"] == ("fast", 15), "squeeze hoort op de 15m fast desk"
+    assert desks["fast_breakout"] == ("fast", 15), "snelle breakout hoort op de 15m fast desk"
+    assert desks["mean_reversion"] == ("swing", 60), "dip-koper hoort op de 1u swing desk"
+    assert desks["breakout"] == ("swing", 60), "normale breakout hoort op de 1u swing desk"
+    assert desks["trend4h"] == ("trend", 240), "Trend-4u hoort op de 4u trend desk"
+    assert cfg_all["cadence"]["monitor_minutes"] == 5 and cfg_all["cadence"]["discovery_minutes"] == 15
+    print("GOED  multi-speed desk-indeling")
+
+    from agents.execution import new_position
+    book = {"name": "schaduw", "positions": {}}
+    pos = new_position(book, "TEST/EUR", "momentum", Signal("buy", .8, "test"), 1, 10, 10, 0,
+                       9, 9, {"_tf_sec": 900, "_cooldown_sec": 2700}, 1, 1_700_000_000, 3600, "test", .8, {})
+    assert pos["timeframe_sec"] == 900 and pos["entry_ts"] == 1_700_000_900, "positie bewaart eigen timeframe niet"
+    assert pos["cooldown_sec"] == 2700, "positie bewaart desk-cooldown niet"
+    print("GOED  timeframe-aware positie")
+
     from agents.equities import EquityScout, update_paper_book
     class EquityProvider:
         def history(self, symbols, period="6mo"):

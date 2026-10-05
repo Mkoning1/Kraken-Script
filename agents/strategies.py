@@ -38,7 +38,7 @@ def _htf_up(htf):
 
 
 class MeanReversionAgent:
-    horizon = "kort"
+    horizon, timeframe_minutes = "swing", 60
     """Koopt paniekdalingen in een munt die op uurbasis stijgt, verkoopt zodra de koers terug is bij het gemiddelde."""
     name, label = "mean_reversion", "Dip-koper"
 
@@ -60,7 +60,7 @@ class MeanReversionAgent:
 
 
 class BreakoutAgent:
-    horizon = "kort"
+    horizon, timeframe_minutes = "swing", 60
     """Koopt als de koers met volume door het hoogste punt van de afgelopen periode breekt."""
     name, label = "breakout", "Uitbraak-agent"
 
@@ -82,8 +82,29 @@ class BreakoutAgent:
         return Signal("hold", 0.0, "Geen uitbraak")
 
 
+class FastBreakoutAgent:
+    horizon, timeframe_minutes = "fast", 15
+    """Snelle 15m-uitbraak: zoekt vroege volume-breakouts voordat de 1u-desk ze ziet."""
+    name, label = "fast_breakout", "Snelle uitbraak"
+
+    def __init__(self, lookback=24, volume_mult=1.35, stop_atr=2.0, **_):
+        self.lookback, self.volume_mult, self.stop_atr = lookback, volume_mult, stop_atr
+
+    def analyse(self, ctx):
+        i, htf = ctx["sig"], ctx["trend"]
+        vol_ratio = i["volume"] / i["volume_avg"] if i["volume_avg"] else 0
+        if _htf_up(htf) and i["close"] > i["prev_high"] and vol_ratio >= self.volume_mult and i["ema20"] > i["ema50"]:
+            strength = min(0.95, 0.68 + (vol_ratio - self.volume_mult) * 0.11)
+            return Signal("buy", strength,
+                          f"Snelle 15m-uitbraak boven de laatste {self.lookback} candles met {vol_ratio:.1f}x volume",
+                          self.stop_atr, True)
+        if i["close"] < i["ema50"]:
+            return Signal("sell", 0.65, "15m-koers terug onder EMA50: snelle uitbraak verzwakt")
+        return Signal("hold", 0.0, "Geen snelle 15m-uitbraak")
+
+
 class MomentumAgent:
-    horizon = "kort"
+    horizon, timeframe_minutes = "fast", 15
     """Springt op een versnelling: MACD kruist omhoog, met extra volume, boven het gemiddelde."""
     name, label = "momentum", "Momentum-agent"
 
@@ -105,7 +126,7 @@ class MomentumAgent:
 
 
 class SqueezeAgent:
-    horizon = "kort"
+    horizon, timeframe_minutes = "fast", 15
     """Wacht tot de markt heel rustig is (smalle banden) en koopt de uitbraak omhoog daarna."""
     name, label = "squeeze", "Squeeze-agent"
 
@@ -131,7 +152,7 @@ class Trend4hAgent:
     en de RSI staat boven 50. Hoe verder boven het kanaal (in ATR's), hoe sterker het advies.
     Verkopen: alleen via de tweetraps trailing stop (2 ATR krap, 6 ATR ruim zodra de winst 3 ATR is).
     """
-    name, label, horizon = "trend4h", "Trend-4u", "lang"
+    name, label, horizon, timeframe_minutes = "trend4h", "Trend-4u", "trend", 240
 
     def __init__(self, lookback=55, rsi_min=50, initial_atr=2.0, **_):
         self.lookback, self.rsi_min, self.initial_atr = lookback, rsi_min, initial_atr
@@ -150,7 +171,7 @@ class Trend4hAgent:
         return Signal("hold", 0.0, f"Nog {abs(pct):.1f}% onder het uitbraakniveau" if pct < 0 else f"Boven het kanaal maar RSI {h4['rsi']:.0f} te laag")
 
 
-AGENT_CLASSES = {c.name: c for c in (Trend4hAgent, MeanReversionAgent, BreakoutAgent, MomentumAgent, SqueezeAgent)}
+AGENT_CLASSES = {c.name: c for c in (Trend4hAgent, MeanReversionAgent, BreakoutAgent, FastBreakoutAgent, MomentumAgent, SqueezeAgent)}
 
 
 def build_agents(agent_cfg):

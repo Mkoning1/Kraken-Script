@@ -1,11 +1,11 @@
-"""Multi-agent trader v3 voor Kraken. Elke run (elke 15 minuten via GitHub Actions):
+"""Multi-agent trader v4 voor Kraken. Elke run (elke 5 minuten via GitHub Actions):
 
-  1. Data-agent         kiest de munten (top op volume) en haalt 15-min-, uur- en zo nodig 4-uurscandles op
+  1. Data-agent         scant breed elke 5 min; discovery elke 15 min; haalt 15m/1u/4u-data per desk op
   2. Uitvoer-agents     bewaken open posities: stop-losses, trailing stops, controle op Kraken
   3. Risico-agent       daglimiet en noodstop, apart voor echt geld en schaduwgeld
   4. Markt-agent        stijgende, neutrale of dalende markt (BTC)
   5. Prestatie-agent    invloed per agent, en wie met echt geld mag handelen
-  6. Strategie-agents   Trend-4u (jouw bot) + vier korte-termijnagents geven hun advies
+  6. Strategie-agents   Fast desk (15m), swing desk (1u) en Trend-4u (4u) geven hun advies
   7. Beslis-agent       rangschikt alle kansen
   8. Risico-agent       keurt goed of af en bepaalt de inzet
   9. Uitvoer-agents     kopen: echt geld via Kraken, schaduwgeld op papier
@@ -33,7 +33,7 @@ STATE_PATH = ROOT / "data" / "state.json"
 DASHBOARD_PATH = ROOT / "docs" / "data.json"
 LEGACY_STATE = ROOT / "bot_state.json"
 STATE_VERSION = 3
-TF = 60          # signalen en bewaking op uurcandles
+TF = 15          # fallback voor nieuwe posities; elke positie bewaart voortaan zijn eigen timeframe
 BACKTEST_PATH = ROOT / "data" / "backtest.json"
 
 
@@ -200,75 +200,147 @@ def run(now_ts=None, exchange=None):
     monitor = MonitorAgent(STATE_PATH, DASHBOARD_PATH)
     data = DataAgent(ex, cfg)
 
-    # 1. Data + opportunity scanner
+    # 1. Data + multi-speed opportunity scanner
+    cadence = cfg.get("cadence", {})
     held = {m for b in state["books"].values() if b for m in b["positions"]}
     scan_report = {"enabled": False, "candidates": [], "core_markets": [], "discovery_markets": []}
     try:
+        # Eén ticker-batch: brede markt- en prijscheck iedere 5 minuten.
         proposed_markets, _, _ = data.universe(held)
         scan_report = data.scan_report
     except Exception as e:
         proposed_markets = list(dict.fromkeys(list(cfg["universe"]["always_include"]) + list(held)))
         errors.append(f"Marktlijst ophalen mislukt ({e}), alleen vaste munten")
 
-    # De wekker loopt elk kwartier, maar nieuwe strategiesignalen ontstaan pas op een gesloten uurcandle.
-    # Houd het actieve universum een uur vast en bespaar op tussentijdse OHLCV-calls.
-    new_hour = state.get("last_hour_scan") is None or now_ts // 3600 > state["last_hour_scan"] // 3600
-    if new_hour or not state.get("active_markets"):
+    fast_tf = int(cadence.get("fast_minutes", 15))
+    swing_tf = int(cadence.get("swing_minutes", 60))
+    trend_tf = int(cadence.get("trend_minutes", 240))
+    discovery_tf = int(cadence.get("discovery_minutes", 15))
+
+    def is_new(slot_name, minutes):
+        last = state.get(slot_name)
+        return last is None or now_ts // (minutes * 60) > int(last) // (minutes * 60)
+
+    new_discovery = is_new("last_discovery_scan", discovery_tf)
+    new_fast = is_new("last_fast_scan", fast_tf)
+    new_hour = is_new("last_hour_scan", swing_tf)
+    new_4h = is_new("last_4h_scan", trend_tf)
+
+    # Discovery-lijst verandert alleen op kwartiergrenzen. Tussendoor blijven posities + actieve set stabiel.
+    if new_discovery or not state.get("active_markets"):
         markets = list(proposed_markets)
         state["active_markets"] = list(markets)
         state["discovery_markets"] = list(scan_report.get("discovery_markets", []))
+        state["last_discovery_scan"] = now_ts
     else:
         markets = list(dict.fromkeys(list(state.get("active_markets", proposed_markets)) + list(held)))
     discovery_markets = set(state.get("discovery_markets", []))
 
     prices = {m: data.all_prices[m] for m in markets if m in data.all_prices}
-    fast, slow, h4list, h4 = {}, {}, {}, {}
+    c15, c1, c4, h4list, h4 = {}, {}, {}, {}, {}
     lookback = cfg["agents"].get("trend4h", {}).get("lookback", 55)
     last4 = state.setdefault("last_4h_eval", {})
     levels = state.setdefault("levels", {})
+    trend1_cache = state.setdefault("trend_1h_cache", {})
+    trend4_cache = state.setdefault("trend_4h_cache", {})
+    corr4_cache = state.setdefault("corr_4h_cache", {})
 
-    if new_hour:
+    # Fast desk: alleen iedere gesloten 15m-candle zware 15m-data ophalen.
+    if new_fast:
         for m in markets:
             try:
-                c1 = data.candles(m, 60, now_ts)
-                if not DataAgent.is_fresh(c1, 60, now_ts):
-                    raise RuntimeError("koersdata is verouderd")
-                c4 = data.candles(m, 240, now_ts)
-                fast[m], slow[m] = c1, c4
-                h4list[m] = h4_series(c4)
-                prices.setdefault(m, c1[-1]["close"])
+                candles = data.candles(m, 15, now_ts)
+                if not DataAgent.is_fresh(candles, 15, now_ts):
+                    raise RuntimeError("15m-koersdata is verouderd")
+                c15[m] = candles
+                prices.setdefault(m, candles[-1]["close"])
             except Exception as e:
-                errors.append(f"{m}: {e}")
+                errors.append(f"{m} (15m): {e}")
+        state["last_fast_scan"] = now_ts
+        if c15:
+            state["spark"] = {m: [c["close"] for c in rows[-96:]] for m, rows in c15.items()}
+
+    # Swing desk + 1u trendcache. Eerste run na een upgrade vult de cache ook als het uur nog niet omsloeg.
+    need_hour = new_hour or any(m not in trend1_cache for m in markets)
+    if need_hour:
+        for m in markets:
+            try:
+                candles = data.candles(m, 60, now_ts)
+                if not DataAgent.is_fresh(candles, 60, now_ts):
+                    raise RuntimeError("1u-koersdata is verouderd")
+                c1[m] = candles
+                trend1_cache[m] = trend_snapshot(candles)
+                prices.setdefault(m, candles[-1]["close"])
+            except ValueError:
+                continue
+            except Exception as e:
+                errors.append(f"{m} (1u): {e}")
         state["last_hour_scan"] = now_ts
 
-        for m, c4 in slow.items():
-            if len(c4) >= lookback:
-                levels[m] = {"breakout": max(c["high"] for c in c4[-lookback:]), "ts": c4[-1]["ts"]}
-        for m, c4 in slow.items():
-            if c4 and c4[-1]["ts"] > last4.get(m, 0):
+    # Trend desk + 4u cache/correlatie. Dit gebeurt alleen bij een nieuwe 4u-candle of lege cache.
+    need_4h = new_4h or any(m not in trend4_cache for m in markets)
+    if need_4h:
+        for m in markets:
+            try:
+                candles = data.candles(m, 240, now_ts)
+                if not DataAgent.is_fresh(candles, 240, now_ts):
+                    raise RuntimeError("4u-koersdata is verouderd")
+                c4[m] = candles
+                h4list[m] = h4_series(candles)
+                corr4_cache[m] = [{"ts": x["ts"], "close": x["close"]} for x in candles[-100:]]
                 try:
-                    h4[m] = snapshot_4h(c4, lookback)
+                    trend4_cache[m] = trend_snapshot(candles)
                 except ValueError:
                     pass
-                except Exception as e:
-                    errors.append(f"{m} (4 uur): {e}")
-        if h4:
-            state["last_4h_scan"] = now_ts
-        state["spark"] = {m: [c["close"] for c in fast[m][-48:]] for m in fast}
+                if len(candles) >= lookback:
+                    levels[m] = {"breakout": max(x["high"] for x in candles[-lookback:]), "ts": candles[-1]["ts"]}
+                if candles[-1]["ts"] > last4.get(m, 0):
+                    try:
+                        h4[m] = snapshot_4h(candles, lookback)
+                    except ValueError:
+                        pass
+                prices.setdefault(m, candles[-1]["close"])
+            except Exception as e:
+                errors.append(f"{m} (4u): {e}")
+        state["last_4h_scan"] = now_ts
 
     for book in state["books"].values():
         if book:
             for m, p in book["positions"].items():
                 prices.setdefault(m, data.all_prices.get(m, p["entry_price"]))
 
-    # 2. Open posities bewaken
+    agent_map = {a.name: a for a in strategies}
+
+    # 2. Open posities iedere 5 minuten bewaken/reconciliëren.
+    # Live stops staan op Kraken zelf. Schaduwposities krijgen daarnaast een 5m ticker-stopcheck.
     exited = {"live": set(), "schaduw": set()}
     for name, book in state["books"].items():
         if not book:
             continue
         for m in list(book["positions"]):
+            pos = book["positions"].get(m)
+            if not pos:
+                continue
+            owner = agent_map.get(pos.get("agent"))
+            horizon = getattr(owner, "horizon", "swing") if owner else "swing"
+            series = c15.get(m, []) if horizon == "fast" else c1.get(m, []) if horizon == "swing" else []
+            four = h4list.get(m) if pos.get("exit_style") == "two_stage" else None
+            last_price = prices.get(m)
+
+            if name == "schaduw" and last_price:
+                ticker_stop = pos.get("hard_stop") if pos.get("exit_style") == "two_stage" else pos.get("stop")
+                if ticker_stop and last_price <= ticker_stop:
+                    try:
+                        res = execs[name].sell(book, m, last_price, now_ts, "5-minuten stopcontrole geraakt", learner)
+                        exited[name].add(m)
+                        ev(type="exit", book=name, market=m, price=res["exit_price"], pnl=round(res["pnl"], 2),
+                           agent=labels.get(res["agent"], res["agent"]), reason=res["exit_reason"], ts=res["exit_ts"])
+                    except Exception as e:
+                        errors.append(f"{m} (schaduw): 5m-stopcontrole mislukt: {e}")
+                    continue
+
             try:
-                res = execs[name].manage(book, m, fast.get(m, []), h4list.get(m), learner, prices.get(m))
+                res = execs[name].manage(book, m, series, four, learner, last_price)
             except Exception as e:
                 errors.append(f"{m} ({'echt geld' if name == 'live' else 'schaduw'}): bewaken mislukt: {e}")
                 continue
@@ -315,16 +387,17 @@ def run(now_ts=None, exchange=None):
                 except Exception as e:
                     errors.append(f"{m}: noodverkoop mislukt: {e}")
 
-    # 4. Markt-agent
-    if cfg["regime_market"] in slow:
+    # 4. Markt-agent: 1u-regime, gecachet tussen uurgrenzen.
+    btc_trend = trend1_cache.get(cfg["regime_market"])
+    if btc_trend:
         try:
-            regime, regime_reason = MarketRegimeAgent().assess(trend_snapshot(slow[cfg["regime_market"]]))
+            regime, regime_reason = MarketRegimeAgent().assess(btc_trend)
         except Exception as e:
             regime, regime_reason = "neutraal", f"Onbekend ({e}), neutraal aangenomen"
     else:
         previous = state.get("last_run", {}).get("regime") or {}
         regime = previous.get("label", "neutraal")
-        regime_reason = previous.get("reason", "Nog geen gesloten uurcandle beschikbaar")
+        regime_reason = previous.get("reason", "Nog geen bruikbare 1u-trend beschikbaar")
     regime_mult = cfg["regime_multiplier"][regime]
 
     # 5. Prestatie-agent
@@ -332,69 +405,122 @@ def run(now_ts=None, exchange=None):
         ev(type="note", reason=note)
     weights = {a.name: learner.weight(a.name) for a in strategies}
 
-    # 6-7. Adviezen en beslissingen
+    # 6-7. Adviezen en beslissingen per desk.
     candidates = []
-    for m, c15 in fast.items():  # c15 = uurcandles
-        last_ts = c15[-1]["ts"]
-        if state["last_candle_ts"].get(m) == last_ts and m not in h4:
-            continue
-        state["last_candle_ts"][m] = last_ts
-        try:
-            ctx = {"sig": snapshot(c15, cfg), "trend": trend_snapshot(slow[m]), "h4": h4.get(m)}
-        except ValueError:
-            continue  # te nieuw op Kraken: nog niet genoeg historie
-        except Exception as e:
-            errors.append(f"{m}: {e}")
-            continue
-        if m in h4:
-            last4[m] = h4[m]["ts"]
-        signals = {a.name: a.analyse(ctx) for a in strategies}
-        close_ts = last_ts + TF * 60
-        notes = []
-        for name, book in state["books"].items():
-            if not book or m not in book["positions"]:
-                continue
-            d = decider.exit_check(signals, book["positions"][m])
-            notes.append(f"{'Echt geld' if name == 'live' else 'Schaduw'}: {d['reason']}")
-            if d["type"] == "exit":
-                try:
-                    res = execs[name].sell(book, m, ctx["sig"]["close"], close_ts, d["reason"], learner)
-                    if name == "live":
-                        persist(state)
-                    if res.get("validated"):
-                        ev(type="validated", book=name, market=m, reason=res["reason"])
-                    else:
-                        exited[name].add(m)
-                        ev(type="exit", book=name, market=m, price=res["exit_price"], pnl=round(res["pnl"], 2),
-                           agent=labels.get(res["agent"]), reason=d["reason"], ts=close_ts)
-                except Exception as e:
-                    errors.append(f"{m}: verkopen mislukt: {e}")
-        for d in decider.entries(signals, weights, regime_mult, regime):
-            if d["type"] != "entry":
-                notes.append(d["reason"])
-                continue
-            bname = "live" if learner.status(d["agent"]) == "live" and state["books"].get("live") else "schaduw"
-            if m in discovery_markets and cfg.get("scanner", {}).get("shadow_only", True):
-                bname = "schaduw"
-                notes.append("Opportunity scanner: discovery-markt blijft voorlopig schaduw-only")
-            book = state["books"][bname]
-            if m in book["positions"] or m in exited[bname]:
-                notes.append(f"{d['reason']} (al een positie of net verkocht)")
-                continue
-            candidates.append((d, bname, m, ctx, last_ts))
-            notes.append(f"Kandidaat voor {'echt geld' if bname == 'live' else 'schaduw'}: {d['reason']} ({d['calc']})")
-        evaluations[m] = {"ts": close_ts, "price": ctx["sig"]["close"],
-                          "signals": {labels[n]: s.to_dict() for n, s in signals.items()},
-                          "notes": notes or ["Geen actie"]}
+    signal_seen = state.setdefault("last_signal_ts", {})
 
-    # 8-9. Beste kansen eerst langs de risico-agent
-    for d, bname, m, ctx, last_ts in sorted(candidates, key=lambda x: -x[0]["score"]):
+    def merge_evaluation(market, close_ts, price, signals, notes):
+        row = evaluations.setdefault(market, {"ts": close_ts, "price": price, "signals": {}, "notes": []})
+        row["ts"] = max(row.get("ts", 0), close_ts)
+        row["price"] = price
+        row["signals"].update({labels[n]: sig.to_dict() for n, sig in signals.items()})
+        row["notes"].extend(notes or ["Geen actie"])
+
+    def process_desk(horizon, series_map, trend_cache, tf_minutes):
+        desk_agents = [a for a in strategies if a.horizon == horizon]
+        if not desk_agents:
+            return
+        for m, candles in series_map.items():
+            if not candles:
+                continue
+            last_ts = candles[-1]["ts"]
+            seen_key = f"{horizon}:{m}"
+            if signal_seen.get(seen_key) == last_ts:
+                continue
+            signal_seen[seen_key] = last_ts
+
+            try:
+                if horizon == "trend":
+                    hs = h4.get(m)
+                    if not hs:
+                        continue
+                    sig_snapshot = {"close": hs["close"], "atr": hs["atr"]}
+                    ctx = {"sig": sig_snapshot, "trend": trend_cache.get(m) or {}, "h4": hs}
+                    price = hs["close"]
+                else:
+                    trend = trend_cache.get(m)
+                    if not trend:
+                        continue
+                    ctx = {"sig": snapshot(candles, cfg), "trend": trend, "h4": h4.get(m)}
+                    price = ctx["sig"]["close"]
+            except ValueError:
+                continue
+            except Exception as e:
+                errors.append(f"{m} ({horizon}): {e}")
+                continue
+
+            signals = {a.name: a.analyse(ctx) for a in desk_agents}
+            close_ts = last_ts + tf_minutes * 60
+            notes = []
+
+            # Alleen de eigenaar-agent van een positie mag hem op strategiesignaal sluiten.
+            for name, book in state["books"].items():
+                if not book or m not in book["positions"]:
+                    continue
+                pos = book["positions"][m]
+                owner = agent_map.get(pos.get("agent"))
+                if not owner or owner.horizon != horizon:
+                    continue
+                d = decider.exit_check(signals, pos)
+                notes.append(f"{'Echt geld' if name == 'live' else 'Schaduw'}: {d['reason']}")
+                if d["type"] == "exit":
+                    try:
+                        res = execs[name].sell(book, m, price, close_ts, d["reason"], learner)
+                        if name == "live":
+                            persist(state)
+                        if res.get("validated"):
+                            ev(type="validated", book=name, market=m, reason=res["reason"])
+                        else:
+                            exited[name].add(m)
+                            ev(type="exit", book=name, market=m, price=res["exit_price"], pnl=round(res["pnl"], 2),
+                               agent=labels.get(res["agent"]), reason=d["reason"], ts=close_ts)
+                    except Exception as e:
+                        errors.append(f"{m}: verkopen mislukt: {e}")
+
+            for d in decider.entries(signals, weights, regime_mult, regime):
+                if d["type"] != "entry":
+                    notes.append(d["reason"])
+                    continue
+                bname = "live" if learner.status(d["agent"]) == "live" and state["books"].get("live") else "schaduw"
+                if m in discovery_markets and cfg.get("scanner", {}).get("shadow_only", True):
+                    bname = "schaduw"
+                    notes.append("Opportunity scanner: discovery-markt blijft voorlopig schaduw-only")
+                book = state["books"][bname]
+                if m in book["positions"] or m in exited[bname]:
+                    notes.append(f"{d['reason']} (al een positie of net verkocht)")
+                    continue
+                candidates.append((d, bname, m, ctx, last_ts, tf_minutes, price))
+                notes.append(f"Kandidaat voor {'echt geld' if bname == 'live' else 'schaduw'}: {d['reason']} ({d['calc']})")
+
+            merge_evaluation(m, close_ts, price, signals, notes)
+
+    # Fast desk krijgt iedere 15m Momentum + Squeeze + Snelle uitbraak.
+    if new_fast:
+        process_desk("fast", c15, trend1_cache, 15)
+
+    # Swing desk krijgt ieder uur Dip-koper + normale Uitbraak, bevestigd door 4u-trend.
+    if new_hour:
+        process_desk("swing", c1, trend4_cache, 60)
+
+    # Trend desk alleen op een nieuwe gesloten 4u-candle.
+    if h4:
+        process_desk("trend", c4, trend4_cache, 240)
+        for m, hs in h4.items():
+            last4[m] = hs["ts"]
+
+    # 8-9. Beste kansen over alle desks eerst langs de risico-agent.
+    for d, bname, m, ctx, last_ts, tf_minutes, signal_price in sorted(candidates, key=lambda x: -x[0]["score"]):
         book = state["books"][bname]
         if m in book["positions"]:
-            evaluations[m]["notes"].append(f"{d['reason']}: overgeslagen, deze run al gekocht door een andere agent")
+            evaluations[m]["notes"].append(f"{d['reason']}: overgeslagen, deze run al gekocht door een andere desk")
             continue
-        price = ctx["sig"]["close"]
+
+        price = signal_price
         stop, hard, extra = plan_stops(d["signal"], price, ctx, cfg["exits"], cfg["agents"].get(d["agent"], {}))
+        extra = dict(extra or {})
+        extra["_tf_sec"] = tf_minutes * 60
+        extra["_cooldown_sec"] = profile["cooldown_candles"] * tf_minutes * 60
+
         equity = book_equity(book, prices)
         avail = book["cash"]
         if bname == "live":
@@ -403,16 +529,24 @@ def run(now_ts=None, exchange=None):
             except Exception as e:
                 errors.append(f"Saldo ophalen mislukt: {e}")
                 continue
+
         corr = None
         for held_m in book["positions"]:
-            if held_m in slow and m in slow:
-                c = correlation(slow[m], slow[held_m])
+            if held_m in corr4_cache and m in corr4_cache:
+                c = correlation(corr4_cache[m], corr4_cache[held_m])
                 if c is not None and (corr is None or c > corr[0]):
                     corr = (c, held_m)
-        ok, qty, risk_eur, why = risk.approve_entry(book, book["risk_status"], equity, book_exposure(book, prices),
-                                                    m, price, hard, avail, d["score"], last_ts, corr)
-        plan = {"stop": stop, "hard_stop": hard, "risk_eur": round(risk_eur, 2), "calc": d["calc"], "risk": why,
-                "max_value": equity * profile["max_position_pct"] / 100}
+
+        ok, qty, risk_eur, why = risk.approve_entry(
+            book, book["risk_status"], equity, book_exposure(book, prices),
+            m, price, hard, avail, d["score"], last_ts, corr
+        )
+        plan = {
+            "desk": d["horizon"], "timeframe_minutes": tf_minutes,
+            "stop": stop, "hard_stop": hard, "risk_eur": round(risk_eur, 2),
+            "calc": d["calc"], "risk": why,
+            "max_value": equity * profile["max_position_pct"] / 100,
+        }
         where = "echt geld" if bname == "live" else "schaduw"
         if not ok:
             evaluations[m]["notes"].append(f"Risico-agent ({where}): {why}")
@@ -420,18 +554,20 @@ def run(now_ts=None, exchange=None):
                 ev(type="blocked", book=bname, market=m, price=price, reason=f"{d['reason']}. Tegengehouden: {why}")
             continue
         try:
-            res = execs[bname].buy(book, m, d["agent"], d["signal"], qty, price, stop, hard, extra, risk_eur,
-                                   last_ts, d["reason"], d["score"], plan)
+            res = execs[bname].buy(
+                book, m, d["agent"], d["signal"], qty, price, stop, hard, extra, risk_eur,
+                last_ts, d["reason"], d["score"], plan
+            )
         except Exception as e:
             errors.append(f"{m}: kopen mislukt: {e}")
             continue
         finally:
             if bname == "live":
                 persist(state)
-        evaluations[m]["notes"].append(f"Uitvoer-agent ({where}): {res['text']}")
+        evaluations[m]["notes"].append(f"Uitvoer-agent ({where}, {tf_minutes}m): {res['text']}")
         if res.get("ok"):
             ev(type="entry", book=bname, market=m, price=book["positions"][m]["entry_price"], agent=labels[d["agent"]],
-               reason=f"{d['reason']}. {d['calc']}. {why} {res['text']}", ts=last_ts + TF * 60)
+               reason=f"{d['reason']}. {d['calc']}. {why} {res['text']}", ts=last_ts + tf_minutes * 60)
         elif res.get("validated"):
             ev(type="validated", book=bname, market=m, reason=f"{d['reason']}. {why} {res['text']}")
         else:
@@ -456,8 +592,19 @@ def run(now_ts=None, exchange=None):
     scan_report["active_markets"] = list(markets)
     scan_report["active_discovery_markets"] = sorted(discovery_markets)
     monitor.record(state, now_ts, prices, prices.get(cfg["benchmark_market"]))
+    desk_status = {
+        "monitor_minutes": int(cadence.get("monitor_minutes", 5)),
+        "discovery_minutes": discovery_tf,
+        "fast_minutes": fast_tf,
+        "swing_minutes": swing_tf,
+        "trend_minutes": trend_tf,
+        "fast_ran": bool(new_fast),
+        "swing_ran": bool(new_hour),
+        "trend_ran": bool(h4),
+    }
     monitor.save(state, cfg, profile, prices, learner.summary(strategies),
-                 {"markets": markets, "spark": state.get("spark", {}), "scanner": scan_report})
+                 {"markets": markets, "spark": state.get("spark", {}), "scanner": scan_report,
+                  "cadence": desk_status})
 
     for line in state["narrative"]:
         print(line)

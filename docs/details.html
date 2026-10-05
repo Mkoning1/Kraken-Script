@@ -185,6 +185,8 @@ function render(d) {
 
     <div class="story" aria-label="Verslag van de laatste run">${d.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</div>
 
+    ${cadenceSection(d)}
+
     ${scannerSection(d)}
 
     ${equitySection(d.__eq)}
@@ -220,6 +222,22 @@ function render(d) {
   `;
   if (live) drawChart("chart-live", live.equity_history, live.stats.start);
   drawChart("chart-schaduw", sh.equity_history, sh.stats.start);
+}
+
+function cadenceSection(d) {
+  const c = d.cadence || {};
+  const p = d.risk_limits || {};
+  return `<section style="margin:32px 0 40px">
+    <h2>Trading cadence & agressiviteit</h2>
+    <p class="muted" style="margin-bottom:12px;font-size:.9375rem">De bot werkt nu in drie desks. Monitoring en stop/reconciliation staan daar los van en lopen iedere ${c.monitor_minutes || 5} minuten.</p>
+    <div class="table-wrap"><table><thead><tr><th>Laag</th><th>Window</th><th>Functie</th></tr></thead><tbody>
+      <tr><td><b>Monitor</b></td><td>${c.monitor_minutes || 5} min</td><td>Prijzen, posities, stops, spreads en brede marktcheck</td></tr>
+      <tr><td><b>Fast desk</b></td><td>${c.fast_minutes || 15} min</td><td>Momentum, squeeze en snelle breakout</td></tr>
+      <tr><td><b>Swing desk</b></td><td>${c.swing_minutes || 60} min</td><td>Dip-koper en normale breakout met 4u-trendbevestiging</td></tr>
+      <tr><td><b>Trend desk</b></td><td>${c.trend_minutes || 240} min</td><td>Trend-4u en grotere runners</td></tr>
+    </tbody></table></div>
+    <p class="muted" style="margin-top:10px">Assertief profiel: ${num(p.risk_per_trade_pct || 0,2)}% basisrisico per trade · max ${p.max_open_positions || "–"} posities · max ${p.max_exposure_pct || "–"}% exposure · daglimiet ${p.max_daily_loss_pct || "–"}%.</p>
+  </section>`;
 }
 
 function scannerSection(d) {
