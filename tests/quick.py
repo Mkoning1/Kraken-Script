@@ -10,6 +10,7 @@ Gecontroleerd:
   5. Een handmatige verkoop wordt herkend.
   6. De noodstop verkoopt alles.
 """
+import json
 import shutil
 import subprocess
 import sys
