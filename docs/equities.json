@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "paper_only": true,
+  "market": "Hong Kong / China",
+  "source": "Yahoo Finance via yfinance",
+  "generated_ts": 0,
+  "candidates": [],
+  "opportunity_board": [],
+  "paper": {
+    "currency": "HKD",
+    "cash": 10000,
+    "equity": 10000,
+    "start": 10000,
+    "return_pct": 0,
+    "positions": [],
+    "trades": [],
+    "trade_count": 0,
+    "win_rate_pct": null,
+    "fees_paid": 0,
+    "equity_history": []
+  },
+  "broker": {
+    "provider": "Interactive Brokers",
+    "live_enabled": false,
+    "status": "not_configured",
+    "reason": "Equity desk is paper-only until an authenticated broker session and trading permissions are configured."
+  },
+  "error": null
+}

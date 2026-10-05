@@ -224,5 +224,91 @@
       "range": 0.15,
       "spread": 0.1
     }
+  },
+  "equities": {
+    "enabled": true,
+    "market": "Hong Kong / China",
+    "provider": "yfinance",
+    "paper_only": true,
+    "history_period": "6mo",
+    "fundamentals_refresh_hours": 24,
+    "paper_capital_hkd": 10000,
+    "max_positions": 3,
+    "max_position_pct": 35,
+    "entry_score": 70,
+    "exit_score": 50,
+    "min_data_quality_pct": 40,
+    "trailing_stop_pct": 12,
+    "paper_fee_pct": 0.15,
+    "paper_slippage_pct": 0.2,
+    "weights": {
+      "growth": 0.3,
+      "margin": 0.25,
+      "momentum": 0.25,
+      "valuation": 0.1,
+      "quality": 0.1
+    },
+    "watchlist": [
+      {
+        "symbol": "9992.HK",
+        "name": "Pop Mart",
+        "theme": "Consumer IP / global expansion"
+      },
+      {
+        "symbol": "0981.HK",
+        "name": "SMIC",
+        "theme": "Semiconductors / China self-sufficiency"
+      },
+      {
+        "symbol": "1347.HK",
+        "name": "Hua Hong Semiconductor",
+        "theme": "Semiconductors / foundry"
+      },
+      {
+        "symbol": "3750.HK",
+        "name": "CATL",
+        "theme": "Batteries / energy storage"
+      },
+      {
+        "symbol": "1810.HK",
+        "name": "Xiaomi",
+        "theme": "Consumer tech / EV"
+      },
+      {
+        "symbol": "1211.HK",
+        "name": "BYD",
+        "theme": "EV / batteries"
+      },
+      {
+        "symbol": "1024.HK",
+        "name": "Kuaishou",
+        "theme": "Digital media / AI"
+      },
+      {
+        "symbol": "3690.HK",
+        "name": "Meituan",
+        "theme": "Local services / delivery"
+      },
+      {
+        "symbol": "9888.HK",
+        "name": "Baidu",
+        "theme": "AI / autonomous driving"
+      },
+      {
+        "symbol": "9961.HK",
+        "name": "Trip.com",
+        "theme": "Travel platform"
+      },
+      {
+        "symbol": "9988.HK",
+        "name": "Alibaba",
+        "theme": "Commerce / cloud / AI"
+      },
+      {
+        "symbol": "3757.HK",
+        "name": "RoboTechnik",
+        "theme": "Automation / semiconductor equipment"
+      }
+    ]
   }
 }

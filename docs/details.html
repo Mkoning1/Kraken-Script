@@ -142,6 +142,7 @@ const BOOK = { live: "echt geld", schaduw: "schaduw" };
 
 const eur = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR" });
 const eur0 = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+const hkd = new Intl.NumberFormat("nl-NL", { style: "currency", currency: "HKD" });
 const num = (v, d = 2) => new Intl.NumberFormat("nl-NL", { minimumFractionDigits: d, maximumFractionDigits: d }).format(v);
 const pct = v => v == null ? "–" : (v > 0 ? "+" : v < 0 ? "−" : "") + num(Math.abs(v), 1) + "%";
 const signed = v => (v > 0 ? "+" : v < 0 ? "−" : "") + eur.format(Math.abs(v));
@@ -154,9 +155,13 @@ let AG = {};
 
 async function load() {
   try {
-    const res = await fetch("data.json?t=" + Date.now(), { cache: "no-store" });
+    const [res, eqr] = await Promise.all([
+      fetch("data.json?t=" + Date.now(), { cache: "no-store" }),
+      fetch("equities.json?t=" + Date.now(), { cache: "no-store" }).catch(() => null)
+    ]);
     if (!res.ok) throw new Error(res.status);
     const d = await res.json();
+    d.__eq = eqr && eqr.ok ? await eqr.json() : null;
     try { const b = await fetch("backtest.json?t=" + Date.now(), { cache: "no-store" }); d.__bt = b.ok ? await b.json() : null; } catch { d.__bt = null; }
     render(d);
   } catch (e) {
@@ -173,7 +178,7 @@ function render(d) {
     : `<span class="mode paper">Alleen papier</span>`;
 
   document.getElementById("app").innerHTML = `
-    <p style="margin:0 0 12px;display:flex;gap:16px"><a href="index.html">Handelsvloer</a><b>Details</b></p>
+    <p style="margin:0 0 12px;display:flex;gap:16px"><a href="index.html">Handelsvloer</a><b>Details</b><a href="opportunities.html">Opportunities</a></p>
     ${modeHtml}
     <p class="intro">Laatste run: <strong>${when(d.generated_ts)}</strong>${d.last_run_ok ? "" : ", met meldingen (zie onderaan)"}.
       Markt: <strong class="regime-${d.regime.label}">${d.regime.label}</strong>. Profiel: <strong>${esc(d.profile)}</strong>. ${d.markets.length} munten gevolgd.</p>
@@ -181,6 +186,8 @@ function render(d) {
     <div class="story" aria-label="Verslag van de laatste run">${d.narrative.map(l => `<p>${esc(l)}</p>`).join("")}</div>
 
     ${scannerSection(d)}
+
+    ${equitySection(d.__eq)}
 
     ${live ? bookSection("live", "Echt geld", live, d) : ""}
 
@@ -234,6 +241,27 @@ function scannerSection(d) {
     <div class="table-wrap"><table><thead><tr><th>Munt</th><th>Score</th><th>24u</th><th>Range</th><th>24u volume</th><th>Spread</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
   </section>`;
 }
+function equitySection(e) {
+  if (!e?.enabled) return "";
+  const rows = (e.candidates || []).slice(0, 8).map(x => `<tr>
+    <td><b>${esc(x.name)}</b><br><span class="muted">${esc(x.symbol)}</span></td>
+    <td>${num(x.score, 0)}/100</td>
+    <td class="${cls(x.m20_pct)}">${pct(x.m20_pct)}</td>
+    <td>${x.components?.growth == null ? "–" : num(x.components.growth,0)}</td>
+    <td>${x.components?.margin == null ? "–" : num(x.components.margin,0)}</td>
+    <td>${x.components?.quality == null ? "–" : num(x.components.quality,0)}</td>
+    <td>${hkd.format(x.price || 0)}</td>
+  </tr>`).join("");
+  const p = e.paper || {};
+  return `<section style="margin:32px 0 40px">
+    <h2>China/Hongkong research desk</h2>
+    <p class="muted" style="margin-bottom:12px;font-size:.9375rem">Deze desk draait volledig los van de live Kraken-loop. Aandelen blijven paper-only totdat een brokerverbinding apart is geauthenticeerd en gevalideerd. Paper equity: <b class="${cls(p.return_pct)}">${pct(p.return_pct || 0)}</b> op ${hkd.format(p.equity || p.start || 0)}.</p>
+    ${e.error ? `<p class="halt">Datasource-melding: ${esc(e.error)}</p>` : ""}
+    <div class="table-wrap"><table><thead><tr><th>Bedrijf</th><th>Score</th><th>20d</th><th>Groei</th><th>Marges</th><th>Kwaliteit</th><th>Koers</th></tr></thead><tbody>${rows || '<tr><td colspan="7">Eerste scan moet nog draaien.</td></tr>'}</tbody></table></div>
+    <p style="margin-top:10px"><a href="opportunities.html">Open de volledige cross-market ranglijst →</a></p>
+  </section>`;
+}
+
 function bookSection(key, title, b, d) {
   const s = b.stats, r = b.risk || {}, L = d.risk_limits;
   const diff = s.benchmark_return_pct == null ? null : s.return_pct - s.benchmark_return_pct;

@@ -10,6 +10,7 @@ Gecontroleerd:
   5. Een handmatige verkoop wordt herkend.
   6. De noodstop verkoopt alles.
 """
+import json
 import shutil
 import subprocess
 import sys
@@ -121,6 +122,62 @@ def unit_checks():
     assert da.scan_report["discovery_markets"] == ["ALT/EUR"], "scanner vond de momentum-altcoin niet"
     assert chosen[-1] == "ALT/EUR", "discovery-markt niet toegevoegd"
     print("GOED  opportunity-scanner")
+
+    from agents.equities import EquityScout, update_paper_book
+    class EquityProvider:
+        def history(self, symbols, period="6mo"):
+            out = {}
+            for j, symbol in enumerate(symbols):
+                # GROW stijgt stevig; VALUE matig; WEAK daalt.
+                factor = 1.012 if symbol == "GROW.HK" else 1.003 if symbol == "VALUE.HK" else 0.996
+                p, rows = 100.0, []
+                for day in range(90):
+                    p *= factor
+                    rows.append({"ts": 1_700_000_000 + day * 86400, "close": p, "volume": 1_000_000})
+                out[symbol] = rows
+            return out
+        def fundamentals(self, symbol):
+            if symbol == "GROW.HK":
+                return {"currency":"HKD","revenue_growth":0.42,"earnings_growth":0.55,"gross_margin":0.58,
+                        "operating_margin":0.24,"profit_margin":0.20,"return_on_equity":0.28,
+                        "debt_to_equity":35,"forward_pe":24}
+            if symbol == "VALUE.HK":
+                return {"currency":"HKD","revenue_growth":0.10,"earnings_growth":0.12,"gross_margin":0.35,
+                        "operating_margin":0.12,"profit_margin":0.10,"return_on_equity":0.15,
+                        "debt_to_equity":45,"forward_pe":14}
+            return {"currency":"HKD","revenue_growth":-0.08,"earnings_growth":-0.15,"gross_margin":0.18,
+                    "operating_margin":0.01,"profit_margin":0.0,"return_on_equity":0.02,
+                    "debt_to_equity":180,"forward_pe":55}
+
+    with tempfile.TemporaryDirectory() as eqtmp:
+        ecfg = {
+            "watchlist": [
+                {"symbol":"GROW.HK","name":"Grow","theme":"growth"},
+                {"symbol":"VALUE.HK","name":"Value","theme":"value"},
+                {"symbol":"WEAK.HK","name":"Weak","theme":"weak"},
+            ],
+            "history_period":"6mo","fundamentals_refresh_hours":24,"paper_capital_hkd":10000,
+            "max_positions":2,"max_position_pct":50,"entry_score":60,"exit_score":45,
+            "min_data_quality_pct":40,"trailing_stop_pct":12,"paper_fee_pct":0.15,
+            "paper_slippage_pct":0.20,
+            "weights":{"growth":0.30,"margin":0.25,"momentum":0.25,"valuation":0.10,"quality":0.10},
+        }
+        scout = EquityScout(ecfg, Path(eqtmp) / "fund.json", provider=EquityProvider())
+        report = scout.scan(1_800_000_000)
+        assert report["candidates"][0]["symbol"] == "GROW.HK", "equity scorer rangschikt sterke groeier niet bovenaan"
+        estate = {}
+        book = update_paper_book(estate, report, ecfg, 1_800_000_000)
+        assert "GROW.HK" in book["positions"], "equity paper desk opent geen sterke kandidaat"
+        bad = json.loads(json.dumps(report))
+        for row in bad["candidates"]:
+            if row["symbol"] == "GROW.HK":
+                row["price"] *= 0.80
+                row["score"] = 30
+                row["m20_pct"] = -12
+        book = update_paper_book(estate, bad, ecfg, 1_800_086_400)
+        assert "GROW.HK" not in book["positions"], "equity paper desk sluit zwakke positie niet"
+        assert book["trades"], "equity paper trade niet vastgelegd"
+    print("GOED  equity-scout en paper desk")
     return True
 
 

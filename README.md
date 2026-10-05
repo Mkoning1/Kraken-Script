@@ -28,6 +28,19 @@ Elke kwartier-run haalt één ticker-snapshot op voor de brede Kraken-markt. De 
 
 De live-kern blijft gebaseerd op de liquiditeitsselectie die al in de backtest is gebruikt. De opportunity scanner voegt maximaal vier extra markten toe op basis van liquiditeit, positief 24-uursmomentum, dagrange en spread. Die discovery-markten handelen standaard uitsluitend met schaduwgeld; zo verzamelen ze bewijs zonder het live-risico te vergroten.
 
+## China/Hongkong equity desk
+
+De aandelenlaag draait als een **aparte GitHub Actions-workflow** en kan daardoor de live Kraken-trader niet blokkeren. De scout volgt een vaste Hongkong/China-watchlist en rangschikt kandidaten op vijf pijlers: groei, marges, koersmomentum, waardering en kwaliteit. Markt- en fundamentele data worden via `yfinance` opgehaald; fundamentals worden gecachet om onnodige requests te voorkomen.
+
+De equity desk is voorlopig **paper-only**. Hij beheert een eigen HKD-paperportfolio met maximaal drie posities, instapscore, exitscore en trailing stop. Live aandelenexecutie blijft bewust uit totdat een afzonderlijke brokerverbinding is geauthenticeerd, handelsrechten zijn gecontroleerd en de paperresultaten voldoende bewijs leveren. De beoogde brokerlaag is Interactive Brokers; die komt los van de Kraken-execution zodat credentials, sessies en risicoregels niet door elkaar lopen.
+
+Het dashboard heeft drie views:
+- **Handelsvloer**: live crypto-operatie, Kraken-radar en een compacte China/HK-samenvatting.
+- **Details**: risico, agents, backtests, crypto-radar en equity research.
+- **Opportunities**: cross-market ranglijst, China/HK-components, equity-paperportfolio en crypto discovery in één scherm.
+
+De Equity Scout draait op weekdagen vier keer per dag via `.github/workflows/equity-scout.yml`. De live Kraken-trader blijft zijn bestaande eigen workflow en frequentie gebruiken.
+
 ## Risicoprofiel
 
 Standaard: `assertief`. Assertief op de markt, met een vangnet zodat je nooit alles kwijt kunt.

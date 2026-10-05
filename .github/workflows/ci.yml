@@ -20,7 +20,7 @@ jobs:
           python-version: "3.11"
 
       - name: Python syntax
-        run: python -m compileall -q main.py agents tests
+        run: python -m compileall -q main.py equity_scan.py agents tests
 
       - name: Safety tests
         run: python tests/quick.py
@@ -30,7 +30,7 @@ jobs:
           python - <<'PY'
           import re
           from pathlib import Path
-          for name in ("docs/index.html", "docs/details.html"):
+          for name in ("docs/index.html", "docs/details.html", "docs/opportunities.html"):
               text = Path(name).read_text()
               scripts = re.findall(r'<script(?: type="module")?>(.*?)</script>', text, flags=re.S)
               if not scripts:
