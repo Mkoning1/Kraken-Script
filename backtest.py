@@ -352,6 +352,10 @@ def run(download=True, log=print):
     for name in cfg["agents"]:
         if name not in AGENT_CLASSES or not cfg["agents"][name].get("enabled", True):
             continue
+        tf_minutes = int(cfg["agents"][name].get("timeframe_minutes", 240 if name == "trend4h" else 60))
+        if tf_minutes == 15:
+            log(f"{name}: overgeslagen in legacy backtest (historie is 1u; live agent draait 15m)")
+            continue
         uni = universes[base_n]
         base_p = defaults_for(cfg, name)
         base_oos = simulate(coins, [(name, base_p)], cfg, profile, split, t1, uni)
@@ -377,7 +381,8 @@ def run(download=True, log=print):
                          "oos_trades": chosen_oos["trades"], "oos_expectancy_r": chosen_oos["expectancy_r"],
                          "oos_return_pct": chosen_oos["return_pct"], "oos_ex_best_expectancy_r": chosen_oos["ex_best_expectancy_r"],
                          "default_oos_expectancy_r": base_oos["expectancy_r"],
-                         "tuned": adopted, "params": {k: chosen[k] for k in grid}, "tried": tried, "universe_size": base_n}
+                         "tuned": adopted, "params": {k: chosen[k] for k in grid}, "tried": tried, "universe_size": base_n,
+                         "timeframe_minutes": tf_minutes}
         log(f"{name}: {full['trades']} trades, gem. {full['expectancy_r']}R, rendement {full['return_pct']}%; "
             f"zonder beste munt ({full['best_market']}) {ex['return_pct']}%; controleperiode {chosen_oos['expectancy_r']}R"
             + (" (nieuwe instellingen)" if adopted else ""))
