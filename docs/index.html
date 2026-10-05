@@ -5,7 +5,7 @@
 <body><div class="load" id="loading"><div><b>KRAKEN AGENTS HQ</b><p>Het levende kantoorpand wordt geopend…</p></div></div>
 <script type="module">
 try {
-  const res=await fetch("hq-v4.html?t="+Date.now(),{cache:"no-store"});
+  const res=await fetch("hq-v5.html?t="+Date.now(),{cache:"no-store"});
   if(!res.ok) throw new Error("HQ-kantoorcampus "+res.status);
   const html=await res.text();
   document.open();document.write(html);document.close();
