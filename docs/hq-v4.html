@@ -95,7 +95,7 @@ const FLOORS=[
  {key:"execution",no:"C2",name:"Execution",x:34,z:52,face:-1,color:COLORS.execution,staff:6,w:20,d:17,desc:"Plaatst echte orders op Kraken en controleert exchange-stops.",lane:39},
  {key:"trade",no:"TF",name:"LIVE TRADEFLOOR",x:0,z:54,face:-1,color:COLORS.trade,staff:24,w:40,d:22,trade:true,desc:"Grote hectische dealing floor waar goedgekeurde live trades zichtbaar worden uitgevoerd.",lane:39}
 ];
-const BYKEYconst BYKEY=Object.fromEntries(FLOORS.map(f=>[f.key,f]));
+const BYKEY=Object.fromEntries(FLOORS.map(f=>[f.key,f]));
 const OLDKEY={monitor:"ops",data:"data",markt:"market",fast:"fast",swing:"swing",trend:"trend",equity:"equity",prestatie:"performance",beslis:"directie",risico:"risk",kapitaal:"capital",uitvoer:"execution"};
 let D=null,EQ=null,lastKey="",latestScan=null;
 const activity=Object.fromEntries(FLOORS.map(f=>[f.key,.18]));
