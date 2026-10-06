@@ -168,7 +168,7 @@ function renderBoard(rec,text){
 function wallBoard(parent,key,text,x,y,z,color="#ffffff",cls="worker-label",w=5.6,h=1.05,bg="#15102f"){
  const canvas=document.createElement("canvas");canvas.width=1024;canvas.height=220;const ctx=canvas.getContext("2d"),texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;
  const frame=box(parent,w+.18,h+.18,.12,mat("#0e0a24"),x,y,z,false);
- const plane=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:texture,toneMapped:false}));plane.position.set(x,y,z+.071);plane.renderOrder=3;parent.add(plane);
+ const plane=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({map:texture,toneMapped:false,side:THREE.DoubleSide}));plane.position.set(x,y,z+.071);plane.renderOrder=3;parent.add(plane);
  const rec={mesh:plane,frame,texture,canvas,ctx,color,bg,text:""};renderBoard(rec,text);if(key)wallboards[key]=rec;return rec;
 }
 function staticSign(parent,text,x,y,z,color,w=4.4,h=.72){
@@ -193,8 +193,8 @@ function updateCamera(dt){
  if(followCourier&&couriers[0]){
    const p=couriers[0].person.position,t=new THREE.Vector3(p.x,1.2,p.z);
    controls.target.lerp(t,Math.min(1,dt*2.5));
-   const desired=new THREE.Vector3(p.x+16,15,p.z+20);camera.position.lerp(desired,Math.min(1,dt*1.8));
-   camera.zoom+=(1.7-camera.zoom)*Math.min(1,dt*2);camera.updateProjectionMatrix();
+   const desired=new THREE.Vector3(p.x+10,10,p.z-14);camera.position.lerp(desired,Math.min(1,dt*1.8));
+   camera.zoom+=(1.03-camera.zoom)*Math.min(1,dt*2);camera.updateProjectionMatrix();
  }else if(camGoal){
    const k=Math.min(1,dt*2.4);camera.position.lerp(camGoal.pos,k);controls.target.lerp(camGoal.target,k);camera.zoom+=(camGoal.zoom-camera.zoom)*k;camera.updateProjectionMatrix();
    if(camera.position.distanceTo(camGoal.pos)<.15&&controls.target.distanceTo(camGoal.target)<.15&&Math.abs(camera.zoom-camGoal.zoom)<.01)camGoal=null;
@@ -450,33 +450,35 @@ function createScenefunction createScene(){
  renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.16;stage.appendChild(renderer.domElement);
  labelRenderer=new CSS2DRenderer();labelRenderer.setSize(innerWidth,innerHeight);labelRenderer.domElement.className="l2d";labelRenderer.domElement.style.cssText="position:absolute;inset:0;pointer-events:none";stage.appendChild(labelRenderer.domElement);
  scene=new THREE.Scene();scene.background=new THREE.Color("#140D33");scene.fog=new THREE.Fog("#140D33",145,235);
- const a=innerWidth/innerHeight,F=76;camera=new THREE.OrthographicCamera(-F*a/2,F*a/2,F/2,-F/2,.1,420);
- controls=new OrbitControls(camera,renderer.domElement);controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};controls.screenSpacePanning=true;controls.enableDamping=true;controls.dampingFactor=.09;controls.minZoom=.16;controls.maxZoom=4.2;controls.minPolarAngle=.3;controls.maxPolarAngle=1.4;
- scene.add(new THREE.HemisphereLight("#e6ddff","#241750",1.2));const sun=new THREE.DirectionalLight("#fff",1.6);sun.position.set(48,92,68);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-90,right:90,top:95,bottom:-55,near:1,far:260});scene.add(sun);
- // nette campusgrond; de oude zwarte skylineblokken zijn bewust verwijderd.
- box(scene,136,.7,112,mat("#1d153e"),4,-.55,17,false);
+ const a=innerWidth/innerHeight;camera=new THREE.PerspectiveCamera(37,a,.1,520);camera.position.set(68,48,-58);
+ controls=new OrbitControls(camera,renderer.domElement);controls.mouseButtons={LEFT:THREE.MOUSE.PAN,MIDDLE:THREE.MOUSE.DOLLY,RIGHT:THREE.MOUSE.ROTATE};controls.screenSpacePanning=true;controls.enableDamping=true;controls.dampingFactor=.075;controls.minDistance=8;controls.maxDistance=190;controls.minPolarAngle=.18;controls.maxPolarAngle=1.48;
+ scene.add(new THREE.HemisphereLight("#f3ead9","#15151a",1.15));const sun=new THREE.DirectionalLight("#fff3dc",1.85);sun.position.set(-28,82,-34);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-90,right:90,top:105,bottom:-65,near:1,far:280});scene.add(sun);
+ const fill=new THREE.PointLight("#d7ad58",1.05,90);fill.position.set(0,18,18);scene.add(fill);
+ box(scene,108,.7,116,mat("#171719"),0,-.55,24,false);
  FLOORS.forEach(buildFloor);buildShaft();buildMinimap();resetView();setupPicking();window.addEventListener("resize",resize);renderer.setAnimationLoop(frame);document.getElementById("loading").style.display="none";
 }
 function resetView(){
  selected=null;followCourier=false;document.getElementById("follow").classList.remove("on");controls.enabled=true;
  document.querySelectorAll(".floor-nav button,.map-room").forEach(b=>b.classList.remove("active"));Object.values(labelsByFloor).forEach(l=>l.element.classList.remove("active"));
- setCamGoal([98,86,120],[2,0,17],Math.max(.46,Math.min(.62,innerWidth/1900)));showOverview();
+ setCamGoal([64,46,-56],[0,4,27],1.0);showOverview();
 }
 function focusFloor(key,fromAuto=false){
  const f=BYKEY[key];if(!f)return;selected=key;if(!fromAuto){followCourier=false;document.getElementById("follow").classList.remove("on")}controls.enabled=!followCourier;
- document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));document.querySelectorAll(".map-room").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));Object.entries(labelsByFloor).forEach(([k,l])=>l.element.classList.toggle("active",k===key));
- const off=f.face===1?24:-24;setCamGoal([f.x+20,16,f.z+off],[f.x,1.35,f.z],f.trade?1.32:1.7);showFloor(key);
+ document.querySelectorAll(".floor-nav button").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));document.querySelectorAll(".map-room").forEach(b=>b.classList.toggle("active",b.dataset.floor===key));
+ const rot=f.rotY??0,fx=Math.sin(rot),fz=Math.cos(rot),baseY=f.y||0;
+ const dist=f.trade?25:17,camY=baseY+(f.trade?11:8.5);
+ setCamGoal([f.x+fx*dist,camY,f.z+fz*dist],[f.x,baseY+(f.trade?2.6:2.0),f.z],f.trade?1.02:1.12);showFloor(key);
 }
 function setPreset(name){
  followCourier=false;document.getElementById("follow").classList.remove("on");selected=null;controls.enabled=true;
- if(name==="command")setCamGoal([34,28,34],[0,1.4,6],1.25);
- else if(name==="analysis")setCamGoal([58,46,46],[0,0,-8],.9);
- else if(name==="management")setCamGoal([60,46,77],[0,0,27],.9);
- else if(name==="trade")focusFloor("trade");
+ if(name==="command")setCamGoal([0,20,-36],[0,6,34],1.04);
+ else if(name==="analysis")setCamGoal([-8,30,-42],[-35,3,27],1.0);
+ else if(name==="management")setCamGoal([10,30,-42],[35,3,27],1.0);
+ else if(name==="trade")setCamGoal([0,14,-22],[0,2.6,29],1.04);
  else if(name==="owner")focusFloor("owner");
  else resetView();
 }
-function resize(){const a=innerWidth/innerHeight,F=76;Object.assign(camera,{left:-F*a/2,right:F*a/2,top:F/2,bottom:-F/2});camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);labelRenderer.setSize(innerWidth,innerHeight)}
 function setupPicking(){
  const ray=new THREE.Raycaster(),mouse=new THREE.Vector2(),hover=document.getElementById("hoverOffice");let down;
  const hitAt=e=>{const r=renderer.domElement.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height*2-1));ray.setFromCamera(mouse,camera);return ray.intersectObjects(clickables,false)[0]};
@@ -534,7 +536,7 @@ function showFloor(key){
  ${key==="owner"&&live?`<div class="grid"><div class="mini"><small>Vermogen</small><b>${eur.format(live.stats?.equity||0)}</b></div><div class="mini"><small>Open</small><b>${live.positions?.length||0}</b></div><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div>`:""}
  <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
 }
-function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents Command HQ</h1><p class="sub">Een centrale live command floor met alle analyse-, control- en managementteams eromheen.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
+function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents Command HQ</h1><p class="sub">Een centrale live command floor met alle analyse-, control- en managementteams eromheen.</p><div class="status"><b>Command HQ</b>De live floor is het hart. Analyse zit links, Risk/Treasury/Execution/Operations rechts en Directie/Owner kijken vanaf de executive bridge over de floor.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
 function setBoard(key,text){if(wallboards[key])renderBoard(wallboards[key],text)}
 function updateClocks(){
  const fmt=z=>new Intl.DateTimeFormat("nl-NL",{timeZone:z,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
