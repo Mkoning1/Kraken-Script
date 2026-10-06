@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Kraken Agents HQ · 3D</title>
+<title>Kraken Agents Command HQ · 3D</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
 <style>
 :root{
@@ -52,7 +52,7 @@ button{font:inherit}
 </head>
 <body>
 <header class="bar">
- <span class="brand">Kraken Agents HQ<small>3D trading headquarters</small></span>
+ <span class="brand">Kraken Agents Command HQ<small>3D trading headquarters</small></span>
  <nav class="tabs"><a href="index.html" aria-current="page">HQ</a><a href="trades.html">Trades</a><a href="details.html">Details</a><a href="opportunities.html">Opportunities</a></nav>
  <span class="mode" id="mode">laden</span>
  <span class="live-dot" id="livestat">Kraken live</span>
@@ -65,7 +65,7 @@ button{font:inherit}
  <section class="card moneybox"><h2>Kapitaal</h2><div class="big" id="moneytotal">–</div><div class="row"><span>Vrij op Kraken</span><b id="moneyfree">–</b></div><div class="row"><span>Belegd</span><b id="moneyused">–</b></div><div class="row"><span>Budget</span><b>ALLES</b></div></section>
  <section class="card"><h2>Afdelingen</h2><div class="floor-nav" id="floornav"></div></section>
 </aside>
-<aside class="right" id="detail"><h1>Kraken Agents HQ</h1><p class="sub">Klik op een kantoor om naar binnen te kijken.</p><div class="status"><b>Kantooroverzicht</b>Losse kantoren liggen rond echte gangen. Actieve teams lichten op en medewerkers brengen dossiers fysiek naar de volgende afdeling.</div></aside>
+<aside class="right" id="detail"><h1>Kraken Agents Command HQ</h1><p class="sub">Klik op een kantoor om naar binnen te kijken.</p><div class="status"><b>Kantooroverzicht</b>Losse kantoren liggen rond echte gangen. Actieve teams lichten op en medewerkers brengen dossiers fysiek naar de volgende afdeling.</div></aside>
 <div class="caption"><div id="caption"><b>HQ</b>Live botdata wordt geladen…</div></div>
 <div class="tools">
  <button id="overview">Campus</button><button id="commandfocus">Command Center</button><button id="analysisfocus">Analyse</button><button id="managementfocus">Management</button><button id="tradefocus">Tradefloor</button><button id="ownerfocus">Owner</button>
@@ -103,22 +103,27 @@ const clock=ts=>ts?new Date(ts*1000).toLocaleTimeString("nl-NL",{hour:"2-digit",
 const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
 const COLORS={ops:"#8FC3E8",data:"#8FA8E8",market:"#6FD6B4",fast:"#FF9A62",swing:"#45D1EE",trend:"#7F9BFF",equity:"#B7A0FF",performance:"#D49BEA",directie:"#E9E4FF",risk:"#FF7D88",capital:"#F4D35E",execution:"#FFB547",trade:"#FFB547",owner:"#FFFFFF"};
 const FLOORS=[
- {key:"data",no:"A1",name:"Radar & Data",x:-34,z:-10,face:1,color:COLORS.data,staff:8,w:14,d:11.8,desc:"Scant de brede Kraken-markt iedere vijf minuten.",lane:6},
- {key:"market",no:"A2",name:"Market Intelligence",x:-17,z:-10,face:1,color:COLORS.market,staff:5,w:14,d:11.8,desc:"Bepaalt het algemene cryptomarktklimaat en trendregime.",lane:6},
- {key:"fast",no:"A3",name:"Fast Desk 15m",x:0,z:-10,face:1,color:COLORS.fast,staff:9,w:15,d:11.8,desc:"Momentum, squeeze en snelle breakout; de drukste analyse-desk.",lane:6},
- {key:"swing",no:"A4",name:"Swing Desk 1u",x:17,z:-10,face:1,color:COLORS.swing,staff:7,w:14,d:11.8,desc:"Dip-koper en breakout werken hier op 1-uurscandles.",lane:6},
- {key:"trend",no:"A5",name:"Trend Desk 4u",x:34,z:-10,face:1,color:COLORS.trend,staff:6,w:14,d:11.8,desc:"Zoekt grotere uitbraken en langere runners.",lane:6},
+ // Analysevleugel links, alle kamers kijken richting de centrale hall.
+ {key:"data",no:"A1",name:"Radar & Data",x:-39,z:-8,rotY:Math.PI/2,color:COLORS.data,staff:8,w:14,d:11.5,desc:"Scant de brede Kraken-markt iedere vijf minuten.",corridorX:-27},
+ {key:"market",no:"A2",name:"Market Intelligence",x:-39,z:7,rotY:Math.PI/2,color:COLORS.market,staff:6,w:14,d:11.5,desc:"Bepaalt het algemene cryptomarktklimaat en trendregime.",corridorX:-27},
+ {key:"fast",no:"A3",name:"Fast Desk 15m",x:-39,z:22,rotY:Math.PI/2,color:COLORS.fast,staff:10,w:14,d:11.5,desc:"Momentum, squeeze en snelle breakout; de drukste analyse-desk.",corridorX:-27},
+ {key:"swing",no:"A4",name:"Swing Desk 1u",x:-39,z:37,rotY:Math.PI/2,color:COLORS.swing,staff:8,w:14,d:11.5,desc:"Dip-koper en breakout werken hier op 1-uurscandles.",corridorX:-27},
+ {key:"trend",no:"A5",name:"Trend Desk 4u",x:-39,z:52,rotY:Math.PI/2,color:COLORS.trend,staff:7,w:14,d:11.5,desc:"Zoekt grotere uitbraken en langere runners.",corridorX:-27},
+ {key:"equity",no:"A6",name:"China / HK Research",x:-39,z:67,rotY:Math.PI/2,color:COLORS.equity,staff:7,w:14,d:11.5,desc:"Research en paper trading voor Hongkong en China.",corridorX:-27},
 
- {key:"equity",no:"B1",name:"China / HK Research",x:-34,z:22,face:-1,color:COLORS.equity,staff:6,w:14,d:11.8,desc:"Research en paper trading voor Hongkong en China.",lane:6},
- {key:"performance",no:"B2",name:"Prestatie",x:-17,z:22,face:-1,color:COLORS.performance,staff:5,w:14,d:11.8,desc:"Meet strategieën en bepaalt wie live of schaduw handelt.",lane:6},
- {key:"directie",no:"B3",name:"Directie",x:0,z:22,face:-1,color:COLORS.directie,staff:5,w:15,d:11.8,desc:"Vergelijkt koopadviezen en beslist welke kansen door mogen.",lane:6},
- {key:"risk",no:"B4",name:"Risk Management",x:17,z:22,face:-1,color:COLORS.risk,staff:5,w:14,d:11.8,desc:"Heeft veto-recht en controleert stop, positieomvang, correlatie en verlieslimieten.",lane:6},
- {key:"capital",no:"B5",name:"Kapitaal / Treasury",x:34,z:22,face:-1,color:COLORS.capital,staff:4,w:14,d:11.8,desc:"Beheert vrij geld, exposure en beschikbare handelsruimte.",lane:6},
+ // Control / support rechts.
+ {key:"performance",no:"B1",name:"Prestatie / Shadow Lab",x:39,z:-8,rotY:-Math.PI/2,color:COLORS.performance,staff:6,w:14,d:11.5,desc:"Meet strategieën en bepaalt wie live of schaduw handelt.",corridorX:27},
+ {key:"risk",no:"B2",name:"Risk Management",x:39,z:8,rotY:-Math.PI/2,color:COLORS.risk,staff:6,w:14,d:11.5,desc:"Heeft veto-recht en controleert stop, positieomvang, correlatie en verlieslimieten.",corridorX:27},
+ {key:"capital",no:"B3",name:"Kapitaal / Treasury",x:39,z:24,rotY:-Math.PI/2,color:COLORS.capital,staff:5,w:14,d:11.5,desc:"Beheert vrij geld, exposure en beschikbare handelsruimte.",corridorX:27},
+ {key:"execution",no:"B4",name:"Execution",x:39,z:40,rotY:-Math.PI/2,color:COLORS.execution,staff:7,w:14,d:11.5,desc:"Plaatst echte orders op Kraken en controleert exchange-stops.",corridorX:27},
+ {key:"ops",no:"B5",name:"Operations",x:39,z:56,rotY:-Math.PI/2,color:COLORS.ops,staff:7,w:14,d:11.5,desc:"Monitoring, scanlog, status en rapportage van het hele bedrijf.",corridorX:27},
 
- {key:"ops",no:"C1",name:"Operations",x:-34,z:48,face:-1,color:COLORS.ops,staff:6,w:19,d:15,desc:"Monitoring, scanlog, status en rapportage van het hele bedrijf.",lane:37},
- {key:"execution",no:"C2",name:"Execution",x:34,z:48,face:-1,color:COLORS.execution,staff:6,w:19,d:15,desc:"Plaatst echte orders op Kraken en controleert exchange-stops.",lane:37},
- {key:"owner",no:"C3",name:"Owner / CEO",x:53,z:48,face:-1,color:COLORS.owner,staff:2,w:15,d:15,desc:"Managementkantoor met totaaloverzicht van vermogen, prestaties en actieve afdelingen.",lane:37},
- {key:"trade",no:"TF",name:"LIVE TRADEFLOOR",x:0,z:50,face:-1,color:COLORS.trade,staff:24,w:38,d:21,trade:true,desc:"Grote hectische dealing floor waar goedgekeurde live trades zichtbaar worden uitgevoerd.",lane:37}
+ // Centrale live floor domineert de hele HQ.
+ {key:"trade",no:"TF",name:"LIVE COMMAND TRADEFLOOR",x:0,z:28,rotY:Math.PI,color:COLORS.trade,staff:36,w:48,d:38,trade:true,desc:"Het hart van het bedrijf: live posities, orderflow, supervisors en centrale marktstatus.",corridorX:0},
+
+ // Management kijkt vanaf de achterzijde over de floor.
+ {key:"directie",no:"C1",name:"Directie",x:-10,z:59,y:7.0,rotY:Math.PI,color:COLORS.directie,staff:5,w:18,d:11,desc:"Boardroom met zicht op de command floor.",corridorX:0},
+ {key:"owner",no:"C2",name:"Owner / CEO",x:11,z:59,y:7.0,rotY:Math.PI,color:COLORS.owner,staff:2,w:17,d:11,desc:"Managementkantoor met totaaloverzicht en zicht op de command floor.",corridorX:0}
 ];
 const BYKEY=Object.fromEntries(FLOORS.map(f=>[f.key,f]));
 const OLDKEY={monitor:"ops",data:"data",markt:"market",fast:"fast",swing:"swing",trend:"trend",equity:"equity",prestatie:"performance",beslis:"directie",risico:"risk",kapitaal:"capital",uitvoer:"execution"};
@@ -494,7 +499,7 @@ function showFloor(key){
  ${key==="owner"&&live?`<div class="grid"><div class="mini"><small>Vermogen</small><b>${eur.format(live.stats?.equity||0)}</b></div><div class="mini"><small>Open</small><b>${live.positions?.length||0}</b></div><div class="mini"><small>Vrij</small><b>${eur.format(live.cash)}</b></div><div class="mini"><small>Belegd</small><b>${eur.format(live.exposure)}</b></div></div>`:""}
  <p>In de ruimte zelf zie je de functie terug: schermwanden, eigen werkplekken, teamleads en fysieke rapportages via de gangen.</p>`;
 }
-function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents HQ</h1><p class="sub">Een levende 3D tradingcampus in plaats van een technisch schema.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
+function showOverview(){document.getElementById("detail").innerHTML=`<h1>Kraken Agents Command HQ</h1><p class="sub">Een centrale live command floor met alle analyse-, control- en managementteams eromheen.</p><div class="status"><b>Kantooroverzicht</b>Grote zwevende namen zijn vervangen door kleine deurcodes. Hover een kantoor voor de naam, klik om naar binnen te vliegen.</div><p>Meerdere dossiers bewegen tegelijk door de gangen. De campus heeft een lobby, koffiehoek, unieke afdelingen, een Owner-kantoor en een aparte hectische live tradefloor.</p><p>Gebruik onderin <b>Volg dossier</b> of <b>Autocamera</b> om het bedrijf zichzelf te laten presenteren.</p>`}
 function setBoard(key,text){if(wallboards[key])renderBoard(wallboards[key],text)}
 function updateClocks(){
  const fmt=z=>new Intl.DateTimeFormat("nl-NL",{timeZone:z,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date());
@@ -589,7 +594,7 @@ async function load(){
  }catch(err){document.getElementById("caption").innerHTML=`<b>Data</b>${esc(err.message||err)}`}
 }
 function buildCompact(){
- const root=document.getElementById("compact");root.innerHTML=`<h2>Kraken Agents HQ</h2><p>Op mobiel krijg je de eenvoudige lijst. Open op desktop voor de volledige 3D-kantoorcampus.</p>${FLOORS.map(f=>`<div class="c-floor"><b>${f.no} · ${esc(f.name)}</b><small>${esc(statusText(f.key))}</small></div>`).join("")}`;
+ const root=document.getElementById("compact");root.innerHTML=`<h2>Kraken Agents Command HQ</h2><p>Op mobiel krijg je de eenvoudige lijst. Open op desktop voor de volledige 3D-kantoorcampus.</p>${FLOORS.map(f=>`<div class="c-floor"><b>${f.no} · ${esc(f.name)}</b><small>${esc(statusText(f.key))}</small></div>`).join("")}`;
 }
 function connectTicker(){
  if(!("WebSocket" in window))return;let ws;try{ws=new WebSocket("wss://ws.kraken.com/v2")}catch{return}
