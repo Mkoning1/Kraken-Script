@@ -342,13 +342,13 @@ function buildFloor(f){
  const hit=box(g,W,H,D,new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}),0,H/2,0,false);hit.userData.floor=f.key;clickables.push(hit);
  return g;
 }
-function iColorfunction iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
+function iColor(x){return x%8===0?"#5cf2b3":x%12===0?"#ff6b78":"#8f7bff"}
 function officeDoor(f){
  const D=f.d||(f.trade?38:11.5),front=(D/2)+1.1,rot=f.rotY??0;
  const x=f.x+Math.sin(rot)*front,z=f.z+Math.cos(rot)*front;
  return {x,z,y:.16,corridorX:f.corridorX??0};
 }
-function createCourierfunction createCourier(color,dossierColor,index){
+function createCourier(color,dossierColor,index){
  const p=makePerson(color,false,.92);p.position.set(-36,.16,7);scene.add(p);
  const d=box(p,.38,.28,.5,new THREE.MeshBasicMaterial({color:dossierColor,toneMapped:false}),.52,1.35,-.05,false);
  const glow=new THREE.PointLight(dossierColor,.7,4);glow.position.set(.52,1.4,-.05);p.add(glow);
@@ -430,7 +430,7 @@ function buildShaft(){
 
  createCourier("#ffffff","#d8d0ff",0);createCourier("#6fd6b4","#5cf2b3",1);createCourier("#ffb547","#ffb547",2);
 }
-function routeWaypointsfunction routeWaypoints(fromKey,toKey){
+function routeWaypoints(fromKey,toKey){
  const fa=BYKEY[fromKey],fb=BYKEY[toKey],a=officeDoor(fa),b=officeDoor(fb),pts=[];
  const ax=fa?.corridorX??0,bx=fb?.corridorX??0;
  pts.push(new THREE.Vector3(a.x,.16,a.z));
@@ -446,7 +446,7 @@ function routeWaypointsfunction routeWaypoints(fromKey,toKey){
  pts.push(new THREE.Vector3(b.x,.16,b.z));
  return pts;
 }
-function createScenefunction createScene(){
+function createScene(){
  renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.16;stage.appendChild(renderer.domElement);
  labelRenderer=new CSS2DRenderer();labelRenderer.setSize(innerWidth,innerHeight);labelRenderer.domElement.className="l2d";labelRenderer.domElement.style.cssText="position:absolute;inset:0;pointer-events:none";stage.appendChild(labelRenderer.domElement);
  scene=new THREE.Scene();scene.background=new THREE.Color("#140D33");scene.fog=new THREE.Fog("#140D33",145,235);
