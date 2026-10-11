@@ -238,5 +238,17 @@
  "BNB": {
   "exchange": "binance",
   "symbol": "BNB/USDT"
+ },
+ "COMP": {
+  "exchange": "kucoin",
+  "symbol": "COMP/USDT"
+ },
+ "W": {
+  "exchange": "kucoin",
+  "symbol": "W/USDT"
+ },
+ "S": {
+  "exchange": "kucoin",
+  "symbol": "S/USDT"
  }
 }

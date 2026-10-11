@@ -1,66 +1,73 @@
-09:46:12 BTC: 46 nieuwe uurcandles van kucoin (BTC/USDT), totaal 17565
-09:46:12 ETH: 46 nieuwe uurcandles van kucoin (ETH/USDT), totaal 17565
-09:46:13 SOL: 46 nieuwe uurcandles van kucoin (SOL/USDT), totaal 17565
-09:46:13 XRP: 46 nieuwe uurcandles van kucoin (XRP/USDT), totaal 17565
-09:46:14 ADA: 46 nieuwe uurcandles van kucoin (ADA/USDT), totaal 17565
-09:46:14 DOGE: 46 nieuwe uurcandles van kucoin (DOGE/USDT), totaal 17565
-09:46:14 DOT: 46 nieuwe uurcandles van kucoin (DOT/USDT), totaal 17565
-09:46:15 LINK: 46 nieuwe uurcandles van kucoin (LINK/USDT), totaal 17565
-09:46:15 AVAX: 46 nieuwe uurcandles van kucoin (AVAX/USDT), totaal 17565
-09:46:16 LTC: 46 nieuwe uurcandles van kucoin (LTC/USDT), totaal 17565
-09:46:16 BCH: 46 nieuwe uurcandles van kucoin (BCH/USDT), totaal 17565
-09:46:16 TRX: 46 nieuwe uurcandles van kucoin (TRX/USDT), totaal 17565
-09:46:17 ATOM: 46 nieuwe uurcandles van kucoin (ATOM/USDT), totaal 17565
-09:46:17 UNI: 46 nieuwe uurcandles van kucoin (UNI/USDT), totaal 17565
-09:46:18 NEAR: 46 nieuwe uurcandles van kucoin (NEAR/USDT), totaal 17565
-09:46:18 FIL: 46 nieuwe uurcandles van kucoin (FIL/USDT), totaal 17565
-09:46:19 ICP: 46 nieuwe uurcandles van kucoin (ICP/USDT), totaal 17565
-09:46:19 APT: 46 nieuwe uurcandles van kucoin (APT/USDT), totaal 17565
-09:46:19 ARB: 46 nieuwe uurcandles van kucoin (ARB/USDT), totaal 17565
-09:46:20 OP: 46 nieuwe uurcandles van kucoin (OP/USDT), totaal 17565
-09:46:20 INJ: 46 nieuwe uurcandles van kucoin (INJ/USDT), totaal 17565
-09:46:21 SUI: 46 nieuwe uurcandles van kucoin (SUI/USDT), totaal 17565
-09:46:21 TIA: 46 nieuwe uurcandles van kucoin (TIA/USDT), totaal 17565
-09:46:22 AAVE: 46 nieuwe uurcandles van kucoin (AAVE/USDT), totaal 17565
-09:46:22 LDO: 46 nieuwe uurcandles van kucoin (LDO/USDT), totaal 17565
-09:46:22 ETC: 46 nieuwe uurcandles van kucoin (ETC/USDT), totaal 17565
-09:46:23 XLM: 46 nieuwe uurcandles van kucoin (XLM/USDT), totaal 17565
-09:46:23 ALGO: 46 nieuwe uurcandles van kucoin (ALGO/USDT), totaal 17565
-09:46:24 HBAR: 46 nieuwe uurcandles van kucoin (HBAR/USDT), totaal 17565
-09:46:24 QNT: 46 nieuwe uurcandles van kucoin (QNT/USDT), totaal 17565
-09:46:24 GRT: 46 nieuwe uurcandles van kucoin (GRT/USDT), totaal 17565
-09:46:25 SAND: 46 nieuwe uurcandles van kucoin (SAND/USDT), totaal 17565
-09:46:25 MANA: 46 nieuwe uurcandles van kucoin (MANA/USDT), totaal 17565
-09:46:26 FET: 46 nieuwe uurcandles van kucoin (FET/USDT), totaal 17565
-09:46:26 RENDER: 46 nieuwe uurcandles van kucoin (RENDER/USDT), totaal 17565
-09:46:27 PEPE: 46 nieuwe uurcandles van kucoin (PEPE/USDT), totaal 17565
-09:46:27 SHIB: 46 nieuwe uurcandles van kucoin (SHIB/USDT), totaal 17565
-09:46:28 BONK: 46 nieuwe uurcandles van kucoin (BONK/USDT), totaal 17565
-09:46:28 WIF: 46 nieuwe uurcandles van kucoin (WIF/USDT), totaal 17565
-09:46:29 SEI: 46 nieuwe uurcandles van kucoin (SEI/USDT), totaal 17565
-09:46:29 ZEC: 46 nieuwe uurcandles van kucoin (ZEC/USDT), totaal 17565
-09:46:30 ZRO: 46 nieuwe uurcandles van kucoin (ZRO/USDT), totaal 17565
-09:46:30 PUMP: 46 nieuwe uurcandles van kucoin (PUMP/USDT), totaal 10720
-09:46:30 HYPE: 46 nieuwe uurcandles van kucoin (HYPE/USDT), totaal 15978
-09:46:31 TAO: 46 nieuwe uurcandles van kucoin (TAO/USDT), totaal 17565
-09:46:31 NIGHT: 46 nieuwe uurcandles van kucoin (NIGHT/USDT), totaal 7175
-09:46:31 MON: 46 nieuwe uurcandles van kucoin (MON/USDT), totaal 7530
-09:46:32 WLD: 46 nieuwe uurcandles van kucoin (WLD/USDT), totaal 17565
-09:46:32 XDC: 46 nieuwe uurcandles van kucoin (XDC/USDT), totaal 17565
-09:46:39 STRK: 17519 nieuwe uurcandles van binance (STRK/USDT), totaal 17519
-09:46:40 ENA: 46 nieuwe uurcandles van kucoin (ENA/USDT), totaal 17565
-09:46:40 ONDO: 46 nieuwe uurcandles van kucoin (ONDO/USDT), totaal 17565
-09:46:43 2Z: 8804 nieuwe uurcandles van binance (2Z/USDT), totaal 8804
-09:46:47 SPX: 16055 nieuwe uurcandles van kucoin (SPX/USDT), totaal 16055
-09:46:52 BNB: 17519 nieuwe uurcandles van binance (BNB/USDT), totaal 17519
-09:46:52 55 munten in de pool, periode 2024-11-11 tot 2026-10-04
-09:47:06 trend4h: 126 trades, gem. 0.291R, rendement 27.0%; zonder beste munt (UNI/EUR) 14.0%; controleperiode 0.481R (nieuwe instellingen)
-09:47:17 mean_reversion: 192 trades, gem. -0.416R, rendement -40.9%; zonder beste munt (ADA/EUR) -40.5%; controleperiode -0.435R
-09:47:29 breakout: 433 trades, gem. -0.196R, rendement -50.6%; zonder beste munt (ADA/EUR) -50.6%; controleperiode -0.269R
-09:47:36 momentum: 322 trades, gem. -0.364R, rendement -56.0%; zonder beste munt (UNI/EUR) -56.9%; controleperiode -0.517R
-09:47:43 squeeze: 313 trades, gem. -0.405R, rendement -57.1%; zonder beste munt (ZEC/EUR) -60.2%; controleperiode -0.367R
-09:47:44 trend4h met 5 munten: leerperiode zonder beste munt 0.99R, controleperiode 0.419R, 10.9%
-09:47:45 trend4h met 8 munten: leerperiode zonder beste munt 2.39R, controleperiode 0.481R, 16.8%
-09:47:48 trend4h met 15 munten: leerperiode zonder beste munt -9.45R, controleperiode 0.145R, 5.7%
-09:47:51 Echt-geldteam (trend4h): rendement 27.0%, grootste daling 17.1%, 0 noodstop(s).
-09:47:51 Hele team: 597 trades, rendement -73.5%. BTC vasthouden 3.6%. Klaar in 103 s.
+09:59:12 BTC: 168 nieuwe uurcandles van kucoin (BTC/USDT), totaal 17733
+09:59:12 ETH: 168 nieuwe uurcandles van kucoin (ETH/USDT), totaal 17733
+09:59:12 SOL: 168 nieuwe uurcandles van kucoin (SOL/USDT), totaal 17733
+09:59:13 XRP: 168 nieuwe uurcandles van kucoin (XRP/USDT), totaal 17733
+09:59:13 ADA: 168 nieuwe uurcandles van kucoin (ADA/USDT), totaal 17733
+09:59:13 DOGE: 168 nieuwe uurcandles van kucoin (DOGE/USDT), totaal 17733
+09:59:14 DOT: 168 nieuwe uurcandles van kucoin (DOT/USDT), totaal 17733
+09:59:14 LINK: 168 nieuwe uurcandles van kucoin (LINK/USDT), totaal 17733
+09:59:15 AVAX: 168 nieuwe uurcandles van kucoin (AVAX/USDT), totaal 17733
+09:59:15 LTC: 168 nieuwe uurcandles van kucoin (LTC/USDT), totaal 17733
+09:59:15 BCH: 168 nieuwe uurcandles van kucoin (BCH/USDT), totaal 17733
+09:59:16 TRX: 168 nieuwe uurcandles van kucoin (TRX/USDT), totaal 17733
+09:59:16 ATOM: 168 nieuwe uurcandles van kucoin (ATOM/USDT), totaal 17733
+09:59:16 UNI: 168 nieuwe uurcandles van kucoin (UNI/USDT), totaal 17733
+09:59:17 NEAR: 168 nieuwe uurcandles van kucoin (NEAR/USDT), totaal 17733
+09:59:17 FIL: 168 nieuwe uurcandles van kucoin (FIL/USDT), totaal 17733
+09:59:18 ICP: 168 nieuwe uurcandles van kucoin (ICP/USDT), totaal 17733
+09:59:18 APT: 168 nieuwe uurcandles van kucoin (APT/USDT), totaal 17733
+09:59:18 ARB: 168 nieuwe uurcandles van kucoin (ARB/USDT), totaal 17733
+09:59:19 OP: 168 nieuwe uurcandles van kucoin (OP/USDT), totaal 17733
+09:59:19 INJ: 168 nieuwe uurcandles van kucoin (INJ/USDT), totaal 17733
+09:59:19 SUI: 168 nieuwe uurcandles van kucoin (SUI/USDT), totaal 17733
+09:59:20 TIA: 168 nieuwe uurcandles van kucoin (TIA/USDT), totaal 17733
+09:59:20 AAVE: 168 nieuwe uurcandles van kucoin (AAVE/USDT), totaal 17733
+09:59:21 LDO: 168 nieuwe uurcandles van kucoin (LDO/USDT), totaal 17733
+09:59:21 ETC: 168 nieuwe uurcandles van kucoin (ETC/USDT), totaal 17733
+09:59:21 XLM: 168 nieuwe uurcandles van kucoin (XLM/USDT), totaal 17733
+09:59:22 ALGO: 168 nieuwe uurcandles van kucoin (ALGO/USDT), totaal 17733
+09:59:22 HBAR: 168 nieuwe uurcandles van kucoin (HBAR/USDT), totaal 17733
+09:59:23 QNT: 168 nieuwe uurcandles van kucoin (QNT/USDT), totaal 17733
+09:59:23 GRT: 168 nieuwe uurcandles van kucoin (GRT/USDT), totaal 17733
+09:59:23 SAND: 168 nieuwe uurcandles van kucoin (SAND/USDT), totaal 17733
+09:59:24 MANA: 168 nieuwe uurcandles van kucoin (MANA/USDT), totaal 17733
+09:59:24 FET: 168 nieuwe uurcandles van kucoin (FET/USDT), totaal 17733
+09:59:25 RENDER: 168 nieuwe uurcandles van kucoin (RENDER/USDT), totaal 17733
+09:59:25 PEPE: 168 nieuwe uurcandles van kucoin (PEPE/USDT), totaal 17733
+09:59:26 SHIB: 168 nieuwe uurcandles van kucoin (SHIB/USDT), totaal 17733
+09:59:26 BONK: 168 nieuwe uurcandles van kucoin (BONK/USDT), totaal 17733
+09:59:26 WIF: 168 nieuwe uurcandles van kucoin (WIF/USDT), totaal 17733
+09:59:27 SEI: 168 nieuwe uurcandles van kucoin (SEI/USDT), totaal 17733
+09:59:27 STRK: historie bijwerken mislukt (binance GET https://api.binance.com/api/v3/exchangeInfo 451  {
+  "code": 0,
+  "msg": "Service unavailable from a restricted location according to 'b. Eligibility' in https://www.binance.com/en/terms. Please contact customer service if you believe you received this message in error."
+})
+09:59:28 ZEC: 168 nieuwe uurcandles van kucoin (ZEC/USDT), totaal 17733
+09:59:28 HYPE: 168 nieuwe uurcandles van kucoin (HYPE/USDT), totaal 16146
+09:59:28 NIGHT: 168 nieuwe uurcandles van kucoin (NIGHT/USDT), totaal 7343
+09:59:28 PUMP: 168 nieuwe uurcandles van kucoin (PUMP/USDT), totaal 10888
+09:59:29   binance niet bereikbaar: binance GET https://api.binance.com/api/v3/exchangeInfo 451  {
+  "code": 0,
+  "m
+09:59:32 COMP: 17519 nieuwe uurcandles van kucoin (COMP/USDT), totaal 17519
+09:59:32 ONDO: 168 nieuwe uurcandles van kucoin (ONDO/USDT), totaal 17733
+09:59:33 TAO: 168 nieuwe uurcandles van kucoin (TAO/USDT), totaal 17733
+09:59:36 W: 17519 nieuwe uurcandles van kucoin (W/USDT), totaal 17519
+09:59:39 S: 15025 nieuwe uurcandles van kucoin (S/USDT), totaal 15025
+09:59:39 ENA: 168 nieuwe uurcandles van kucoin (ENA/USDT), totaal 17733
+09:59:40 ZRO: 168 nieuwe uurcandles van kucoin (ZRO/USDT), totaal 17733
+09:59:40 WLD: 168 nieuwe uurcandles van kucoin (WLD/USDT), totaal 17733
+09:59:40 MON: 168 nieuwe uurcandles van kucoin (MON/USDT), totaal 7698
+09:59:41 VVV: 214 nieuwe uurcandles van kucoin (VVV/USDT), totaal 14903
+09:59:42 55 munten in de pool, periode 2024-11-11 tot 2026-10-11
+09:59:57 trend4h: 126 trades, gem. 0.286R, rendement 45.3%; zonder beste munt (ETH/EUR) 37.9%; controleperiode 0.193R (nieuwe instellingen)
+10:00:10 mean_reversion: 201 trades, gem. -0.398R, rendement -49.6%; zonder beste munt (ADA/EUR) -50.6%; controleperiode -0.472R
+10:00:23 breakout: 507 trades, gem. -0.172R, rendement -54.6%; zonder beste munt (ZEC/EUR) -61.8%; controleperiode -0.153R
+10:00:23 momentum: overgeslagen in legacy backtest (historie is 1u; live agent draait 15m)
+10:00:23 squeeze: overgeslagen in legacy backtest (historie is 1u; live agent draait 15m)
+10:00:23 fast_breakout: overgeslagen in legacy backtest (historie is 1u; live agent draait 15m)
+10:00:24 trend4h met 5 munten: leerperiode zonder beste munt -6.45R, controleperiode 0.1R, 16.9%
+10:00:25 trend4h met 8 munten: leerperiode zonder beste munt 8.79R, controleperiode 0.193R, 18.9%
+10:00:29 trend4h met 15 munten: leerperiode zonder beste munt -6.2R, controleperiode -0.148R, -4.2%
+10:00:32 Echt-geldteam (trend4h): rendement 46.0%, grootste daling 24.2%, 1 noodstop(s).
+10:00:32 Hele team: 543 trades, rendement -54.3%. BTC vasthouden 1.1%. Klaar in 85 s.
