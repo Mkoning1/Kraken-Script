@@ -5,6 +5,5 @@ COPY requirements.txt ./
 RUN python -m pip install --no-cache-dir -r requirements.txt
 COPY agents ./agents
 COPY main.py runner.py config.json ./
-COPY data/state.json ./data/state.json
 RUN mkdir -p /app/docs /app/data
 CMD ["python", "runner.py"]
