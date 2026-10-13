@@ -56,9 +56,9 @@ Standaard: `assertief`. Assertief op de markt, met een vangnet zodat je nooit al
 | | voorzichtig | normaal | **assertief** | agressief |
 |---|---|---|---|---|
 | Risico per trade | 1% | 1,5% | 1,25% | 2,5% |
-| Grootte per positie | 25% | 35% | **100% (actuele config; herzien)** | 50% |
+| Grootte per positie | 25% | 35% | **45%** | 50% |
 | Max posities | 2 | 3 | 4 | 3 |
-| Max belegd | 50% | 75% | **100% (actuele config; herzien)** | 100% |
+| Max belegd | 50% | 75% | **90%** | 100% |
 | Daglimiet verlies | 3% | 5% | 5% | 8% |
 | Noodstop (alles verkopen) | 15% | 20% | 20% | 30% |
 
@@ -117,7 +117,7 @@ Query Closed Orders & Trades, Create & Modify Orders en Cancel & Close Orders. *
 
 ## Engine Safety Review (oktober 2026)
 
-De oorspronkelijke documentatie beschreef een lager assertief positielimiet dan de werkelijke `config.json`.
+De risicoprofielen zijn nu gelijkgetrokken: assertief laat maximaal 45% per positie en 90% totale blootstelling toe.
 Ook is de 15-minutenstrategie **niet** gevalideerd door de huidige historische 1-uursbacktester;
 positieve paperresultaten zijn geen bewijs dat deze strategie live winstgevend is.
 
