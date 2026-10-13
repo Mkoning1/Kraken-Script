@@ -46,11 +46,29 @@ def load_config():
         raise SystemExit(f"Profiel '{cfg['profile']}' bestaat niet. Kies uit: {', '.join(cfg['profiles'])}")
     tuned_path = ROOT / "data" / "tuned_params.json"
     if cfg.get("backtest", {}).get("use_tuned_params") and tuned_path.exists():
+        # Never use an old tuned file just because it exists. Require robust
+        # out-of-sample evidence on the exact strategy timeframe and parameters.
+        report = json.loads(BACKTEST_PATH.read_text()) if BACKTEST_PATH.exists() else {}
+        assessments = report.get("agents", {})
         for name, params in json.loads(tuned_path.read_text()).items():
             if name == "_universe_size":
-                cfg["universe"]["size"] = int(params)  # aantal munten dat de backtest het beste vond
-            elif name in cfg["agents"]:
-                cfg["agents"][name].update(params)  # instellingen die de backtest heeft bewezen
+                # Universe sizing is a portfolio-level choice, not safe to
+                # apply from a single strategy's optimized return.
+                continue
+            if name not in cfg["agents"]:
+                continue
+            result = assessments.get(name) or {}
+            tf = int(cfg["agents"][name].get("timeframe_minutes", 60))
+            oos = result.get("oos_expectancy_r")
+            robust = result.get("oos_ex_best_expectancy_r")
+            enough = int(result.get("oos_trades") or 0) >= max(
+                10, int(cfg["backtest"].get("min_trades", 30)) // 3)
+            if (result.get("tuned") is True and enough
+                    and int(result.get("timeframe_minutes") or -1) == tf
+                    and oos is not None and oos > 0
+                    and robust is not None and robust > 0):
+                if all(result.get("params", {}).get(k) == v for k, v in params.items()):
+                    cfg["agents"][name].update(params)
     return cfg
 
 
@@ -445,7 +463,8 @@ def run(now_ts=None, exchange=None):
             seen_key = f"{horizon}:{m}"
             if signal_seen.get(seen_key) == last_ts:
                 continue
-            signal_seen[seen_key] = last_ts
+            # Mark processed only after valid indicators, higher-timeframe
+            # context and decisions exist. A temporary data failure is retryable.
 
             try:
                 if horizon == "trend":
@@ -511,6 +530,7 @@ def run(now_ts=None, exchange=None):
                 notes.append(f"Kandidaat voor {'echt geld' if bname == 'live' else 'schaduw'}: {d['reason']} ({d['calc']})")
 
             merge_evaluation(m, close_ts, price, signals, notes)
+            signal_seen[seen_key] = last_ts
 
     # Fast desk krijgt iedere 15m Momentum + Squeeze + Snelle uitbraak.
     if new_fast:
