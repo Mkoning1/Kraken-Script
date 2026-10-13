@@ -1,7 +1,8 @@
 # Kraken multi-agent trader
 
-Een team van agents dat de Kraken-markt volgt en met **echt geld** handelt. Draait op GitHub Actions,
-aangestuurd door een externe wekker (cron-job.org) die elk kwartier een run start.
+Een team van agents dat de Kraken-markt volgt en met **echt geld** handelt. De huidige worker draait
+in langdurige GitHub Actions-jobs en probeert zichzelf door te starten; er is ook een GitHub-schema als vangnet.
+Een eventueel nog actieve externe cron-job kan extra runs starten en moet apart worden gecontroleerd.
 Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 
 ## Het team
@@ -55,9 +56,9 @@ Standaard: `assertief`. Assertief op de markt, met een vangnet zodat je nooit al
 | | voorzichtig | normaal | **assertief** | agressief |
 |---|---|---|---|---|
 | Risico per trade | 1% | 1,5% | 1,25% | 2,5% |
-| Grootte per positie | 25% | 35% | 45% | 50% |
+| Grootte per positie | 25% | 35% | **100% (actuele config; herzien)** | 50% |
 | Max posities | 2 | 3 | 4 | 3 |
-| Max belegd | 50% | 75% | 95% | 100% |
+| Max belegd | 50% | 75% | **100% (actuele config; herzien)** | 100% |
 | Daglimiet verlies | 3% | 5% | 5% | 8% |
 | Noodstop (alles verkopen) | 15% | 20% | 20% | 30% |
 
@@ -112,3 +113,21 @@ GitHub voert geplande taken maar een paar keer per dag uit. Daarom start cron-jo
 ## Kraken API-sleutel
 GitHub Secrets `KRAKEN_API_KEY` en `KRAKEN_API_SECRET`, met de rechten Query Funds, Query Open Orders & Trades,
 Query Closed Orders & Trades, Create & Modify Orders en Cancel & Close Orders. **Nooit** Withdraw Funds.
+
+
+## Engine Safety Review (oktober 2026)
+
+De oorspronkelijke documentatie beschreef een lager assertief positielimiet dan de werkelijke `config.json`.
+Ook is de 15-minutenstrategie **niet** gevalideerd door de huidige historische 1-uursbacktester;
+positieve paperresultaten zijn geen bewijs dat deze strategie live winstgevend is.
+
+De nieuwste veiligheidstests, het onderzoek naar Freqtrade en de geplande infrastructuurvervanging staan
+in [Engine rebuild plan](docs/ENGINE_REBUILD_PLAN.md). Voor een lokale, volledig read-only controle:
+
+```bash
+python scripts/audit_engine.py --json
+```
+
+**Let op:** deze repository is publiek. De huidige datafiles en Git-geschiedenis bevatten gedetailleerde
+handelsinformatie. Publiceer hier nooit Kraken API-sleutels of persoonlijke accountsaldi zonder expliciete keuze
+voor die openbaarmaking. Stop order-beveiliging is nooit een gegarandeerde verlieslimiet bij scherpe koersgaps.
