@@ -1,0 +1,11 @@
+services:
+  freqtrade-dry:
+    image: freqtradeorg/freqtrade:stable
+    container_name: kraken-freqtrade-research
+    restart: unless-stopped
+    volumes:
+      - ./:/freqtrade/user_data
+    command: >
+      trade --config /freqtrade/user_data/config.dry.json
+      --strategy TrendBreakoutResearch --strategy-path /freqtrade/user_data/strategies
+    # Intentionally NO Kraken credentials, host UI port or live-trading command.

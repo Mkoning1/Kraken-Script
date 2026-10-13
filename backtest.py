@@ -349,12 +349,14 @@ def run(download=True, log=print):
         return r["robust_r"] if r["trades"] >= 20 else None
 
     results, tuned = {}, {}
+    # This legacy simulator advances in 1h steps. A 15m strategy cannot be
+    # responsibly promoted or evaluated from hourly data; its result is absent.
     for name in cfg["agents"]:
         if name not in AGENT_CLASSES or not cfg["agents"][name].get("enabled", True):
             continue
         tf_minutes = int(cfg["agents"][name].get("timeframe_minutes", 240 if name == "trend4h" else 60))
         if tf_minutes == 15:
-            log(f"{name}: overgeslagen in legacy backtest (historie is 1u; live agent draait 15m)")
+            log(f"GEEN GELDIGE BACKTEST voor {name}: 15m-strategie wordt overgeslagen; aparte 15m-engine vereist")
             continue
         uni = universes[base_n]
         base_p = defaults_for(cfg, name)
@@ -371,7 +373,11 @@ def run(download=True, log=print):
         chosen, chosen_oos, adopted = base_p, base_oos, False
         if best and best != base_p:
             oos = simulate(coins, [(name, best)], cfg, profile, split, t1, uni)
-            if (oos["expectancy_r"] or -1) > 0 and oos["trades"] >= 10 and (oos["expectancy_r"] or -1) >= (base_oos["expectancy_r"] or -1):
+            if (oos["expectancy_r"] is not None and oos["expectancy_r"] > 0
+                    and oos["ex_best_expectancy_r"] is not None
+                    and oos["ex_best_expectancy_r"] > 0
+                    and oos["trades"] >= 10
+                    and oos["expectancy_r"] >= (base_oos["expectancy_r"] if base_oos["expectancy_r"] is not None else float("-inf"))):
                 chosen, chosen_oos, adopted = best, oos, True
                 tuned[name] = {k: best[k] for k in grid}
         full = simulate(coins, [(name, chosen)], cfg, profile, t0, t1, uni)

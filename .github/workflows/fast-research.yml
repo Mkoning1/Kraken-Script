@@ -1,0 +1,53 @@
+name: Fast Strategy Research (15m)
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "17 4 * * 1"  # weekly, separate from Sunday 1h legacy backtest
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fast-research
+  cancel-in-progress: false
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Fetch 15m candles and run OOS research
+        id: research
+        continue-on-error: true
+        run: >
+          python scripts/backtest_fast.py --download --days 180 --min-days 60
+          --markets BTC/EUR ETH/EUR SOL/EUR XRP/EUR
+      - name: Persist archive and research report (never alters live strategy)
+        if: always()
+        shell: bash
+        run: |
+          git config user.name "kraken-research"
+          git config user.email "kraken-research@users.noreply.github.com"
+          git add data/history_15m data/fast_backtest.json 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "15m research history [skip ci]"
+          for i in 1 2 3 4; do
+            git pull --rebase && git push && exit 0
+            sleep 6
+          done
+          exit 1
+      - name: Report missing history as research failure
+        if: steps.research.outcome != 'success'
+        run: |
+          echo "::error::No validated 15m research result. Review missing data and API history."
+          exit 1

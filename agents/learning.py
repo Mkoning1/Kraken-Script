@@ -103,16 +103,15 @@ class LearningAgent:
         bt_tf = int(b.get("timeframe_minutes", 240 if agent == "trend4h" else 60))
         if cfg_tf != bt_tf:
             return "geen"
+        # Promotion evidence must come from unseen out-of-sample data, not training returns.
         trades, exp = b.get("oos_trades", 0), b.get("oos_expectancy_r")
-        if exp is None or trades < max(10, self.bt_min_trades // 3):
-            trades, exp = b.get("trades", 0), b.get("expectancy_r")
         if exp is None or trades < max(10, self.bt_min_trades // 3):
             return "geen"
         if exp < 0:
             return "negatief"
-        ex_best = b.get("ex_best_expectancy_r")
-        if ex_best is not None and ex_best < 0:
-            return "neutraal"  # winst hangt aan één munt: geen snelle route naar echt geld
+        ex_best = b.get("oos_ex_best_expectancy_r")
+        if ex_best is None or ex_best < 0:
+            return "neutraal"  # no robust positive evidence outside the optimization window
         return "positief" if exp >= self.p.get("backtest_min_r", 0.1) else "neutraal"
 
     def summary(self, agents):

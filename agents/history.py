@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 
 HOUR = 3600
+TIMEFRAMES = {"1h": 3600, "15m": 900}
 SOURCES = ["binance", "kucoin", "okx", "gateio", "bitfinex", "coinbaseexchange"]
 QUOTES = ["USDT", "USD", "EUR"]
 
@@ -19,7 +20,11 @@ QUOTES = ["USDT", "USD", "EUR"]
 class HistoryAgent:
     label = "Historie-agent"
 
-    def __init__(self, root, log=print):
+    def __init__(self, root, log=print, timeframe="1h"):
+        if timeframe not in TIMEFRAMES:
+            raise ValueError(f"Unsupported history timeframe: {timeframe}")
+        self.timeframe = timeframe
+        self.step = TIMEFRAMES[timeframe]
         self.root = Path(root)
         self.root.mkdir(parents=True, exist_ok=True)
         self.meta_path = self.root / "meta.json"
@@ -88,6 +93,16 @@ class HistoryAgent:
             for q in QUOTES:
                 sym = f"{base}/{q}"
                 if sym in ex.markets and ex.markets[sym].get("spot", True):
+                    if self.timeframe == "15m":
+                        # An exchange may expose markets but block OHLCV by
+                        # region or API policy. Verify the actual endpoint.
+                        try:
+                            probe = ex.fetch_ohlcv(sym, self.timeframe, limit=2)
+                            if not probe:
+                                continue
+                        except Exception as e:
+                            self.log(f"  {name} {sym} OHLCV unavailable: {str(e)[:80]}")
+                            continue
                     return name, sym
         return None, None
 
@@ -100,12 +115,12 @@ class HistoryAgent:
         ex = self._exchange(name)
         rows = self.load(base)
         now = int(time.time())
-        start = max(rows[-1][0] + HOUR, now - days * 86400) if rows else now - days * 86400
+        start = max(rows[-1][0] + self.step, now - days * 86400) if rows else now - days * 86400
         new, since, tries = [], start * 1000, 0
-        while since < (now - HOUR) * 1000 and tries < 400:
+        while since < (now - self.step) * 1000 and tries < 2500:
             tries += 1
             try:
-                batch = ex.fetch_ohlcv(sym, "1h", since=since, limit=1000)
+                batch = ex.fetch_ohlcv(sym, self.timeframe, since=since, limit=1000)
             except Exception as e:
                 self.log(f"{base}: ophalen bij {name} mislukt ({str(e)[:80]})")
                 time.sleep(2)
@@ -113,20 +128,24 @@ class HistoryAgent:
                     break
                 continue
             if not batch:
-                since += 1000 * HOUR * 1000  # gat in de historie overslaan
+                # Never silently bridge an API/network gap: missing candles would corrupt indicators.
+                raise RuntimeError(f"{base} {self.timeframe}: empty OHLCV page at {since}; history incomplete")
                 continue
             for r in batch:
                 ts = int(r[0] // 1000)
-                if ts + HOUR <= now and (not new or ts > new[-1][0]):
+                if ts + self.step <= now and (not new or ts > new[-1][0]):
                     new.append([ts, float(r[1]), float(r[2]), float(r[3]), float(r[4]), float(r[5] or 0)])
-            nxt = int(batch[-1][0]) + HOUR * 1000
+            nxt = int(batch[-1][0]) + self.step * 1000
             if nxt <= since:
                 break
             since = nxt
         if new:
+            # Strictly increasing, aligned candles only. Gaps remain visible to validation.
+            if any(row[0] % self.step for row in new):
+                raise RuntimeError(f"{base}: received unaligned OHLCV timestamps")
             self._save(base, new)
         self.meta[base] = {"exchange": name, "symbol": sym}
         self.meta_path.write_text(json.dumps(self.meta, indent=1))
         total = len(self.load(base))
-        self.log(f"{base}: {len(new)} nieuwe uurcandles van {name} ({sym}), totaal {total}")
+        self.log(f"{base}: {len(new)} nieuwe {self.timeframe}-candles van {name} ({sym}), totaal {total}")
         return total

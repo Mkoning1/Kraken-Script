@@ -1,0 +1,25 @@
+# Optional future deployment; NOT enabled by the pull request.
+# Back up/reconcile the state file and verify stop orders before first run.
+services:
+  kraken-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    restart: unless-stopped
+    init: true
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      KRAKEN_API_KEY: ${KRAKEN_API_KEY:-}
+      KRAKEN_API_SECRET: ${KRAKEN_API_SECRET:-}
+      KRAKEN_LIVE_CONFIRMED: ${KRAKEN_LIVE_CONFIRMED:-NO}
+    volumes:
+      - kraken_state:/app/data
+      - kraken_dashboard:/app/docs
+
+volumes:
+  kraken_state:
+  kraken_dashboard:

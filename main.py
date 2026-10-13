@@ -26,6 +26,7 @@ from agents.indicators import correlation, h4_series, snapshot, snapshot_4h, tre
 from agents.learning import LearningAgent
 from agents.monitor import MonitorAgent, book_equity, book_exposure
 from agents.risk import RiskAgent
+from agents.storage import save_json
 from agents.strategies import MarketRegimeAgent, build_agents
 
 ROOT = Path(__file__).parent
@@ -45,11 +46,29 @@ def load_config():
         raise SystemExit(f"Profiel '{cfg['profile']}' bestaat niet. Kies uit: {', '.join(cfg['profiles'])}")
     tuned_path = ROOT / "data" / "tuned_params.json"
     if cfg.get("backtest", {}).get("use_tuned_params") and tuned_path.exists():
+        # Never use an old tuned file just because it exists. Require robust
+        # out-of-sample evidence on the exact strategy timeframe and parameters.
+        report = json.loads(BACKTEST_PATH.read_text()) if BACKTEST_PATH.exists() else {}
+        assessments = report.get("agents", {})
         for name, params in json.loads(tuned_path.read_text()).items():
             if name == "_universe_size":
-                cfg["universe"]["size"] = int(params)  # aantal munten dat de backtest het beste vond
-            elif name in cfg["agents"]:
-                cfg["agents"][name].update(params)  # instellingen die de backtest heeft bewezen
+                # Universe sizing is a portfolio-level choice, not safe to
+                # apply from a single strategy's optimized return.
+                continue
+            if name not in cfg["agents"]:
+                continue
+            result = assessments.get(name) or {}
+            tf = int(cfg["agents"][name].get("timeframe_minutes", 60))
+            oos = result.get("oos_expectancy_r")
+            robust = result.get("oos_ex_best_expectancy_r")
+            enough = int(result.get("oos_trades") or 0) >= max(
+                10, int(cfg["backtest"].get("min_trades", 30)) // 3)
+            if (result.get("tuned") is True and enough
+                    and int(result.get("timeframe_minutes") or -1) == tf
+                    and oos is not None and oos > 0
+                    and robust is not None and robust > 0):
+                if all(result.get("params", {}).get(k) == v for k, v in params.items()):
+                    cfg["agents"][name].update(params)
     return cfg
 
 
@@ -121,7 +140,7 @@ def load_state(cfg, now_ts):
 def persist(state):
     """Direct opslaan na elke echte order, zodat een crash later in de run nooit een positie 'vergeet'."""
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    STATE_PATH.write_text(json.dumps(state, separators=(",", ":"), ensure_ascii=False))
+    save_json(STATE_PATH, state)
 
 
 def make_exchange(cfg):
@@ -343,6 +362,14 @@ def run(now_ts=None, exchange=None):
                 res = execs[name].manage(book, m, series, four, learner, last_price)
             except Exception as e:
                 errors.append(f"{m} ({'echt geld' if name == 'live' else 'schaduw'}): bewaken mislukt: {e}")
+                if name == "live":
+                    # A broken reconciliation/protection check must block ALL
+                    # fresh live exposure, not simply skip one existing position.
+                    book["unresolved_order"] = {
+                        "id": pos.get("stop_order_id"), "market": m,
+                        "side": "position-monitor", "ts": now_ts,
+                    }
+                    book["trading_blocked_reason"] = f"Live positiecontrole mislukt: {m}"
                 continue
             if name == "live":
                 persist(state)
@@ -369,11 +396,33 @@ def run(now_ts=None, exchange=None):
         except Exception as e:
             errors.append(f"Saldo gelijktrekken mislukt: {e}")
 
+    # Live orders require a *confirmed* exchange-side stop. Reconcile/repair
+    # existing positions above before allowing any fresh entry in this round.
+    if live:
+        unprotected = [m for m, p in live["positions"].items()
+                       if not p.get("stop_order_id") or p.get("protection_pending")]
+        missing_perms = [permission for permission, ok in (state.get("permissions") or {}).items() if not ok]
+        if missing_perms:
+            live["trading_blocked_reason"] = "Kraken API-rechten onvoldoende: " + ", ".join(missing_perms)
+            errors.append("KRITIEK: nieuwe live aankopen geblokkeerd; ontbrekende Kraken API-rechten: "
+                          + ", ".join(missing_perms))
+        elif live.get("unresolved_order"):
+            incident = live["unresolved_order"]
+            live["trading_blocked_reason"] = "Onopgeloste Kraken-order: " + str(incident.get("id"))
+            errors.append("KRITIEK: nieuwe live aankopen geblokkeerd totdat onopgeloste order "
+                          + str(incident.get("id")) + " handmatig is gereconcilieerd")
+        elif unprotected:
+            live["trading_blocked_reason"] = "Onbevestigde stop-loss: " + ", ".join(unprotected)
+            errors.append("KRITIEK: nieuwe live aankopen geblokkeerd; stop-loss onbevestigd voor "
+                          + ", ".join(unprotected))
+        else:
+            live.pop("trading_blocked_reason", None)
+
     # 3. Daglimiet en noodstop
     for name, book in state["books"].items():
         if not book:
             continue
-        enabled = cfg["live"]["trading_enabled"] if name == "live" else True
+        enabled = (cfg["live"]["trading_enabled"] and not book.get("trading_blocked_reason")) if name == "live" else True
         status, halt = risk.update(book, book_equity(book, prices), now_ts, enabled)
         book["risk_status"] = status
         if halt:
@@ -427,7 +476,8 @@ def run(now_ts=None, exchange=None):
             seen_key = f"{horizon}:{m}"
             if signal_seen.get(seen_key) == last_ts:
                 continue
-            signal_seen[seen_key] = last_ts
+            # Mark processed only after valid indicators, higher-timeframe
+            # context and decisions exist. A temporary data failure is retryable.
 
             try:
                 if horizon == "trend":
@@ -441,7 +491,8 @@ def run(now_ts=None, exchange=None):
                     trend = trend_cache.get(m)
                     if not trend:
                         continue
-                    ctx = {"sig": snapshot(candles, cfg), "trend": trend, "h4": h4.get(m)}
+                    lb = cfg["agents"].get("fast_breakout" if horizon == "fast" else "breakout", {}).get("lookback", 24)
+                    ctx = {"sig": snapshot(candles, cfg, lookback=lb), "trend": trend, "h4": h4.get(m)}
                     price = ctx["sig"]["close"]
             except ValueError:
                 continue
@@ -493,6 +544,7 @@ def run(now_ts=None, exchange=None):
                 notes.append(f"Kandidaat voor {'echt geld' if bname == 'live' else 'schaduw'}: {d['reason']} ({d['calc']})")
 
             merge_evaluation(m, close_ts, price, signals, notes)
+            signal_seen[seen_key] = last_ts
 
     # Fast desk krijgt iedere 15m Momentum + Squeeze + Snelle uitbraak.
     if new_fast:

@@ -47,7 +47,7 @@ def save():
         if sh("git pull -q --rebase --autostash").returncode == 0 and sh("git push -q").returncode == 0:
             return
         time.sleep(5)
-    log("Opslaan mislukt, volgende ronde opnieuw")
+    raise RuntimeError("CRITIEK: state opslaan naar GitHub mislukt; handelen gestopt om dubbelorders te voorkomen")
 
 
 def next_slot(now):
@@ -63,8 +63,12 @@ def main():
     sh('git config user.email "trading-bot@users.noreply.github.com"')
     start, tested, tests_ok, rounds = time.time(), None, False, 0
     while True:
-        sh("git pull -q --rebase --autostash")
+        pulled = sh("git pull -q --rebase --autostash")
+        if pulled.returncode != 0:
+            raise RuntimeError("CRITIEK: GitHub-state kon niet worden gesynchroniseerd: " + pulled.stderr[-500:])
         h = head()
+        if not h:
+            raise RuntimeError("CRITIEK: geen geldige commit gevonden; handelen gestopt")
         if code_changed(tested, h):
             t = sh(f"{sys.executable} -m tests.quick")
             tests_ok = t.returncode == 0
@@ -75,6 +79,8 @@ def main():
         if tests_ok:
             r = subprocess.run([sys.executable, "main.py"])
             log(f"Ronde {rounds + 1} klaar (code {r.returncode})")
+            if r.returncode != 0:
+                raise RuntimeError("CRITIEK: handelsproces is gecrasht; geen nieuwe run voordat dit is onderzocht")
         save()
         rounds += 1
         nxt = next_slot(datetime.datetime.now(datetime.timezone.utc))
