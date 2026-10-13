@@ -28,3 +28,29 @@ jobs:
         run: python -m tests.quick
       - name: Read-only health report
         run: python scripts/audit_engine.py --json
+
+  live-data-research-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    continue-on-error: true
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements.txt
+      - name: Verify actual multi-month 15m historical processing
+        run: >
+          python scripts/backtest_fast.py --download --days 90 --min-days 30
+          --markets BTC/EUR ETH/EUR
+      - name: Store research report without modifying live settings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fast-15m-research-check
+          path: data/fast_backtest.json
+          if-no-files-found: warn
+          retention-days: 7
