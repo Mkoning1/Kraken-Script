@@ -477,6 +477,9 @@ class LiveExecutionAgent:
         trade = self.reconcile(book, market, last_price, learner)
         if trade:
             return trade
+        if (book.get("unresolved_order") or {}).get("market") == market:
+            # Do not replace/cancel protection based on an uncertain partial fill.
+            return None
         hit = advance(pos, new_candles, h4_list, self.exits, self.fee, self.slip,
                       int(pos.get("timeframe_sec") or self.tf_sec), intrabar=False)
         if hit:
