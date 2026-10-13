@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from .fmt import eur
+from .storage import save_json
 
 RECENT_POINTS = 4 * 24 * 3
 OLD_POINTS = 24 * 120
@@ -104,7 +105,7 @@ class MonitorAgent:
 
     def save(self, state, cfg, profile, prices, agent_summary, extra):
         self.state_path.parent.mkdir(parents=True, exist_ok=True)
-        self.state_path.write_text(json.dumps(state, separators=(",", ":"), ensure_ascii=False))
+        save_json(self.state_path, state)
 
         books = {}
         for name, book in state["books"].items():
@@ -144,4 +145,4 @@ class MonitorAgent:
             **extra,
         }
         self.dashboard_path.parent.mkdir(parents=True, exist_ok=True)
-        self.dashboard_path.write_text(json.dumps(dashboard, separators=(",", ":"), ensure_ascii=False))
+        save_json(self.dashboard_path, dashboard)
