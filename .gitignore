@@ -1,2 +1,18 @@
 __pycache__/
 *.pyc
+# Never commit local credentials or worker runtime control files.
+.env
+.env.*
+!.env.worker.example
+data/ENGINE_HALT.json
+data/ENGINE_HEARTBEAT.json
+data/ENGINE_LOCK
+data/.state-*.tmp
+docs/.state-*.tmp
+
+# Docker research-only databases, logs and caches.
+research/freqtrade/tradesv3*.sqlite*
+research/freqtrade/logs/
+research/freqtrade/data/
+research/freqtrade/user_data/
+research/freqtrade/*.db
