@@ -58,7 +58,7 @@ class EngineGuardrailTests(unittest.TestCase):
 
         book = {
             "name": "live", "cash": 200.0, "fees_paid": 0.0,
-            "positions": {}, "risk_status": {"trading_enabled": True},
+            "positions": {}, "risk_status": {"trading_enabled": True, "halted": False, "daily_limit_hit": False},
         }
         errs = []
         cfg = {
