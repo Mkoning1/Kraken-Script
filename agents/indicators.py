@@ -94,7 +94,7 @@ def bollinger(closes, period=20, mult=2.0):
     return mid, upper, lower, width
 
 
-def snapshot(candles, cfg):
+def snapshot(candles, cfg, lookback=None):
     """Alle indicatoren voor de laatste afgesloten candle (en waar nodig de candle ervoor)."""
     if len(candles) < 260:
         raise ValueError(f"te weinig candles ({len(candles)})")
@@ -110,7 +110,7 @@ def snapshot(candles, cfg):
     bb_mid, bb_up, bb_low, bb_w = bollinger(closes, 20, 2.0)
     vol_avg = sma(vols, 20)
 
-    lookback = cfg["agents"].get("breakout", {}).get("lookback", 24)
+    lookback = int(lookback if lookback is not None else cfg["agents"].get("breakout", {}).get("lookback", 24))
     sq_look = cfg["agents"].get("squeeze", {}).get("squeeze_lookback", 120)
     widths = [w for w in bb_w[-sq_look - 1:-1] if w is not None]
     prev_w = bb_w[-2]
