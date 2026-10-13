@@ -15,7 +15,9 @@ It does not assume you have a VPS, always-on computer, or safe broker migration.
 5. Start in paper/validation mode; verify health and resilience to restarts.
    A live session additionally requires `KRAKEN_LIVE_CONFIRMED=YES`,
    matching live state, compatible Kraken API permissions and operator oversight.
-6. Bind-mount durable data storage with backups. Test automated alert delivery
+6. Copy the frozen state into the private `kraken_state` Docker volume; the image
+   deliberately carries no account ledger. Set up encrypted volume backups.
+   Test automated alert delivery
    for `ENGINE_HALT.json` and stale `ENGINE_HEARTBEAT.json`.
 7. Once new state reconciliation is accepted, shut down old live triggers
    permanently before enabling the new worker. Never run two writers to
