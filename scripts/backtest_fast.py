@@ -98,7 +98,8 @@ class MarketSeries:
                   self.m[i], self.ms[i], self.m[i - 1], self.ms[i - 1])
         if any(x is None or not math.isfinite(x) for x in fields):
             return None
-        older = self.bbw[i - self.squeeze_lookback - 1:i]
+        # Match agents.indicators.snapshot: last N widths excluding the current candle.
+        older = self.bbw[i - self.squeeze_lookback:i]
         older = [x for x in older if x is not None]
         prevw = self.bbw[i - 1]
         sq = 50.0 if prevw is None or not older else sum(v < prevw for v in older) / len(older) * 100
