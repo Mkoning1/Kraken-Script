@@ -478,7 +478,8 @@ def run(now_ts=None, exchange=None):
                     trend = trend_cache.get(m)
                     if not trend:
                         continue
-                    ctx = {"sig": snapshot(candles, cfg), "trend": trend, "h4": h4.get(m)}
+                    lb = cfg["agents"].get("fast_breakout" if horizon == "fast" else "breakout", {}).get("lookback", 24)
+                    ctx = {"sig": snapshot(candles, cfg, lookback=lb), "trend": trend, "h4": h4.get(m)}
                     price = ctx["sig"]["close"]
             except ValueError:
                 continue
