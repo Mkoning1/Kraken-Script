@@ -87,6 +87,37 @@ class EngineGuardrailTests(unittest.TestCase):
         )
         self.assertFalse(approved[0])
 
+    def test_unconfirmed_buy_fill_is_not_invented(self):
+        class Exchange:
+            def market(self, market):
+                return {"base": "BTC", "limits": {"amount": {"min": 0}, "cost": {"min": 0}}}
+
+            def amount_to_precision(self, market, amount):
+                return str(amount)
+
+            def create_order(self, *args, **kwargs):
+                return {"id": "uncertain-buy-123"}
+
+        errors = []
+        x = LiveExecutionAgent(
+            Exchange(), {"fee_pct": 0.4, "slippage_pct": 0.08, "exits": {}},
+            15, 3, False, errors,
+        )
+        x._wait_fill = lambda *_: (_ for _ in ()).throw(RuntimeError("timeout"))
+        book = {
+            "name": "live", "cash": 100.0, "fees_paid": 0.0,
+            "positions": {}, "risk_status": {"trading_enabled": True},
+        }
+        sig = SimpleNamespace(exit_style="r_trail", trailing=True, max_candles=0)
+        result = x.buy(book, "BTC/EUR", "momentum", sig, 0.1, 100.0,
+                       90.0, 90.0, {}, 1.0, 1000, "test", 0.8, {})
+        self.assertFalse(result["ok"])
+        self.assertEqual(book["cash"], 100.0)  # no made-up execution values
+        self.assertEqual(book["positions"], {})
+        self.assertEqual(book["unresolved_order"]["id"], "uncertain-buy-123")
+        self.assertFalse(book["risk_status"]["trading_enabled"])
+        self.assertTrue(any("KRITIEK" in e for e in errors))
+
 
 if __name__ == "__main__":
     unittest.main()
