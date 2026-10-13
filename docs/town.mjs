@@ -38,7 +38,7 @@ function svgChart(history,key='equity'){
  if(visible.length<2)return '<div class="empty">Nog geen geschiedenis voor deze periode.</div>';
  const vals=visible.map(p=>Number(p[key]));let min=Math.min(...vals),max=Math.max(...vals);
  let span=max-min||Math.max(max*.01,.1);min-=span*.17;max+=span*.17;
- let x=(i/(vals.length-1)*300),y=v=>120-(v-min)/(max-min)*108;
+ let x=i=>i/(vals.length-1)*300,y=v=>120-(v-min)/(max-min)*108;
  let coordinates=vals.map((v,i)=>(i?'L':'M')+x(i).toFixed(1)+' '+y(v).toFixed(1)).join(' ');
  let area=coordinates+' L 300 126 L 0 126 Z';
  let c=vals[vals.length-1]>=vals[0]?'#7cdbad':'#ed8f8a';
