@@ -217,7 +217,7 @@ function updateHead(d){
  $('data-age').textContent='Botupdate: '+time(d.generated_ts)+(old?' (vertraagd)':'');
  $('city-mode').textContent=d.mode==='live'?'ECHT GELD':'SIMULATIE';
  $('city-subtitle').textContent=(d.markets?.length||0)+' markten · '+(d.regime?.label||'onbekend')+' markt';
- $('label-tower')?.classList.toggle('has-alert',Boolean(old||failed||r.halted||(d.errors||[]).length));
+ $('label-tower')?.classList.toggle('has-alert',Boolean(old||failed||r.halted||(d.errors||[]).some(e=>Number(e.ts||0)>Number(d.generated_ts||0)-86400)));
  $('label-gate')?.classList.toggle('has-alert',Boolean(d.scanner?.enabled&&d.scanner?.active_discovery_markets?.length));
 }
 function updateAll(d){
