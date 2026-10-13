@@ -22,14 +22,15 @@ try{
   assert.match(equity,/€/,'real Kraken data displays a euro value');
   assert.equal(await page.locator('.place-label').count(),7,'seven working town buildings');
   // Clicking a building must open real information from the existing static feed.
-  await page.locator('#label-treasury').click({force:true});
+  await page.screenshot({path:'/tmp/koopmansstad-initial.png',fullPage:true});
+  await page.locator('.rail-item[data-select="treasury"]').click();
   assert.match(await page.locator('#detail-title').textContent(),/Schatkamer/);
   assert.match(await page.locator('#detail-content').textContent(),/Beschikbaar/);
-  await page.locator('#label-guild').click({force:true});
+  await page.locator('.rail-item[data-select="guild"]').click();
   assert.match(await page.locator('#detail-title').textContent(),/Gildehuis/);
-  await page.locator('#label-tower').click({force:true});
+  await page.locator('.rail-item[data-select="tower"]').click();
   assert.match(await page.locator('#detail-content').textContent(),/Max. positiegrootte/);
-  await page.locator('#label-gate').click({force:true});
+  await page.locator('.rail-item[data-select="gate"]').click();
   assert.match(await page.locator('#detail-content').textContent(),/Markten gezien/);
   await page.locator('#home').click();
   assert.match(await page.locator('#detail-title').textContent(),/Raadshuis/);
@@ -44,7 +45,7 @@ try{
   await mobile.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
   await mobile.waitForFunction(()=>document.getElementById('h-equity')?.textContent?.includes('€'),null,{timeout:30000});
   assert.equal(await mobile.locator('#label-market').count(),1);
-  await mobile.locator('#label-market').click({force:true});
+  await mobile.locator('.rail-item[data-select="market"]').click();
   assert.match(await mobile.locator('#detail-title').textContent(),/Marktplaats/);
   await mobile.screenshot({path:'/tmp/koopmansstad-mobile.png',fullPage:true});
   assert.deepEqual(errors,[],'mobile browser has no runtime errors');
