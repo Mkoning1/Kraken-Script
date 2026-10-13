@@ -93,6 +93,16 @@ class HistoryAgent:
             for q in QUOTES:
                 sym = f"{base}/{q}"
                 if sym in ex.markets and ex.markets[sym].get("spot", True):
+                    if self.timeframe == "15m":
+                        # An exchange may expose markets but block OHLCV by
+                        # region or API policy. Verify the actual endpoint.
+                        try:
+                            probe = ex.fetch_ohlcv(sym, self.timeframe, limit=2)
+                            if not probe:
+                                continue
+                        except Exception as e:
+                            self.log(f"  {name} {sym} OHLCV unavailable: {str(e)[:80]}")
+                            continue
                     return name, sym
         return None, None
 
