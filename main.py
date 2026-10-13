@@ -362,6 +362,14 @@ def run(now_ts=None, exchange=None):
                 res = execs[name].manage(book, m, series, four, learner, last_price)
             except Exception as e:
                 errors.append(f"{m} ({'echt geld' if name == 'live' else 'schaduw'}): bewaken mislukt: {e}")
+                if name == "live":
+                    # A broken reconciliation/protection check must block ALL
+                    # fresh live exposure, not simply skip one existing position.
+                    book["unresolved_order"] = {
+                        "id": pos.get("stop_order_id"), "market": m,
+                        "side": "position-monitor", "ts": now_ts,
+                    }
+                    book["trading_blocked_reason"] = f"Live positiecontrole mislukt: {m}"
                 continue
             if name == "live":
                 persist(state)
