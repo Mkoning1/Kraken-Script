@@ -26,6 +26,7 @@ from agents.indicators import correlation, h4_series, snapshot, snapshot_4h, tre
 from agents.learning import LearningAgent
 from agents.monitor import MonitorAgent, book_equity, book_exposure
 from agents.risk import RiskAgent
+from agents.storage import save_json
 from agents.strategies import MarketRegimeAgent, build_agents
 
 ROOT = Path(__file__).parent
@@ -121,7 +122,7 @@ def load_state(cfg, now_ts):
 def persist(state):
     """Direct opslaan na elke echte order, zodat een crash later in de run nooit een positie 'vergeet'."""
     STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    STATE_PATH.write_text(json.dumps(state, separators=(",", ":"), ensure_ascii=False))
+    save_json(STATE_PATH, state)
 
 
 def make_exchange(cfg):
