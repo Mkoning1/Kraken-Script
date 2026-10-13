@@ -401,7 +401,12 @@ def run(now_ts=None, exchange=None):
     if live:
         unprotected = [m for m, p in live["positions"].items()
                        if not p.get("stop_order_id") or p.get("protection_pending")]
-        if live.get("unresolved_order"):
+        missing_perms = [permission for permission, ok in (state.get("permissions") or {}).items() if not ok]
+        if missing_perms:
+            live["trading_blocked_reason"] = "Kraken API-rechten onvoldoende: " + ", ".join(missing_perms)
+            errors.append("KRITIEK: nieuwe live aankopen geblokkeerd; ontbrekende Kraken API-rechten: "
+                          + ", ".join(missing_perms))
+        elif live.get("unresolved_order"):
             incident = live["unresolved_order"]
             live["trading_blocked_reason"] = "Onopgeloste Kraken-order: " + str(incident.get("id"))
             errors.append("KRITIEK: nieuwe live aankopen geblokkeerd totdat onopgeloste order "
