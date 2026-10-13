@@ -183,7 +183,7 @@ const sun=new THREE.DirectionalLight(0xffebc3,2.5);sun.position.set(-20,34,18);s
 sun.shadow.mapSize.set(2048,2048);sun.shadow.camera.left=-49;sun.shadow.camera.right=49;sun.shadow.camera.top=40;sun.shadow.camera.bottom=-40;sun.shadow.bias=-.00025;scene.add(sun);
 setupLandscape();
 createBuilding('townhall',0,-4.8,hall,9.3);
-createBuilding('market',0,5.0,g=>{box(2.9,1.5,2.1,M.plaster,0,.88,0,g);roof(g,3.1,2.3,1.63,M.roof,1.1);},4.2);
+createBuilding('market',3.9,7.4,g=>{box(2.9,1.5,2.1,M.plaster,0,.88,0,g);roof(g,3.1,2.3,1.63,M.roof,1.1);},4.2);
 createBuilding('treasury',10,-4.8,treasury,7.9);
 createBuilding('tower',-14,-7,watchtower,12.3);
 createBuilding('guild',-10,2.4,guild,6.75);
