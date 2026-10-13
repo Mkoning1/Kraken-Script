@@ -369,11 +369,23 @@ def run(now_ts=None, exchange=None):
         except Exception as e:
             errors.append(f"Saldo gelijktrekken mislukt: {e}")
 
+    # Live orders require a *confirmed* exchange-side stop. Reconcile/repair
+    # existing positions above before allowing any fresh entry in this round.
+    if live:
+        unprotected = [m for m, p in live["positions"].items()
+                       if not p.get("stop_order_id") or p.get("protection_pending")]
+        if unprotected:
+            live["trading_blocked_reason"] = "Onbevestigde stop-loss: " + ", ".join(unprotected)
+            errors.append("KRITIEK: nieuwe live aankopen geblokkeerd; stop-loss onbevestigd voor "
+                          + ", ".join(unprotected))
+        else:
+            live.pop("trading_blocked_reason", None)
+
     # 3. Daglimiet en noodstop
     for name, book in state["books"].items():
         if not book:
             continue
-        enabled = cfg["live"]["trading_enabled"] if name == "live" else True
+        enabled = (cfg["live"]["trading_enabled"] and not book.get("trading_blocked_reason")) if name == "live" else True
         status, halt = risk.update(book, book_equity(book, prices), now_ts, enabled)
         book["risk_status"] = status
         if halt:
