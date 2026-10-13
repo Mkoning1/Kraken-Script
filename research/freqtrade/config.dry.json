@@ -1,0 +1,67 @@
+{
+  "$schema": "https://schema.freqtrade.io/schema.json",
+  "dry_run": true,
+  "dry_run_wallet": 1000,
+  "stake_currency": "EUR",
+  "stake_amount": 30,
+  "tradable_balance_ratio": 0.6,
+  "max_open_trades": 2,
+  "trading_mode": "spot",
+  "fiat_display_currency": "EUR",
+  "cancel_open_orders_on_exit": false,
+  "unfilledtimeout": {
+    "entry": 5,
+    "exit": 15,
+    "exit_timeout_count": 0,
+    "unit": "minutes"
+  },
+  "entry_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1
+  },
+  "exit_pricing": {
+    "price_side": "same",
+    "use_order_book": true,
+    "order_book_top": 1
+  },
+  "exchange": {
+    "name": "kraken",
+    "key": "",
+    "secret": "",
+    "ccxt_config": {
+      "enableRateLimit": true
+    },
+    "pair_whitelist": [
+      "BTC/EUR",
+      "ETH/EUR",
+      "SOL/EUR",
+      "XRP/EUR"
+    ],
+    "pair_blacklist": []
+  },
+  "pairlists": [
+    {
+      "method": "StaticPairList"
+    }
+  ],
+  "order_types": {
+    "entry": "market",
+    "exit": "market",
+    "emergency_exit": "market",
+    "force_entry": "market",
+    "force_exit": "market",
+    "stoploss": "market",
+    "stoploss_on_exchange": true,
+    "stoploss_on_exchange_interval": 60
+  },
+  "order_time_in_force": {
+    "entry": "GTC",
+    "exit": "GTC"
+  },
+  "initial_state": "stopped",
+  "api_server": {
+    "enabled": false
+  },
+  "bot_name": "kraken_research_only"
+}
