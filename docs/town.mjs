@@ -1,4 +1,4 @@
-import {initTown} from './town-world.mjs';
+// The data dashboard must continue working even if 3D dependencies are unavailable.
 
 const $ = id => document.getElementById(id);
 const fmt = new Intl.NumberFormat('nl-NL',{style:'currency',currency:'EUR',minimumFractionDigits:2,maximumFractionDigits:2});
@@ -276,6 +276,16 @@ function fallback(){
  notify('3D-renderer niet beschikbaar. Gebouwen zijn nog steeds aanklikbaar.');
 }
 bindControls();
-try{world=initTown($('world'),key=>selectBuilding(key,false));world.animate(motion)}
-catch(e){console.error('Koopmansstad 3D could not start',e);fallback()}
-selectBuilding('townhall',false);loadData();setInterval(loadData,45000);
+selectBuilding('townhall',false);
+loadData();
+setInterval(loadData,45000);
+(async()=>{
+ try{
+  const {initTown}=await import('./town-world.mjs');
+  world=initTown($('world'),key=>selectBuilding(key,false));
+  world.animate(motion);
+ }catch(e){
+  console.error('Koopmansstad 3D could not start',e);
+  fallback();
+ }
+})();
