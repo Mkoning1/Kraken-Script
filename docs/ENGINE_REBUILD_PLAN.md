@@ -81,3 +81,43 @@ live orders on its own.
 A draft PR is **not deployed**. Never treat CI and mock backtests alone as approval
 to release a live crypto trader. Do a supervised dry run and small-limit reconciliation
 before going live, and keep exchange-side stop orders checked on Kraken.
+
+## 15-minute real-data research check — 2026-10-13
+
+A non-gating GitHub Actions research job downloaded approximately 90 days of real
+15m candles for BTC and ETH from a supported external spot exchange (KuCoin
+USDT data where available). Entries used the next bar's open, fee and
+slippage estimates; last 40% of the window was evaluated separately.
+
+| Agent | OOS closed trades | OOS simulated return | OOS expectancy |
+|---|---:|---:|---:|
+| momentum | 31 | -13.48% | -0.560 R |
+| squeeze | 22 | -12.90% | -0.695 R |
+| fast_breakout | 42 | -18.70% | -0.547 R |
+| BTC buy-and-hold benchmark | — | +5.44% | — |
+
+These are single-window, cross-exchange *proxy* results, not proof of future
+performance or a verified Kraken EUR fill model. No fast strategy is approved
+for real-money promotion. More 15m historical sources, walk-forward segments,
+Kraken fee/volume constraints and independent validation are still necessary.
+
+## Implemented on safety PR (not deployed)
+
+- Live exchange stop confirmation and ambiguous order fill rejection; partial
+  exit accounting is not silently accepted.
+- Automatic per-account block on unresolved live orders or failed live
+  position monitoring; sticky persistent worker halt for hard errors.
+- Atomic JSON state writes and worker single-instance filesystem lock.
+- Risk-profile limit correction from one position consuming 100% of account
+  to 45% per position (90% portfolio exposure).
+- 15m candle-aligned research engine, history import, weekly independent
+  research workflow and optional Freqtrade dry-run comparator.
+- Research-sourced tuned parameters rejected when OOS is concentrated,
+  stale, missing, or mismatched to current timeframe.
+- CI regression tests and runbook to migrate from GitHub jobs to Docker
+  with a private state volume.
+
+Remaining deployment blockers are **real exchange dry-run validation,
+account reconciliation, production hosting and secrets, live alert routing,
+and security migration away from publicly tracked financial state**.
+Do not mark this PR ready for live use until these gates are cleared.
