@@ -131,3 +131,14 @@ python scripts/audit_engine.py --json
 **Let op:** deze repository is publiek. De huidige datafiles en Git-geschiedenis bevatten gedetailleerde
 handelsinformatie. Publiceer hier nooit Kraken API-sleutels of persoonlijke accountsaldi zonder expliciete keuze
 voor die openbaarmaking. Stop order-beveiliging is nooit een gegarandeerde verlieslimiet bij scherpe koersgaps.
+
+## Tijdelijke live-aankoopstop na engine-audit
+
+De configuratie is bewust gezet op `live.trading_enabled: false` zolang de nieuwe
+live-engine en strategieën niet robuust gevalideerd zijn. **De bot blijft bestaande
+open posities bewaken en stop-orders controleren; uitsluitend nieuwe live aankopen
+worden tegengehouden.** Schaduwtrades en strategieonderzoek blijven actief.
+
+Maak live aankopen niet automatisch weer mogelijk op basis van een enkele
+positieve backtest. Vereist: volledige Kraken-reconciliatie, degelijke uit-
+de-steekproef validatie, stabiele paperresultaten en expliciete handelsautorisatie.
