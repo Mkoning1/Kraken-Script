@@ -6,10 +6,18 @@ const errors=[];
 try{
   const page=await browser.newPage({viewport:{width:1570,height:900},reducedMotion:'reduce'});
   page.on('pageerror',e=>errors.push(String(e)));
-  page.on('console',m=>{if(m.type()==='error'&&/TypeError|ReferenceError|SyntaxError|Uncaught/i.test(m.text()))errors.push(m.text())});
+  page.on('requestfailed',r=>console.log('REQUEST FAILED',r.url(),r.failure()?.errorText));
+  page.on('console',m=>{if(m.type()==='error'){console.log('BROWSER ERROR',m.text());errors.push(m.text())}});
   const res=await page.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
   assert.equal(res.status(),200,'homepage served');
-  await page.waitForFunction(()=>document.getElementById('h-equity')?.textContent?.includes('€'),{timeout:30000});
+  try{
+    await page.waitForFunction(()=>document.getElementById('h-equity')?.textContent?.includes('€'),null,{timeout:30000});
+  }catch(e){
+    await page.screenshot({path:'/tmp/koopmansstad-failure.png',fullPage:true});
+    console.log('DEBUG H-EQUITY',await page.locator('#h-equity').textContent());
+    console.log('DEBUG TOAST',await page.locator('#toast').textContent());
+    throw e;
+  }
   const equity=await page.locator('#h-equity').textContent();
   assert.match(equity,/€/,'real Kraken data displays a euro value');
   assert.equal(await page.locator('.place-label').count(),7,'seven working town buildings');
@@ -34,7 +42,7 @@ try{
   const mobile=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
   mobile.on('pageerror',e=>errors.push('mobile: '+String(e)));
   await mobile.goto('http://127.0.0.1:8765/index.html',{waitUntil:'domcontentloaded'});
-  await mobile.waitForFunction(()=>document.getElementById('h-equity')?.textContent?.includes('€'),{timeout:30000});
+  await mobile.waitForFunction(()=>document.getElementById('h-equity')?.textContent?.includes('€'),null,{timeout:30000});
   assert.equal(await mobile.locator('#label-market').count(),1);
   await mobile.locator('#label-market').click({force:true});
   assert.match(await mobile.locator('#detail-title').textContent(),/Marktplaats/);
