@@ -75,8 +75,9 @@ def advance(pos, new_candles, h4_list, exits, fee, slip, tf_sec, intrabar):
             if (price - pos["entry_price"]) / atr >= pos["runner_threshold_atr"]:
                 pos["is_runner"] = True
             mult = pos["runner_atr"] if pos["is_runner"] else pos["initial_atr"]
-            pos["stop"] = pos["peak"] - mult * atr
-            pos["hard_stop"] = pos["stop"] - exits["catastrophe_atr"] * atr
+            # Trailing stops must never move down after volatility expands or a runner is activated.
+            pos["stop"] = max(pos["stop"], pos["peak"] - mult * atr)
+            pos["hard_stop"] = max(pos["hard_stop"], pos["stop"] - exits["catastrophe_atr"] * atr)
             if price < pos["stop"]:
                 mode = "runner, 6 ATR" if pos["is_runner"] else "krap, 2 ATR"
                 return price, h4["ts"] + 14400, f"4-uursslot onder de trailing stop ({mode}) op {px(pos['stop'])}"
@@ -238,7 +239,11 @@ class LiveExecutionAgent:
         if self.validate:
             pos["stop_validated"] = True
             return
-        pos["stop_order_id"] = o.get("id")
+        oid = o.get("id")
+        if not oid:
+            raise RuntimeError("Kraken returned no stop-loss order ID; protection cannot be verified")
+        pos["stop_order_id"] = oid
+        pos["protection_pending"] = False
 
     def _cancel_stop(self, pos):
         """Stop-order weghalen. Geeft de order terug als die intussen al uitgevoerd bleek."""
@@ -335,8 +340,17 @@ class LiveExecutionAgent:
             self._place_stop(pos)
             stop_txt = f"stop-loss order op Kraken op {px(pos['exchange_stop_price'])}"
         except Exception as e:
-            self.errors.append(f"{market}: stop-loss plaatsen mislukt ({e}), volgende run opnieuw")
-            stop_txt = "stop-loss order nog niet geplaatst (volgende run opnieuw)"
+            # A market purchase may already have filled. Never quietly allow further live entries
+            # while its exchange-side protection is unknown. Keep the position for reconciliation.
+            pos["protection_pending"] = True
+            book["trading_blocked_reason"] = f"Onbevestigde stop-loss voor {market}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(
+                f"KRITIEK {market}: aankoop uitgevoerd maar stop-loss niet bevestigd ({e}). "
+                "NIEUWE LIVE AANKOPEN GEBLOKKEERD; controleer Kraken direct."
+            )
+            stop_txt = "LET OP: stop-loss niet bevestigd; nieuwe aankopen geblokkeerd"
         note = f" ({plan['note']})" if plan and plan.get("note") else ""
         return {"ok": True, "text": f"Gekocht: {net_qty:g} {m['base']} tegen gemiddeld {px(avg)}{note}, kosten {eur(fee_total)}; {stop_txt}"}
 
