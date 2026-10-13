@@ -276,7 +276,21 @@ class LiveExecutionAgent:
             raise  # stop staat nog open en kon niet weg: niets aanraken, volgende run opnieuw
 
     def _exit_from_order(self, book, pos, o, reason, learner):
-        filled = float(o.get("filled") or pos["qty"])
+        filled = float(o.get("filled") or 0)
+        # Closed does not imply 100% executed (cancelled remainders can be partial).
+        if filled < pos["qty"] * 0.995:
+            book["unresolved_order"] = {
+                "id": o.get("id"), "market": pos["market"], "side": "stop",
+                "ts": self.now, "filled": filled, "expected": pos["qty"],
+            }
+            book["trading_blocked_reason"] = f"Stop-order mogelijk gedeeltelijk uitgevoerd: {pos['market']}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(
+                f"KRITIEK {pos['market']}: stop-order {o.get('id')} slechts "
+                f"{filled:g}/{pos['qty']:g} gevuld. Handmatige reconciliatie vereist."
+            )
+            raise RuntimeError("Stop-order gedeeltelijk uitgevoerd; positie niet fictief afsluiten")
         avg = float(o.get("average") or o.get("price") or pos.get("exchange_stop_price") or pos["entry_price"])
         cost = float(o.get("cost") or filled * avg)
         fee = (o.get("fee") or {}).get("cost")
@@ -432,15 +446,28 @@ class LiveExecutionAgent:
             if status in ("canceled", "expired", "rejected"):
                 pos["stop_order_id"] = None
         total = float(self.balance()["total"].get(self._base(market), 0) or 0)
-        if total < pos["qty"] * 0.5:
-            if status == "unknown" and pos.get("exchange_stop_price"):
-                est = pos["exchange_stop_price"]
-                proceeds = pos["qty"] * est
-                return record_exit(book, pos, est, proceeds * (1 - self.fee), proceeds * self.fee, self.now,
-                                   f"Stop-loss op Kraken uitgevoerd (geschat op {px(est)})", learner, self.cooldown_sec)
-            value = total * last_price
-            return record_exit(book, pos, last_price, value, 0.0, self.now,
-                               "Munt niet meer (volledig) op Kraken gevonden: handmatig verkocht?", learner, self.cooldown_sec)
+        if status == "unknown":
+            # If we cannot confirm the stop's order state, a missing balance is NOT
+            # enough evidence to invent a filled stop and a realized P&L.
+            book["unresolved_order"] = {"id": oid, "market": market, "side": "stop", "ts": self.now}
+            book["trading_blocked_reason"] = f"Stop-orderstatus onbekend: {market}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(
+                f"KRITIEK {market}: Kraken stop-orderstatus onbekend; "
+                "geen geschatte verkoop geboekt. Nieuwe aankopen geblokkeerd."
+            )
+            return None
+        if total < pos["qty"] * 0.995:
+            # Unknown manual sale, partial fill or missing base balance cannot be
+            # reconciled from prices alone. Preserve ledger for operator recovery.
+            book["unresolved_order"] = {"id": oid, "market": market, "side": "balance", "ts": self.now}
+            book["trading_blocked_reason"] = f"Verschil tussen boek en Kraken-saldo: {market}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(f"KRITIEK {market}: Kraken-saldo {total:g} wijkt af van geboekte {pos['qty']:g}; "
+                               "controleer uitgevoerde orders voordat handel hervat.")
+            return None
         return None
 
     def manage(self, book, market, new_candles, h4_list, learner, last_price):
