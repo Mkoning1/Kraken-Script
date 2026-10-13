@@ -119,5 +119,54 @@ class EngineGuardrailTests(unittest.TestCase):
         self.assertTrue(any("KRITIEK" in e for e in errors))
 
 
+    def test_partial_exchange_stop_is_not_logged_as_full_sale(self):
+        class Exchange:
+            def price_to_precision(self, market, amount):
+                return str(amount)
+        book = {"name": "live", "positions": {"BTC/EUR": {}},
+                "risk_status": {"trading_enabled": True}}
+        errors = []
+        x = LiveExecutionAgent(
+            Exchange(), {"fee_pct": 0.4, "slippage_pct": 0.08, "exits": {}},
+            15, 3, False, errors,
+        )
+        x.now = 12345
+        pos = {"market": "BTC/EUR", "qty": 1.0, "entry_price": 100.0,
+               "exchange_stop_price": 90.0}
+        order = {"id": "partial-stop", "status": "closed",
+                 "filled": 0.2, "average": 90., "cost": 18.0}
+        with self.assertRaisesRegex(RuntimeError, "gedeeltelijk"):
+            x._exit_from_order(book, pos, order, "partial", None)
+        self.assertFalse(book["risk_status"]["trading_enabled"])
+        self.assertIn("BTC/EUR", book["positions"])
+        self.assertEqual(book["unresolved_order"]["id"], "partial-stop")
+
+    def test_unknown_stop_does_not_invent_a_trade(self):
+        class Exchange:
+            def market(self, market):
+                return {"base": "BTC"}
+            def fetch_order(self, oid, market):
+                raise TimeoutError("exchange did not respond")
+            def fetch_balance(self):
+                return {"total": {"BTC": 0.0}}
+
+        cfg = {"fee_pct": .4, "slippage_pct": .08, "exits": {}}
+        errors = []
+        x = LiveExecutionAgent(Exchange(), cfg, 15, 3, False, errors)
+        x.now = 12345
+        book = {"name": "live",
+                "positions": {"BTC/EUR": {
+                    "market": "BTC/EUR", "qty": 1.0,
+                    "stop_order_id": "uncertain-456",
+                    "exchange_stop_price": 90.0,
+                    "entry_price": 100.0}},
+                "risk_status": {"trading_enabled": True},
+                "trades": []}
+        self.assertIsNone(x.reconcile(book, "BTC/EUR", 90.0, None))
+        self.assertFalse(book["risk_status"]["trading_enabled"])
+        self.assertEqual(len(book["trades"]), 0)
+        self.assertEqual(book["unresolved_order"]["id"], "uncertain-456")
+
+
 if __name__ == "__main__":
     unittest.main()
