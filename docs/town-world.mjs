@@ -45,7 +45,7 @@ const face=[0,2,1,3,4,5,0,3,5,0,5,2,1,2,5,1,5,4,0,1,4,0,4,3];
 const pos=[];for(const id of face)pos.push(...vertices.slice(id*3,id*3+3));
 let geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));geo.computeVertexNormals();
 const r=mesh(geo,material,0,0,0,parent);r.castShadow=true;
-box(.1,.15,d+.06,M.gold,0,y+h,z=0,parent);
+box(.1,.15,d+.06,M.gold,0,y+h,0,parent);
 return r;
 }
 function house(x,z,w=2.4,d=2.1,color=M.plaster,roofColor=M.roof,rot=0){
