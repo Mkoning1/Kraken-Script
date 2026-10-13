@@ -26,7 +26,7 @@ sys.path.insert(0, r"TESTS_DIR")
 from mockex import MockKraken
 import main
 cfg = json.load(open("config.json"))
-cfg["mode"] = "live"; cfg["live"]["validate_only"] = False; cfg["promotion"]["all_agents_live"] = True
+cfg["mode"] = "live"; cfg["live"]["validate_only"] = False; cfg["live"]["trading_enabled"] = True; cfg["promotion"]["all_agents_live"] = True
 json.dump(cfg, open("config.json", "w"))
 SYMS = {"BTC/EUR": 60000, "ETH/EUR": 3000, "SOL/EUR": 150, "HBAR/EUR": 0.08, "DOGE/EUR": 0.1}
 K0, STEPS, SKIP, SEED = 3500, STEPS_N, SKIP_N, SEED_N
