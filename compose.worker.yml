@@ -17,5 +17,9 @@ services:
       KRAKEN_API_SECRET: ${KRAKEN_API_SECRET:-}
       KRAKEN_LIVE_CONFIRMED: ${KRAKEN_LIVE_CONFIRMED:-NO}
     volumes:
-      - ./data:/app/data
-      - ./docs:/app/docs
+      - kraken_state:/app/data
+      - kraken_dashboard:/app/docs
+
+volumes:
+  kraken_state:
+  kraken_dashboard:
