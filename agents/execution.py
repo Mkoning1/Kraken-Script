@@ -213,6 +213,17 @@ class LiveExecutionAgent:
             if o.get("status") == "closed" or (o.get("remaining") == 0 and o.get("filled")):
                 break
             time.sleep(1.5)
+        # Do not treat a still-open market order as complete: it may fill later
+        # and leave additional exposure without an exchange-side protective stop.
+        terminal = {"closed", "canceled", "expired", "rejected"}
+        if o.get("status") not in terminal:
+            try:
+                self.ex.cancel_order(order_id, market)
+            except Exception:
+                pass  # order may have filled just before cancellation
+            o = self.ex.fetch_order(order_id, market)
+            if o.get("status") not in terminal:
+                raise RuntimeError(f"order {order_id} has unresolved status {o.get('status')!r}")
         filled = float(o.get("filled") or 0)
         avg = float(o.get("average") or o.get("price") or 0)
         cost = float(o.get("cost") or filled * avg)
@@ -322,10 +333,18 @@ class LiveExecutionAgent:
         try:
             filled, avg, cost, fee_eur, fee_base, _ = self._wait_fill(o["id"], market)
         except Exception as e:
-            # De order is wel geplaatst: positie nooit kwijtraken, schatten en volgende runs controleren
-            self.errors.append(f"{market}: aankoop geplaatst maar bevestiging ophalen mislukt ({e}); bedragen geschat")
-            filled, avg = amount, price * (1 + self.slip)
-            cost, fee_eur, fee_base = filled * avg, filled * avg * self.fee, 0.0
+            # An estimated fill can hide an open order or double the next purchase.
+            # Record the order ID for manual/exchange reconciliation, and hard-block
+            # all further purchases; never fabricate a confirmed filled position.
+            book["unresolved_order"] = {"id": o.get("id"), "market": market, "side": "buy", "ts": self.now}
+            book["trading_blocked_reason"] = f"Onbekende uitvoerstatus aankoop {market}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(
+                f"KRITIEK {market}: buy-order {o.get('id')} geplaatst, uitvoerstatus onbekend ({e}). "
+                "NIEUWE LIVE AANKOPEN GEBLOKKEERD; handmatige Kraken-reconciliatie vereist."
+            )
+            return {"ok": False, "text": "Aankoopstatus onbekend; alle nieuwe live aankopen geblokkeerd"}
         if filled <= 0:
             return {"ok": False, "text": "Order niet (of niet op tijd) uitgevoerd door Kraken"}
         net_qty = filled - fee_base
@@ -371,10 +390,27 @@ class LiveExecutionAgent:
         try:
             filled, avg, cost, fee_eur, fee_base, _ = self._wait_fill(o["id"], market)
         except Exception as e:
-            self.errors.append(f"{market}: verkoop geplaatst maar bevestiging ophalen mislukt ({e}); bedragen geschat")
-            filled, avg = amount, price * (1 - self.slip)
-            cost, fee_eur, fee_base = filled * avg, filled * avg * self.fee, 0.0
+            book["unresolved_order"] = {"id": o.get("id"), "market": market, "side": "sell", "ts": self.now}
+            book["trading_blocked_reason"] = f"Onbekende uitvoerstatus verkoop {market}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(
+                f"KRITIEK {market}: verkooporder {o.get('id')} status onbekend ({e}); "
+                "nooit een geschatte verkoop boeken. Handmatige Kraken-reconciliatie vereist."
+            )
+            raise RuntimeError("Verkoopstatus onbekend, handelen gepauzeerd") from e
         self._bal = None
+        if filled < pos["qty"] * 0.995:
+            book["unresolved_order"] = {"id": o.get("id"), "market": market, "side": "sell",
+                                         "ts": self.now, "filled": filled, "expected": pos["qty"]}
+            book["trading_blocked_reason"] = f"Gedeeltelijke verkoop {market}"
+            if book.get("risk_status"):
+                book["risk_status"]["trading_enabled"] = False
+            self.errors.append(
+                f"KRITIEK {market}: verkoop slechts {filled:g}/{pos['qty']:g} gevuld. "
+                "Verkoop NIET als volledig geboekt; direct handmatig Kraken controleren."
+            )
+            raise RuntimeError("Gedeeltelijke verkoop; handmatige reconciliatie vereist")
         fee = fee_eur + fee_base * avg
         return record_exit(book, pos, avg, cost - fee, fee, ts, reason, learner, self.cooldown_sec)
 
