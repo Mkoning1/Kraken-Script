@@ -1,0 +1,50 @@
+name: Koopmansstad Browser QA
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/index.html"
+      - "docs/town.css"
+      - "docs/town.mjs"
+      - "docs/town-world.mjs"
+      - "docs/data.json"
+      - "tests/test_town.mjs"
+      - ".github/workflows/town-ci.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Parse frontend JavaScript modules
+        run: |
+          node --check docs/town.mjs
+          node --check docs/town-world.mjs
+          node --check tests/test_town.mjs
+      - name: Install Playwright Chromium for a real browser test
+        run: |
+          npm install --no-save playwright
+          npx playwright install chromium --with-deps
+      - name: Start static dashboard and test desktop/mobile
+        shell: bash
+        run: |
+          python3 -m http.server 8765 --directory docs > /tmp/town-http.log 2>&1 &
+          sleep 2
+          node tests/test_town.mjs
+      - name: Upload browser screenshots for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: koopmansstad-screenshots
+          path: /tmp/koopmansstad-*.png
+          if-no-files-found: warn
+          retention-days: 7
