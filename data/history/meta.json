@@ -250,5 +250,17 @@
  "S": {
   "exchange": "kucoin",
   "symbol": "S/USDT"
+ },
+ "BAT": {
+  "exchange": "kucoin",
+  "symbol": "BAT/USDT"
+ },
+ "XMR": {
+  "exchange": "kucoin",
+  "symbol": "XMR/USDT"
+ },
+ "CRV": {
+  "exchange": "kucoin",
+  "symbol": "CRV/USDT"
  }
 }
