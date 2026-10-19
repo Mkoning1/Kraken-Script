@@ -1,0 +1,18 @@
+{
+ "BTC": {
+  "exchange": "kucoin",
+  "symbol": "BTC/USDT"
+ },
+ "ETH": {
+  "exchange": "kucoin",
+  "symbol": "ETH/USDT"
+ },
+ "SOL": {
+  "exchange": "kucoin",
+  "symbol": "SOL/USDT"
+ },
+ "XRP": {
+  "exchange": "kucoin",
+  "symbol": "XRP/USDT"
+ }
+}
