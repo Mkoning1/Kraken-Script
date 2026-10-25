@@ -262,5 +262,9 @@
  "CRV": {
   "exchange": "kucoin",
   "symbol": "CRV/USDT"
+ },
+ "JUP": {
+  "exchange": "kucoin",
+  "symbol": "JUP/USDT"
  }
 }
