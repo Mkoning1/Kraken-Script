@@ -383,6 +383,26 @@
       {
         "name": "Kraken-blog",
         "url": "https://blog.kraken.com/feed"
+      },
+      {
+        "name": "BBC Wereld",
+        "url": "https://feeds.bbci.co.uk/news/world/rss.xml",
+        "world": true
+      },
+      {
+        "name": "BBC Economie",
+        "url": "https://feeds.bbci.co.uk/news/business/rss.xml",
+        "world": true
+      },
+      {
+        "name": "Al Jazeera",
+        "url": "https://www.aljazeera.com/xml/rss/all.xml",
+        "world": true
+      },
+      {
+        "name": "Federal Reserve",
+        "url": "https://www.federalreserve.gov/feeds/press_all.xml",
+        "world": true
       }
     ],
     "gdelt_queries": [

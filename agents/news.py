@@ -325,6 +325,8 @@ class NewsAgent:
                 break
             try:
                 got = self._rss(feed["url"], feed["name"])
+                for it in got:
+                    it["world"] = bool(feed.get("world"))
                 counts[feed["name"]] = len(got)
                 items += got
             except Exception as e:
@@ -385,7 +387,7 @@ class NewsAgent:
     def _analyse(self, fresh, followed, all_prices, now_ts):
         def prio(it):
             hit = any(mentions(it["title"], b) for b in followed)
-            return (not hit, bool(it.get("gdelt")), -it["ts"])
+            return (not hit, bool(it.get("gdelt") or it.get("world")), -it["ts"])
         batch = sorted(fresh, key=prio)[:int(self.cfg.get("max_headlines_per_call", 50))]
         ids = {str(i + 1): it for i, it in enumerate(batch)}
         lines = "\n".join(f"{i} | {datetime.fromtimestamp(it['ts'], timezone.utc):%d-%m %H:%M} | {it['src']} | {it['title']}"
