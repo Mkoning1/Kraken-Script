@@ -16,6 +16,7 @@ Drie taken:
 Alles wordt gemeten: de koers 24 en 72 uur na elk oordeel. Valt de AI weg (limiet, storing, geen toegang), dan werkt
 een simpele woordenlijst als veto. Deze agent mag de handel nooit laten crashen: elke fout wordt opgevangen.
 """
+import gzip
 import hashlib
 import json
 import os
@@ -100,7 +101,10 @@ class Http:
         req = urllib.request.Request(url, data=body, headers=h, method="POST" if body is not None else "GET")
         try:
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                return r.status, r.read(2_000_000).decode("utf-8", "replace"), dict(r.headers)
+                raw = r.read(2_000_000)
+                if raw[:2] == b"\x1f\x8b":
+                    raw = gzip.decompress(raw)
+                return r.status, raw.decode("utf-8", "replace"), dict(r.headers)
         except urllib.error.HTTPError as e:
             try:
                 text = e.read(20_000).decode("utf-8", "replace")
@@ -246,6 +250,7 @@ class NewsAgent:
             m.update(day=day, light=None, heavy=None, catalog=False)
             try:
                 status, text, _ = self.http.request(CATALOG_URL, headers=self._headers(), timeout=8)
+                m["catalog_status"] = status
                 if status == 200:
                     tiers = {x.get("id"): (x.get("rate_limit_tier") or "") for x in json.loads(text) if x.get("id")}
                     for kind, tier in (("light", "low"), ("heavy", "high")):
@@ -287,6 +292,9 @@ class NewsAgent:
                 except Exception as e:
                     usage["failed"] = usage.get("failed", 0) + 1
                     self._error(f"AI-antwoord ({model})", e)
+                    h = {k.lower(): v for k, v in (headers or {}).items()}
+                    self.s["debug_ai"] = {"ts": now_ts, "model": model, "len": len(text or ""), "begin": (text or "")[:400],
+                                          "type": h.get("content-type"), "encoding": h.get("content-encoding")}
                     return None
             if status == 429:
                 retry = _clamp((headers or {}).get("Retry-After") or (headers or {}).get("retry-after"), 60, 86400, 3600)
