@@ -187,6 +187,9 @@ class NewsAgent:
         return out[:30]
 
     def _gdelt(self, query, timespan="1h", maxrecords=15):
+        # GDELT knijpt gedeelde cloud-adressen (zoals GitHub) af: na een 429 een half uur met rust laten.
+        if (self.s.get("gdelt_pause_until") or 0) > self.clock():
+            raise RuntimeError("pauze na limiet")
         wait = 5.5 - (self.clock() - self._last_gdelt)
         if wait > 0:
             if wait > self._left() - 10:
@@ -196,7 +199,12 @@ class NewsAgent:
         url = GDELT_URL + "?" + urllib.parse.urlencode({
             "query": query, "mode": "artlist", "format": "json", "maxrecords": maxrecords,
             "timespan": timespan, "sort": "datedesc"})
-        text = self._get(url, timeout=12)
+        status, text, _ = self.http.request(url, timeout=min(12, max(2, self._left())))
+        if status == 429:
+            self.s["gdelt_pause_until"] = int(self.clock()) + 1800
+            raise RuntimeError("HTTP 429, pauze 30 min")
+        if status != 200:
+            raise RuntimeError(f"HTTP {status}")
         if not text.strip().startswith("{"):
             raise RuntimeError(text.strip()[:80] or "leeg antwoord")
         out = []
@@ -322,7 +330,13 @@ class NewsAgent:
             except Exception as e:
                 counts[feed["name"]] = 0
                 self._error(feed["name"], e)
-        for q in self.cfg.get("gdelt_queries", []):
+        queries = self.cfg.get("gdelt_queries", [])
+        # Eén GDELT-vraag per kwartier, om de beurt (crypto, economie, geopolitiek): blijft onder hun limiet.
+        if queries:
+            i = int(self.s.get("gdelt_i", 0))
+            self.s["gdelt_i"] = i + 1
+            queries = [queries[i % len(queries)]]
+        for q in queries:
             if self._left() < 30:
                 break
             try:
