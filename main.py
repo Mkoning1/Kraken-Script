@@ -10,9 +10,12 @@
   8. Risico-agent       keurt goed of af en bepaalt de inzet
   9. Uitvoer-agents     kopen: echt geld via Kraken, schaduwgeld op papier
  10. Monitor-agent      verslag, logboek en dashboard
+Daarnaast leest de Nieuws-agent elk kwartier het nieuws (gratis bronnen, gratis AI via GitHub Models): veto bij hard
+slecht nieuws, nieuwe kansen naar de scanner en een gemeten tweede mening bij elke koopkans.
 """
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime
@@ -25,6 +28,7 @@ from agents.fmt import eur, px
 from agents.indicators import correlation, h4_series, snapshot, snapshot_4h, trend_snapshot
 from agents.learning import LearningAgent
 from agents.monitor import MonitorAgent, book_equity, book_exposure
+from agents.news import NewsAgent
 from agents.risk import RiskAgent
 from agents.storage import save_json
 from agents.strategies import MarketRegimeAgent, build_agents
@@ -143,6 +147,61 @@ def persist(state):
     save_json(STATE_PATH, state)
 
 
+def flow_factor(equity_before, flow):
+    """Schaalfactor voor de hoogste stand bij een storting of opname: het dalingspercentage blijft gelijk."""
+    if equity_before <= 0:
+        return 1.0
+    return max(0.0, (equity_before + flow) / equity_before)
+
+
+def _parse_eur(text):
+    m = re.search(r"€\s*([\d.]+,\d{2})", text or "")
+    return float(m.group(1).replace(".", "").replace(",", ".")) if m else None
+
+
+def repair_withdrawal_halt(state, now_ts, ev, limit):
+    """Eenmalig: een noodstop die alleen door een opname kwam (oude rekenfout) opheffen.
+
+    Rekent de echte daling uit met tijdgewogen rendement: elke storting of opname wordt uit de vermogenslijn gehaald.
+    Blijft de echte daling onder de grens, dan gaat de noodstop eraf en telt hij niet mee in de noodstop-historie."""
+    fixes = state.setdefault("fixes", {})
+    if fixes.get("withdrawal_halt_v1"):
+        return
+    fixes["withdrawal_halt_v1"] = now_ts
+    live = (state.get("books") or {}).get("live")
+    if not live or not live.get("halted") or "hoogste stand" not in (live.get("halt_reason") or ""):
+        return
+    flows = []
+    for e in state.get("events", []):
+        r = e.get("reason") or ""
+        if e.get("book") == "live" and e.get("type") == "note" and "herkend op Kraken" in r:
+            amount = _parse_eur(r)
+            if amount:
+                flows.append((e["ts"], amount if r.startswith("Storting") else -amount))
+    hist = live.get("equity_history") or []
+    if not flows or len(hist) < 2:
+        return
+    index, peak = 1.0, 1.0
+    for a, b in zip(hist, hist[1:]):
+        flow = sum(f for t, f in flows if a["ts"] < t <= b["ts"])
+        if a["equity"] > 0:
+            index *= (b["equity"] - flow) / a["equity"]
+        peak = max(peak, index)
+    real_dd = (1 - index / peak) * 100 if peak else 0.0
+    if real_dd >= limit:
+        return
+    halted_at = max((t for t in live.get("halt_history", []) if any(abs(t - ft) < 7200 for ft, _ in flows)), default=None)
+    if halted_at is None:
+        return
+    live["halt_history"] = [t for t in live.get("halt_history", []) if t != halted_at]
+    live["halted"], live["halt_reason"], live["halt_until"] = False, None, None
+    equity = hist[-1]["equity"]
+    live["peak_equity"] = equity / (1 - real_dd / 100) if real_dd < 100 else equity
+    pct = f"{real_dd:.1f}".replace(".", ",")
+    ev(type="note", book="live", reason=f"Noodstop opgeheven: die kwam door je opname, niet door verlies. "
+                                        f"Echte daling vanaf de top: {pct}% (grens {limit}%).")
+
+
 def make_exchange(cfg):
     import ccxt
     key, secret = os.environ.get("KRAKEN_API_KEY", ""), os.environ.get("KRAKEN_API_SECRET", "")
@@ -154,7 +213,7 @@ def make_exchange(cfg):
     return ccxt.kraken(opts)
 
 
-def run(now_ts=None, exchange=None):
+def run(now_ts=None, exchange=None, news=None):
     now_ts = now_ts or int(time.time())
     cfg = load_config()
     profile = cfg["profiles"][cfg["profile"]]
@@ -175,6 +234,19 @@ def run(now_ts=None, exchange=None):
         live["cash"] += extra
         live["starting_capital"] += extra
         ev(type="note", book="live", reason=f"Budget verhoogd met {eur(extra)}")
+
+    repair_withdrawal_halt(state, now_ts, ev, profile["max_drawdown_pct"])
+
+    # Nieuws-agent alleen in echte runs (de veiligheidstest geeft een nagebootste Kraken mee en een eigen nep-agent).
+    ncfg = cfg.get("news") or {}
+    if callable(news):  # testen geven een fabriek mee die de agent aan deze state koppelt
+        news = news(state, cfg)
+    elif news is None and exchange is None and ncfg.get("enabled"):
+        try:
+            news = NewsAgent(state, ncfg, cfg["universe"]["exclude_bases"])
+        except Exception as e:
+            print("  Nieuws-agent kon niet starten:", e)
+            news = None
 
     if live and not live.get("initialized"):
         try:
@@ -254,6 +326,24 @@ def run(now_ts=None, exchange=None):
     else:
         markets = list(dict.fromkeys(list(state.get("active_markets", proposed_markets)) + list(held)))
     discovery_markets = set(state.get("discovery_markets", []))
+
+    # Nieuws-agent: meten, elk kwartier nieuws beoordelen, en kansen uit het nieuws de scanner in laten gaan.
+    # Nieuwskansen volgen de scannerregel (nu: alleen schaduw). Een fout hier stopt de handel nooit.
+    if news:
+        try:
+            all_trades = [t for b in state["books"].values() if b for t in b["trades"]]
+            news.evaluate(now_ts, data.all_prices, all_trades)
+            news.refresh(now_ts, data.all_prices, sorted({m.split("/")[0] for m in markets}))
+            for m in news.picks(now_ts):
+                if m in data.all_prices and m not in markets:
+                    markets.append(m)
+                    discovery_markets.add(m)
+            for m, v in news.held_alerts(held, now_ts):
+                ev(type="note", market=m, reason=f"Nieuws-agent: hard nieuws over een munt die we hebben ({v['reason']}). "
+                                                 "De stop-loss op Kraken blijft de bescherming; verkopen op nieuws wordt eerst gemeten.")
+        except Exception as e:
+            print("  Nieuws-agent fout:", e)
+            news.s["last_error"] = f"ronde: {e}"
 
     prices = {m: data.all_prices[m] for m in markets if m in data.all_prices}
     c15, c1, c4, h4list, h4 = {}, {}, {}, {}, {}
@@ -386,11 +476,14 @@ def run(now_ts=None, exchange=None):
             free = float(live_exec.balance(refresh=True)["free"].get("EUR", 0) or 0)
             diff = free - live["cash"]
             if abs(diff) > 0.5:
+                # Hoogste stand en dagstart meeschalen, zodat een opname nooit als verlies telt
+                # (een opname van EUR 38 van EUR 40 is geen daling van 95%).
+                factor = flow_factor(book_equity(live, prices), diff)
                 live["starting_capital"] += diff
-                live["peak_equity"] += diff
+                live["peak_equity"] *= factor
                 live["budget"] += diff
                 if live["day"].get("start_equity") is not None:
-                    live["day"]["start_equity"] += diff
+                    live["day"]["start_equity"] *= factor
                 ev(type="note", book="live", reason=f"{'Storting' if diff > 0 else 'Opname'} van {eur(abs(diff))} herkend op Kraken; telt niet als winst of verlies")
             live["cash"] = free
         except Exception as e:
@@ -566,6 +659,13 @@ def run(now_ts=None, exchange=None):
         if m in book["positions"]:
             evaluations[m]["notes"].append(f"{d['reason']}: overgeslagen, deze run al gekocht door een andere desk")
             continue
+        veto = news.veto_for(m, now_ts) if news else None
+        if veto:
+            evaluations[m]["notes"].append(f"Nieuws-agent: niet kopen ({veto['reason']})")
+            ev(type="blocked", book=bname, market=m, price=signal_price,
+               reason=f"{d['reason']}. Tegengehouden door de nieuws-agent: {veto['reason']}")
+            news.track("veto_blok", m, signal_price, now_ts, d["agent"])
+            continue
 
         price = signal_price
         stop, hard, extra = plan_stops(d["signal"], price, ctx, cfg["exits"], cfg["agents"].get(d["agent"], {}))
@@ -605,6 +705,18 @@ def run(now_ts=None, exchange=None):
             if not why.startswith(("Maximum van", "Te weinig ruimte")):
                 ev(type="blocked", book=bname, market=m, price=price, reason=f"{d['reason']}. Tegengehouden: {why}")
             continue
+        check = None
+        if news:
+            try:
+                check = news.research_check(m, d, ctx, price, now_ts)
+            except Exception as e:
+                print("  Koopcheck mislukt:", e)
+            if check:
+                evaluations[m]["notes"].append(f"Koopcheck nieuws-agent: {check['oordeel']} ({check['reden']})")
+                if check["oordeel"] == "tegenhouden" and news.check_is_live():
+                    ev(type="blocked", book=bname, market=m, price=price,
+                       reason=f"{d['reason']}. Tegengehouden door de koopcheck: {check['reden']}")
+                    continue
         try:
             res = execs[bname].buy(
                 book, m, d["agent"], d["signal"], qty, price, stop, hard, extra, risk_eur,
@@ -617,6 +729,10 @@ def run(now_ts=None, exchange=None):
             if bname == "live":
                 persist(state)
         evaluations[m]["notes"].append(f"Uitvoer-agent ({where}, {tf_minutes}m): {res['text']}")
+        if res.get("ok") and check and m in book["positions"]:
+            book["positions"][m]["news_check"] = check
+            if bname == "live":
+                persist(state)
         if res.get("ok"):
             ev(type="entry", book=bname, market=m, price=book["positions"][m]["entry_price"], agent=labels[d["agent"]],
                reason=f"{d['reason']}. {d['calc']}. {why} {res['text']}", ts=last_ts + tf_minutes * 60)
@@ -633,6 +749,11 @@ def run(now_ts=None, exchange=None):
     state["last_run"] = {"ts": now_ts, "ok": not errors, "regime": regime_info,
                          "prices": {m: prices[m] for m in prices if any(b and m in b["positions"] for b in state["books"].values()) or m == cfg["benchmark_market"]}}
     state["narrative"] = MonitorAgent.narrative(state, cfg, regime_info, len(markets), events, bool(h4), errors, validate)
+    if news:
+        try:
+            state["narrative"][1:1] = news.narrative(now_ts)
+        except Exception as e:
+            print("  Nieuwsverslag mislukt:", e)
     if scan_report.get("enabled"):
         active_discovery = sorted(discovery_markets)
         state["narrative"].insert(
@@ -693,9 +814,15 @@ def run(now_ts=None, exchange=None):
         "swing_ran": bool(new_hour),
         "trend_ran": bool(h4),
     }
+    news_view = None
+    if news:
+        try:
+            news_view = news.dashboard(now_ts)
+        except Exception as e:
+            print("  Nieuwsdashboard mislukt:", e)
     monitor.save(state, cfg, profile, prices, learner.summary(strategies),
                  {"markets": markets, "spark": state.get("spark", {}), "scanner": scan_report,
-                  "cadence": desk_status})
+                  "cadence": desk_status, "news": news_view})
 
     for line in state["narrative"]:
         print(line)

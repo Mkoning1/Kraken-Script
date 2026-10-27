@@ -16,6 +16,7 @@ Dashboard: de GitHub Pages-site van deze repository (Handelsvloer en Details).
 | Uitbraak-agent | Koopt uitbraken boven het hoogste punt van de laatste 24 uur met extra volume. |
 | Momentum-agent | Koopt een versnelling (MACD kruist omhoog met volume) op uurcandles. |
 | Squeeze-agent | Koopt de uitbraak na een zeer rustige periode op uurcandles. |
+| Nieuws-agent | Leest elk kwartier het nieuws (GDELT, cryptonieuwssites, Kraken-blog, nieuwe Kraken-noteringen, Fear & Greed) en laat een gratis AI-model (GitHub Models) beoordelen wat het betekent. Hard slecht nieuws (hack, delisting, rechtszaak): 48 uur niet kopen. Munten met een nieuwe aanleiding gaan de scanner in. Zie *Nieuws-agent* hieronder. |
 | Prestatie-agent | Meet elke agent in R en bepaalt zijn invloed en of hij echt geld krijgt (zie promotie). |
 | Beslis-agent | Rangschikt alle kansen: sterkte x invloed, bonus als agents het eens zijn, x marktfase. |
 | Risico-agent | Inzet en limieten: daglimiet, noodstop, max posities, en halve inzet als een munt sterk meebeweegt met een munt waar je al in zit. |
@@ -140,3 +141,25 @@ live-strategie daadwerkelijk een koopsignaal geeft en alle ingestelde
 risico-, positie- en Kraken-stopcontroles dit toestaan. Er is **geen**
 garantie op winst: de strategieresultaten zijn nog niet robuust positief
 gevalideerd. De snelle, slecht presterende strategieën blijven in schaduw.
+
+
+## Nieuws-agent (gratis)
+
+Kosten: niets. De bronnen zijn openbaar en de AI draait via GitHub Models met de token die elke workflow-run al heeft
+(`permissions: models: read` in `trading-bot.yml`). Er is geen API-sleutel nodig.
+
+| Taak | Werking | Status |
+|---|---|---|
+| Veto | Meldt het nieuws een hack, exploit, delisting, rechtszaak, depeg of insolventie van een munt, dan koopt de bot die munt 48 uur niet. | Direct actief |
+| Research | Munten met een concrete nieuwe aanleiding (en nieuwe noteringen op Kraken) gaan de scanner in. Ze volgen de scannerregel (`scanner.shadow_only`). | Actief |
+| Koopcheck | Bij een koopkans geeft het zware model een tweede mening: echte aanleiding of loze pomp? | Meet eerst in de schaduw |
+
+De koopcheck gaat vanzelf live (`news.research_check_live: "auto"`) zodra hij over minstens 50 gecheckte trades
+1 op de 5 verliezers had tegengehouden en hooguit 1 op de 10 winnaars. Valt hij daarna onder die lat, dan gaat hij
+vanzelf terug naar meten. Zet de waarde op `true` of `false` om dat zelf te bepalen.
+
+Limieten: het gratis GitHub Models-tegoed is 150 lichte en 50 zware aanvragen per dag. De bot gebruikt er hoogstens
+110 en 40 (`daily_cap_light`, `daily_cap_heavy`). Is de limiet bereikt of de AI onbereikbaar, dan houdt een
+woordenlijst hard slecht nieuws tegen. De handel stopt nooit door de nieuws-agent.
+
+Alles wordt gemeten: de koers 24 en 72 uur na elk oordeel staat in de Wachttoren op het dashboard.

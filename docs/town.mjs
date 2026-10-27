@@ -104,6 +104,37 @@ function viewMarket(d){
  html+='<div class="empty">Deze publieke dashboardfeed bevat geen volledig overzicht van open Kraken-orders. Voor daadwerkelijke orderstatus is Kraken zelf leidend.</div>';
  return html;
 }
+const DIRECTION={'-2':'Sterk negatief','-1':'Negatief','0':'Neutraal','1':'Positief','2':'Sterk positief'};
+function direction(v){return DIRECTION[String(Math.max(-2,Math.min(2,Math.round(Number(v)||0))))]}
+function newsBlock(d){
+ const n=d.news;
+ if(!n)return section('Nieuwsbode')+'<div class="empty">De nieuws-agent heeft nog niet gedraaid.</div>';
+ const ai=n.ai||{},u=ai.used_today||{},caps=ai.caps||{},now=Number(d.generated_ts||0);
+ const aiOn=Boolean(ai.token&&!ai.paused_until&&Number(ai.last_ok||0)>now-3*3600);
+ let html=section('Nieuwsbode')+
+ '<div class="healthline"><span class="dot '+(aiOn?'':'warn')+'"></span><b>'+(aiOn?'AI leest het nieuws mee':'Woordenlijst bewaakt het nieuws')+'</b></div>'+
+ note(aiOn?'Elk kwartier beoordeelt een gratis AI-model de nieuwe koppen. Meldt het nieuws een hack, delisting of rechtszaak, dan koopt de bot die munt 48 uur niet.'
+  :(ai.paused_until?'De gratis AI is tot '+time(ai.paused_until)+' niet beschikbaar. ':'De AI heeft nog geen beoordeling gegeven. ')+'Tot dan houdt een woordenlijst hard slecht nieuws tegen.')+
+ '<div class="tile-grid">'+tile('Beoordelingen vandaag',num(u.light||0)+' van '+num(caps.light||0))+tile('Koopchecks vandaag',num(u.heavy||0)+' van '+num(caps.heavy||0))+
+ tile('Fear & Greed',n.fng?num(n.fng.value)+' '+(n.fng.label||''):'—')+tile('Nieuws over de markt',n.market?direction(n.market.richting):'—')+'</div>';
+ if(n.market&&n.market.reden)html+=note(n.market.reden);
+ const vetoes=n.vetoes||[];
+ html+=section('Niet kopen door nieuws');
+ html+=vetoes.length?vetoes.map(v=>item(v.market,(v.reason||'')+' (tot '+time(v.until)+')','VETO','bad')).join('')
+  :'<div class="empty">Geen hard slecht nieuws over de munten die we volgen.</div>';
+ const sc=n.scorecard||{},t=sc.trades||{};
+ html+=section('Koopcheck')+note(n.koopcheck_live?'De koopcheck heeft zijn doel gehaald en houdt nu aankopen tegen.'
+  :'De koopcheck geeft bij elke koopkans een tweede mening, maar telt pas mee als hij bewezen verliezers eruit haalt: minstens 1 op de 5 verliezers, en hooguit 1 op de 10 winnaars.')+
+ item('Gecheckte trades','Afgesloten trades met een tweede mening',num(t.gecheckt||0)+' van '+num(t.nodig||50))+
+ item('Verliezers tegengehouden','Had de check deze verliezers tegengehouden?',num(t.verliezers_tegengehouden||0)+' van '+num(t.verliezers||0),t.verliezers?'good':'')+
+ item('Winnaars tegengehouden','Had de check deze winnaars ten onrechte tegengehouden?',num(t.winnaars_tegengehouden||0)+' van '+num(t.winnaars||0),t.winnaars_tegengehouden?'bad':'');
+ const pass=sc.koopcheck_doorlaten||{},stop=sc.koopcheck_tegenhouden||{};
+ if((pass.gemeten||0)+(stop.gemeten||0)>0)html+=item('Koers 24 uur later','Doorgelaten tegen tegengehouden',percent(pass.r24)+' / '+percent(stop.r24));
+ const coins=(n.coins||[]).filter(c=>Number(c.richting)!==0).slice(0,6);
+ if(coins.length){html+=section('Laatste oordelen');for(const c of coins)html+=item(c.base,c.reden||c.title||'',direction(c.richting),cls(c.richting))}
+ if(n.last_error&&Number(n.last_error_ts||0)>now-3600)html+='<div class="copy-note">Laatste storing: '+esc(n.last_error)+'. De bot handelt gewoon door.</div>';
+ return html;
+}
 function viewTower(d){
  const l=d.books?.live||{},r=l.risk||{},p=d.risk_limits||{};
  const [label,code,message]=riskStatus(d);
@@ -122,6 +153,7 @@ function viewTower(d){
  html+=item(x.market,missing?'Exchange-stop onbevestigd':'Stop-order geregistreerd',
  missing?'CONTROLE':'BEWAAKT',missing?'bad':'good');
  }
+ html+=newsBlock(d);
  if((d.errors||[]).length)html+=section('Gemelde fouten')+(d.errors||[]).slice(0,4).map(x=>item(time(x.ts),x.message,'!','bad')).join('');
  return html;
 }
@@ -171,6 +203,11 @@ function viewGate(d){
  for(const c of candidates.slice(0,9))
  html+=item(c.market||'Markt', 'Verandering 24u: '+percent(c.change_pct)+' · volume '+eur(c.quote_volume),
  c.score!=null?num(Number(c.score)*100,1)+'/100':'—',c.selected?'good':'');
+ const picks=d.news?.picks||[];
+ html+=section('Kansen uit het nieuws');
+ html+=picks.length?note('Munten met een concrete nieuwe aanleiding. Ze volgen de regel van de verkenners'+(s.shadow_only?': eerst alleen op papier.':'.'))+
+  picks.map(p=>item(p.market,p.reason||'Nieuwe aanleiding','tot '+time(p.until),'good')).join('')
+  :'<div class="empty">Het nieuws bracht nu geen nieuwe kansen.</div>';
  html+=section('Nu in de stad')+'<div class="copy-note">'+esc(active.slice(0,15).join(' · ')||'Nog geen markten')+'</div>';
  return html;
 }

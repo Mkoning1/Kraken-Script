@@ -221,11 +221,211 @@ def unit_checks():
     return True
 
 
+
+class FakeHttp:
+    """Nagebootst internet voor de nieuws-agent: geen echte verzoeken in de veiligheidstest."""
+
+    def __init__(self, light=None, heavy=None, feeds_ok=True, models_status=200):
+        self.light, self.heavy, self.feeds_ok, self.models_status = light, heavy, feeds_ok, models_status
+        self.calls = []
+
+    def request(self, url, data=None, headers=None, timeout=10):
+        import json as _j
+        self.calls.append(url)
+        if "catalog" in url:
+            return 200, _j.dumps([{"id": "openai/gpt-4.1-mini", "rate_limit_tier": "low"},
+                                  {"id": "openai/gpt-4.1", "rate_limit_tier": "high"}]), {}
+        if "models.github.ai/inference" in url:
+            if self.models_status != 200:
+                return self.models_status, "rate limited", {"Retry-After": "120"}
+            heavy = data["model"] == "openai/gpt-4.1"
+            body = self.heavy if heavy else self.light
+            if body is None:
+                return 500, "kapot", {}
+            return 200, _j.dumps({"choices": [{"message": {"content": "```json\n" + _j.dumps(body) + "\n```"}}]}), {}
+        if not self.feeds_ok:
+            return 503, "", {}
+        if "alternative.me" in url:
+            return 200, _j.dumps({"data": [{"value": "31", "value_classification": "Fear"}]}), {}
+        if "gdeltproject" in url:
+            return 200, _j.dumps({"articles": [{"title": "Fed holds rates steady as markets wait",
+                                                "url": "https://example.org/fed", "domain": "example.org",
+                                                "seendate": "20261027T080000Z"}]}), {}
+        rss = ("<?xml version='1.0'?><rss><channel>"
+               "<item><title>Bonk treasury hacked, $40M stolen</title><link>https://example.org/bonk</link>"
+               "<pubDate>Tue, 27 Oct 2026 08:00:00 GMT</pubDate></item>"
+               "<item><title>Coinbase to list dogwifhat next week</title><link>https://example.org/wif</link>"
+               "<pubDate>Tue, 27 Oct 2026 07:30:00 GMT</pubDate></item>"
+               "</channel></rss>")
+        return 200, rss, {}
+
+
+def news_checks():
+    sys.path.insert(0, str(ROOT))
+    from agents.news import NewsAgent, mentions
+    cfg = json.loads((ROOT / "config.json").read_text())["news"]
+    now = 1_793_090_000  # 27-10-2026
+    prices = {"BTC/EUR": 70000.0, "ETH/EUR": 2300.0, "BONK/EUR": 0.00002, "WIF/EUR": 0.5, "SOL/EUR": 150.0}
+    nosleep = lambda x: None
+
+    assert mentions("Bitcoin slides below 70k", "BTC") and mentions("ETH ETF inflows jump", "ETH")
+    assert not mentions("Sui network upgrade", "SUI") and mentions("$SUI rallies", "SUI")
+    assert not mentions("Use a link to sign up", "LINK"), "gewoon Engels woord als munt herkend"
+    print("GOED  nieuws: munten herkennen in koppen")
+
+    light = {"markt": {"richting": -1, "reden": "Rente blijft hoog"},
+             "munten": [{"munt": "BONK", "richting": -2, "impact": 3, "termijn": "dagen", "zekerheid": 0.9,
+                         "gebeurtenis": "hack", "reden": "Treasury gehackt", "bronnen": [1]},
+                        {"munt": "FAKE", "richting": 2, "zekerheid": 1, "gebeurtenis": "hack", "bronnen": [2]}],
+             "kansen": [{"munt": "WIF", "aanleiding": "Notering op Coinbase", "bronnen": [2]}]}
+    st = {}
+    agent = NewsAgent(st, cfg, ["USDT"], http=FakeHttp(light=light), token="t", sleep=nosleep)
+    agent.refresh(now, prices, ["BTC", "ETH", "BONK"])
+    assert agent.veto_for("BONK/EUR", now), "AI-veto bij een hack ontbreekt"
+    assert not agent.veto_for("BTC/EUR", now), "veto op een munt zonder slecht nieuws"
+    assert "FAKE" not in st["news"]["coins"], "verzonnen munt overgenomen"
+    assert agent.picks(now) == ["WIF/EUR"], "kans uit het nieuws niet naar de scanner"
+    assert st["news"]["usage"]["light"] == 1 and st["news"]["fng"]["value"] == 31
+    assert {t["k"] for t in st["news"]["trackers"]} == {"score", "veto"}, "oordelen worden niet gemeten"
+    assert not agent.veto_for("BONK/EUR", now + 49 * 3600), "veto verloopt niet"
+    agent.refresh(now + 300, prices, ["BTC"])  # zelfde kwartier: niets opnieuw ophalen
+    assert st["news"]["usage"]["light"] == 1, "nieuws dubbel beoordeeld"
+    print("GOED  nieuws: AI-veto, kansen en meting")
+
+    st2 = {}
+    fb = NewsAgent(st2, cfg, [], http=FakeHttp(), token="", sleep=nosleep)
+    fb.refresh(now, prices, ["BTC", "BONK", "SOL"])
+    assert fb.veto_for("BONK/EUR", now) and fb.veto_for("BONK/EUR", now)["by"] == "woordenlijst"
+    assert not fb.veto_for("SOL/EUR", now)
+    st3 = {}
+    rl = NewsAgent(st3, cfg, [], http=FakeHttp(light=light, models_status=429), token="t", sleep=nosleep)
+    rl.refresh(now, prices, ["BONK"])
+    assert st3["news"]["pause_until"] == now + 120 and rl.veto_for("BONK/EUR", now), "limiet niet netjes afgehandeld"
+    broken = NewsAgent({}, cfg, [], http=FakeHttp(feeds_ok=False), token="t", sleep=nosleep)
+    broken.refresh(now, prices, ["BTC"])  # alle bronnen kapot: geen fout naar boven
+    print("GOED  nieuws: woordenlijst, limiet en storingen")
+
+    heavy = {"oordeel": "tegenhouden", "zekerheid": 0.7, "aanleiding": "geen", "reden": "Geen nieuws, lijkt een pomp"}
+    ag = NewsAgent({}, cfg, [], http=FakeHttp(light=light, heavy=heavy), token="t", sleep=nosleep)
+    v = ag.research_check("WIF/EUR", {"reason": "Uitbraak", "horizon": "trend", "score": 0.8},
+                          {"sig": {"close": 0.5, "rsi": 71}}, 0.5, now)
+    assert v["oordeel"] == "tegenhouden" and not ag.check_is_live(), "koopcheck hoort eerst in schaduw te staan"
+    ag.evaluate(now + 86400, {"WIF/EUR": 0.45}, [])
+    assert ag.s["trackers"][-1]["r24"] == -10.0, "koers na 24 uur niet gemeten"
+    trades = ([{"pnl": -1, "news_check": {"oordeel": "tegenhouden" if i < 8 else "doorlaten"}} for i in range(30)]
+              + [{"pnl": 1, "news_check": {"oordeel": "tegenhouden" if i < 1 else "doorlaten"}} for i in range(20)])
+    ag.evaluate(now + 86400, {}, trades)
+    assert ag.s["scorecard"]["trades"]["goal_met"] and ag.check_is_live(), "doel gehaald maar koopcheck niet live"
+    ag.evaluate(now + 86400, {}, trades[:40])
+    assert not ag.check_is_live(), "koopcheck live met te weinig bewijs"
+    print("GOED  nieuws: koopcheck en doel")
+
+    st4 = {}
+    ln = NewsAgent(st4, cfg, [], http=FakeHttp(feeds_ok=False), token="", sleep=nosleep)
+    ln.refresh(now, prices, [])
+    ln.refresh(now + 900, {**prices, "NEW/EUR": 1.0}, [])
+    assert "NEW/EUR" in ln.picks(now + 900), "nieuwe Kraken-notering niet opgemerkt"
+    print("GOED  nieuws: nieuwe noteringen")
+    return True
+
+
+def withdrawal_checks():
+    sys.path.insert(0, str(ROOT))
+    import main
+    f = main.flow_factor(39.72, -38.0)
+    peak = 41.04 * f
+    assert abs((1 - 1.72 / peak) * 100 - 3.2) < 0.1, "opname telt als verlies"
+    hist = [{"ts": 100, "equity": 41.04}, {"ts": 200, "equity": 39.72}, {"ts": 300, "equity": 1.72}]
+    st = {"events": [{"ts": 250, "type": "note", "book": "live", "reason": "Opname van € 38,00 herkend op Kraken; telt niet"}],
+          "books": {"live": {"halted": True, "halt_reason": "Vermogen 43.3% onder de hoogste stand", "halt_until": 999,
+                             "halt_history": [250], "peak_equity": 3.04, "equity_history": hist}}}
+    notes = []
+    main.repair_withdrawal_halt(st, 400, lambda **kw: notes.append(kw), 20)
+    live = st["books"]["live"]
+    assert not live["halted"] and live["halt_history"] == [] and notes, "valse noodstop niet opgeheven"
+    st["books"]["live"]["halted"] = True
+    main.repair_withdrawal_halt(st, 500, lambda **kw: notes.append(kw), 20)
+    assert live["halted"], "herstel hoort maar één keer te draaien"
+    real = {"events": [], "books": {"live": {"halted": True, "halt_reason": "Vermogen 25% onder de hoogste stand",
+                                             "halt_history": [250], "peak_equity": 40, "equity_history": hist}}}
+    main.repair_withdrawal_halt(real, 400, lambda **kw: None, 20)
+    assert real["books"]["live"]["halted"], "echte noodstop zonder opname mag niet worden opgeheven"
+    print("GOED  opname telt niet als verlies; valse noodstop opgeheven")
+    return True
+
+
+NEWS_CASE = r"""
+import sys, io, contextlib, json
+sys.path.insert(0, r"TESTS_DIR")
+from mockex import MockKraken
+from quick import FakeHttp
+import main
+from agents.news import NewsAgent
+cfg = json.load(open("config.json"))
+cfg["mode"] = "live"; cfg["live"]["validate_only"] = False; cfg["promotion"]["all_agents_live"] = True
+cfg["news"]["research_check_live"] = CHECK_LIVE
+json.dump(cfg, open("config.json", "w"))
+SYMS = {"BTC/EUR": 60000, "ETH/EUR": 3000, "SOL/EUR": 150, "HBAR/EUR": 0.08, "DOGE/EUR": 0.1}
+ex = MockKraken(SYMS, 3500 + 440, eur=300, seed0=5)
+light = {"markt": {"richting": 0, "reden": "rustig"}, "munten": [], "kansen": []}
+heavy = {"oordeel": "VERDICT", "zekerheid": 0.8, "aanleiding": "geen", "reden": "test"}
+def factory(state, c):
+    a = NewsAgent(state, c["news"], [], http=FakeHttp(light=light, heavy=heavy), token="t", sleep=lambda x: None)
+    if VETO_ALL:
+        for m in SYMS:
+            a.s["vetoes"][m] = {"until": 10**12, "reason": "test-veto", "by": "test", "ts": 0}
+    return a
+errs, st = [], None
+for k in range(3500, 3900, 7):
+    ex.set_k(k)
+    with contextlib.redirect_stdout(io.StringIO()):
+        st = main.run(now_ts=ex.now() + 180, exchange=ex, news=factory)
+    errs += [e["message"] for e in st["errors"] if e["ts"] == ex.now() + 180]
+assert not errs, f"fouten: {errs[:3]}"
+books = [b for b in st["books"].values() if b]
+entries = [e for e in st["events"] if e["type"] == "entry"]
+blocked = " ".join(e["reason"] for e in st["events"] if e["type"] == "blocked")
+checks = [p.get("news_check") for b in books for p in list(b["positions"].values()) + b["trades"]]
+assert st["news"].get("last_ai_ok") and st["news"]["headlines"], "nieuws-agent draaide niet mee"
+assert "news" in json.load(open("docs/data.json")), "nieuws ontbreekt op het dashboard"
+if VETO_ALL:
+    assert not entries and "nieuws-agent" in blocked, "veto hield aankopen niet tegen"
+    print(f"OK: veto blokkeerde alles ({blocked.count('nieuws-agent')} keer)")
+elif CHECK_LIVE:
+    # Zonder koopcheck (limiet per ronde, AI weg) handelt de bot gewoon door; met een 'tegenhouden' nooit.
+    assert "koopcheck" in blocked and not any(checks), "koopcheck hield aankopen niet tegen"
+    print(f"OK: koopcheck blokkeerde {blocked.count('koopcheck')} aankopen, {len(entries)} zonder check doorgegaan")
+else:
+    assert entries, "geen aankopen in schaduwmodus"
+    assert any(checks), "koopcheck niet bij de positie bewaard"
+    print(f"OK: {len(entries)} aankopen, {sum(1 for c in checks if c)} met koopcheck")
+"""
+
+
+def news_case(name, veto_all, check_live, verdict):
+    with tempfile.TemporaryDirectory() as tmp:
+        for item in ("main.py", "config.json"):
+            shutil.copy(ROOT / item, tmp)
+        shutil.copytree(ROOT / "agents", Path(tmp) / "agents")
+        code = (NEWS_CASE.replace("TESTS_DIR", str(TESTS)).replace("VETO_ALL", str(veto_all))
+                .replace("CHECK_LIVE", str(check_live)).replace("VERDICT", verdict))
+        res = subprocess.run([sys.executable, "-c", code], cwd=tmp, capture_output=True, text=True, timeout=600)
+        ok = res.returncode == 0
+        print(f"{'GOED' if ok else 'FOUT'}  {name}: {(res.stdout.strip().splitlines() or [''])[-1]}")
+        if not ok:
+            print(res.stderr[-1500:])
+        return ok
+
 if __name__ == "__main__":
     results = [
         unit_checks(),
         run_case("normale werking", 200, 1, 3, False),
         run_case("gemiste runs", 400, 7, 5, False),
         run_case("stop op Kraken en noodstop", 300, 1, 1, True),
+        news_checks(),
+        withdrawal_checks(),
+        news_case("nieuws-veto in de handelsronde", True, False, "doorlaten"),
+        news_case("koopcheck live houdt tegen", False, True, "tegenhouden"),
+        news_case("koopcheck in schaduw meet alleen", False, False, "tegenhouden"),
     ]
     sys.exit(0 if all(results) else 1)

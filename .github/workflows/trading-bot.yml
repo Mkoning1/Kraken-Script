@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write   # resultaten opslaan
   actions: write    # de volgende run starten
+  models: read      # gratis AI (GitHub Models) voor de nieuws-agent
 
 concurrency:
   group: trader     # nooit twee runs tegelijk: voorkomt dubbele orders
@@ -32,6 +33,7 @@ jobs:
         env:
           KRAKEN_API_KEY: ${{ secrets.KRAKEN_API_KEY }}
           KRAKEN_API_SECRET: ${{ secrets.KRAKEN_API_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # alleen voor GitHub Models (nieuws-agent)
           LOOP_MINUTES: "340"
         run: python loop.py
 

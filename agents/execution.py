@@ -124,6 +124,8 @@ def record_exit(book, pos, fill, proceeds_net, fee, ts, reason, learner, cooldow
         "was_runner": pos.get("is_runner", False),
         "entry_reason": pos["entry_reason"], "exit_reason": reason,
     }
+    if pos.get("news_check"):
+        trade["news_check"] = pos["news_check"]
     book["trades"].append(trade)
     learner.record(trade)
     if pnl < 0:

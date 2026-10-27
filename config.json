@@ -332,5 +332,72 @@
     "fast_minutes": 15,
     "swing_minutes": 60,
     "trend_minutes": 240
+  },
+  "news": {
+    "enabled": true,
+    "every_minutes": 15,
+    "time_budget_sec": 75,
+    "ai": true,
+    "light_models": [
+      "openai/gpt-4.1-mini",
+      "openai/gpt-4o-mini",
+      "meta/Llama-3.3-70B-Instruct"
+    ],
+    "heavy_models": [
+      "openai/gpt-4.1",
+      "openai/gpt-4o"
+    ],
+    "daily_cap_light": 110,
+    "daily_cap_heavy": 40,
+    "max_headlines_per_call": 50,
+    "checks_per_run": 2,
+    "checks_per_run_live": 4,
+    "veto_hours": 48,
+    "veto_min_confidence": 0.6,
+    "research_check_live": "auto",
+    "check_goal_trades": 50,
+    "check_goal_losers": 0.2,
+    "check_goal_winners": 0.1,
+    "discovery": {
+      "enabled": true,
+      "max": 3,
+      "days": 3
+    },
+    "rss": [
+      {
+        "name": "CoinDesk",
+        "url": "https://www.coindesk.com/arc/outboundfeeds/rss/"
+      },
+      {
+        "name": "Cointelegraph",
+        "url": "https://cointelegraph.com/rss"
+      },
+      {
+        "name": "Decrypt",
+        "url": "https://decrypt.co/feed"
+      },
+      {
+        "name": "The Block",
+        "url": "https://www.theblock.co/rss.xml"
+      },
+      {
+        "name": "Kraken-blog",
+        "url": "https://blog.kraken.com/feed"
+      }
+    ],
+    "gdelt_queries": [
+      {
+        "name": "crypto",
+        "query": "(bitcoin OR ethereum OR crypto OR cryptocurrency OR stablecoin OR memecoin) sourcelang:english"
+      },
+      {
+        "name": "economie",
+        "query": "(\"federal reserve\" OR \"interest rates\" OR inflation OR tariffs OR recession) sourcelang:english"
+      },
+      {
+        "name": "geopolitiek",
+        "query": "(war OR ceasefire OR sanctions OR missile OR invasion) sourcelang:english"
+      }
+    ]
   }
 }
