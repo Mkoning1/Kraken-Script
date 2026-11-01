@@ -266,5 +266,21 @@
  "JUP": {
   "exchange": "kucoin",
   "symbol": "JUP/USDT"
+ },
+ "LSK": {
+  "exchange": "kucoin",
+  "symbol": "LSK/USDT"
+ },
+ "STX": {
+  "exchange": "kucoin",
+  "symbol": "STX/USDT"
+ },
+ "SNX": {
+  "exchange": "kucoin",
+  "symbol": "SNX/USDT"
+ },
+ "COW": {
+  "exchange": "kucoin",
+  "symbol": "COW/USDT"
  }
 }
