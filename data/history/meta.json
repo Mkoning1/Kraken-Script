@@ -282,5 +282,9 @@
  "COW": {
   "exchange": "kucoin",
   "symbol": "COW/USDT"
+ },
+ "XTZ": {
+  "exchange": "kucoin",
+  "symbol": "XTZ/USDT"
  }
 }

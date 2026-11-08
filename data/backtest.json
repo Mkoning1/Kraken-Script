@@ -1,10 +1,10 @@
 {
- "generated_ts": 1793528869,
- "seconds": 112,
+ "generated_ts": 1794133213,
+ "seconds": 80,
  "period": {
   "start": 1731326400,
-  "end": 1793527200,
-  "split": 1768646880
+  "end": 1794132000,
+  "split": 1769009760
  },
  "coins": [
   "BTC/EUR",
@@ -48,47 +48,45 @@
   "WIF/EUR",
   "SEI/EUR",
   "ZEC/EUR",
-  "HYPE/EUR",
-  "ZRO/EUR",
-  "LSK/EUR",
-  "ENA/EUR",
   "PUMP/EUR",
-  "XDC/EUR",
-  "STX/EUR",
-  "TAO/EUR",
+  "HYPE/EUR",
+  "ENA/EUR",
   "VVV/EUR",
   "ONDO/EUR",
-  "SNX/EUR",
   "BNB/EUR",
-  "JUP/EUR",
-  "COW/EUR"
+  "TAO/EUR",
+  "XDC/EUR",
+  "POL/EUR",
+  "CRV/EUR",
+  "XTZ/EUR",
+  "ZRO/EUR"
  ],
- "pool_size": 55,
+ "pool_size": 53,
  "universe_size": 8,
  "size_test": {
   "5": {
-   "train_robust_r": -0.47,
-   "train_return_pct": 2.0,
-   "oos_expectancy_r": -0.123,
-   "oos_ex_best_expectancy_r": -0.424,
-   "oos_return_pct": -8.0,
-   "oos_trades": 60
+   "train_robust_r": -0.8,
+   "train_return_pct": -0.1,
+   "oos_expectancy_r": -0.106,
+   "oos_ex_best_expectancy_r": -0.41,
+   "oos_return_pct": -7.0,
+   "oos_trades": 59
   },
   "8": {
-   "train_robust_r": -2.88,
-   "train_return_pct": 8.5,
-   "oos_expectancy_r": 0.085,
-   "oos_ex_best_expectancy_r": -0.123,
-   "oos_return_pct": 2.2,
-   "oos_trades": 73
+   "train_robust_r": -3.54,
+   "train_return_pct": 6.3,
+   "oos_expectancy_r": 0.102,
+   "oos_ex_best_expectancy_r": -0.105,
+   "oos_return_pct": 9.2,
+   "oos_trades": 72
   },
   "15": {
-   "train_robust_r": -5.62,
-   "train_return_pct": 5.9,
-   "oos_expectancy_r": -0.003,
-   "oos_ex_best_expectancy_r": -0.129,
-   "oos_return_pct": -6.7,
-   "oos_trades": 96
+   "train_robust_r": -6.63,
+   "train_return_pct": 3.1,
+   "oos_expectancy_r": 0.078,
+   "oos_ex_best_expectancy_r": -0.081,
+   "oos_return_pct": 2.5,
+   "oos_trades": 93
   }
  },
  "sources": {
@@ -375,6 +373,10 @@
   "COW": {
    "exchange": "kucoin",
    "symbol": "COW/USDT"
+  },
+  "XTZ": {
+   "exchange": "kucoin",
+   "symbol": "XTZ/USDT"
   }
  },
  "profile": "assertief",
@@ -386,10 +388,10 @@
    "win_rate_pct": 24.4,
    "expectancy_r": 0.088,
    "total_r": 15.8,
-   "profit_factor": 1.11,
-   "return_pct": 9.7,
+   "profit_factor": 1.18,
+   "return_pct": 16.0,
    "max_drawdown_pct": 29.1,
-   "fees": 259.99,
+   "fees": 261.47,
    "halts": 0,
    "best_market": "XRP/EUR",
    "best_market_r": 15.829,
@@ -479,11 +481,11 @@
    },
    "ex_best_return_pct": 4.3,
    "ex_best_trades": 170,
-   "oos_trades": 73,
-   "oos_expectancy_r": 0.085,
-   "oos_return_pct": 2.2,
-   "oos_ex_best_expectancy_r": -0.123,
-   "default_oos_expectancy_r": 0.085,
+   "oos_trades": 72,
+   "oos_expectancy_r": 0.102,
+   "oos_return_pct": 9.2,
+   "oos_ex_best_expectancy_r": -0.105,
+   "default_oos_expectancy_r": 0.102,
    "tuned": false,
    "params": {
     "lookback": 55,
@@ -502,7 +504,7 @@
    "profit_factor": 0.34,
    "return_pct": -48.9,
    "max_drawdown_pct": 51.0,
-   "fees": 416.5,
+   "fees": 416.49,
    "halts": 0,
    "best_market": "DOGE/EUR",
    "best_market_r": 0.861,
@@ -513,13 +515,13 @@
      "trades": 24,
      "r": -12.667
     },
-    "BTC/EUR": {
-     "trades": 41,
-     "r": -19.491
-    },
     "SOL/EUR": {
      "trades": 22,
      "r": -10.38
+    },
+    "BTC/EUR": {
+     "trades": 41,
+     "r": -19.491
     },
     "BNB/EUR": {
      "trades": 25,
@@ -584,11 +586,11 @@
    },
    "ex_best_return_pct": -49.4,
    "ex_best_trades": 204,
-   "oos_trades": 89,
-   "oos_expectancy_r": -0.48,
-   "oos_return_pct": -27.7,
-   "oos_ex_best_expectancy_r": -0.484,
-   "default_oos_expectancy_r": -0.48,
+   "oos_trades": 82,
+   "oos_expectancy_r": -0.448,
+   "oos_return_pct": -24.0,
+   "oos_ex_best_expectancy_r": -0.452,
+   "default_oos_expectancy_r": -0.448,
    "tuned": false,
    "params": {
     "rsi_buy": 28,
@@ -600,31 +602,31 @@
    "timeframe_minutes": 60
   },
   "breakout": {
-   "trades": 495,
+   "trades": 496,
    "win_rate_pct": 24.8,
-   "expectancy_r": -0.232,
-   "total_r": -114.95,
-   "profit_factor": 0.61,
-   "return_pct": -64.0,
-   "max_drawdown_pct": 65.3,
-   "fees": 668.31,
+   "expectancy_r": -0.235,
+   "total_r": -116.77,
+   "profit_factor": 0.6,
+   "return_pct": -64.7,
+   "max_drawdown_pct": 65.9,
+   "fees": 667.04,
    "halts": 0,
    "best_market": "ZEC/EUR",
    "best_market_r": 6.545,
-   "ex_best_expectancy_r": -0.262,
-   "robust_r": -121.5,
+   "ex_best_expectancy_r": -0.266,
+   "robust_r": -123.32,
    "by_market": {
     "BTC/EUR": {
-     "trades": 88,
-     "r": -35.746
+     "trades": 87,
+     "r": -34.656
     },
     "DOGE/EUR": {
      "trades": 19,
      "r": 0.625
     },
     "ETH/EUR": {
-     "trades": 69,
-     "r": -13.513
+     "trades": 70,
+     "r": -14.875
     },
     "PEPE/EUR": {
      "trades": 6,
@@ -639,8 +641,8 @@
      "r": -13.202
     },
     "BNB/EUR": {
-     "trades": 81,
-     "r": -34.321
+     "trades": 82,
+     "r": -35.866
     },
     "XRP/EUR": {
      "trades": 50,
@@ -707,13 +709,13 @@
      "r": 0.728
     }
    },
-   "ex_best_return_pct": -67.8,
+   "ex_best_return_pct": -67.9,
    "ex_best_trades": 472,
-   "oos_trades": 188,
-   "oos_expectancy_r": -0.275,
-   "oos_return_pct": -33.6,
-   "oos_ex_best_expectancy_r": -0.349,
-   "default_oos_expectancy_r": -0.275,
+   "oos_trades": 186,
+   "oos_expectancy_r": -0.266,
+   "oos_return_pct": -32.5,
+   "oos_ex_best_expectancy_r": -0.339,
+   "default_oos_expectancy_r": -0.266,
    "tuned": false,
    "params": {
     "lookback": 24,
@@ -726,19 +728,19 @@
   }
  },
  "team": {
-  "trades": 586,
-  "win_rate_pct": 25.6,
-  "expectancy_r": -0.252,
-  "total_r": -147.63,
+  "trades": 591,
+  "win_rate_pct": 25.7,
+  "expectancy_r": -0.255,
+  "total_r": -150.51,
   "profit_factor": 0.62,
-  "return_pct": -67.9,
-  "max_drawdown_pct": 75.1,
-  "fees": 763.65,
+  "return_pct": -68.1,
+  "max_drawdown_pct": 75.2,
+  "fees": 771.62,
   "halts": 7,
   "best_market": "XRP/EUR",
   "best_market_r": 16.087,
-  "ex_best_expectancy_r": -0.305,
-  "robust_r": -163.72,
+  "ex_best_expectancy_r": -0.307,
+  "robust_r": -166.59,
   "curve": [
    [
     1731369600,
@@ -782,375 +784,379 @@
    ],
    [
     1737417600,
-    846.87
+    846.97
    ],
    [
     1738022400,
-    772.76
+    772.84
    ],
    [
     1738627200,
-    765.76
+    765.84
    ],
    [
     1739232000,
-    765.76
+    765.84
    ],
    [
     1739836800,
-    765.76
+    765.84
    ],
    [
     1740441600,
-    741.01
+    741.09
    ],
    [
     1741046400,
-    741.01
+    741.09
    ],
    [
     1741651200,
-    741.01
+    741.09
    ],
    [
     1742256000,
-    741.01
+    741.09
    ],
    [
     1742860800,
-    735.44
+    735.52
    ],
    [
     1743465600,
-    711.97
+    712.05
    ],
    [
     1744070400,
-    702.07
+    702.15
    ],
    [
     1744675200,
-    694.87
+    694.95
    ],
    [
     1745280000,
-    674.91
+    674.98
    ],
    [
     1745884800,
-    679.95
+    680.02
    ],
    [
     1746489600,
-    640.2
+    640.26
    ],
    [
     1747094400,
-    655.2
+    655.27
    ],
    [
     1747699200,
-    626.18
+    626.25
    ],
    [
     1748304000,
-    614.75
+    614.82
    ],
    [
     1748908800,
-    598.81
+    598.88
    ],
    [
     1749513600,
-    576.02
+    576.08
    ],
    [
     1750118400,
-    561.01
+    561.07
    ],
    [
     1750723200,
-    559.66
+    559.72
    ],
    [
     1751328000,
-    550.14
+    550.2
    ],
    [
     1751932800,
-    544.55
+    544.61
    ],
    [
     1752537600,
-    592.39
+    592.46
    ],
    [
     1753142400,
-    627.09
+    627.16
    ],
    [
     1753747200,
-    595.67
+    595.74
    ],
    [
     1754352000,
-    585.26
+    585.32
    ],
    [
     1754956800,
-    592.87
+    592.93
    ],
    [
     1755561600,
-    565.19
+    565.25
    ],
    [
     1756166400,
-    550.83
+    550.89
    ],
    [
     1756771200,
-    550.83
+    550.89
    ],
    [
     1757376000,
-    550.83
+    550.89
    ],
    [
     1757980800,
-    541.74
+    541.8
    ],
    [
     1758585600,
-    526.41
+    523.54
    ],
    [
     1759190400,
-    509.91
+    509.28
    ],
    [
     1759795200,
-    505.0
+    496.78
    ],
    [
     1760400000,
-    499.26
+    497.91
    ],
    [
     1761004800,
-    499.26
+    497.91
    ],
    [
     1761609600,
-    496.52
+    495.17
    ],
    [
     1762214400,
-    496.38
+    495.03
    ],
    [
     1762819200,
-    496.38
+    495.03
    ],
    [
     1763424000,
-    496.38
+    495.03
    ],
    [
     1764028800,
-    496.38
+    495.03
    ],
    [
     1764633600,
-    496.38
+    495.03
    ],
    [
     1765238400,
-    496.38
+    495.03
    ],
    [
     1765843200,
-    496.38
+    495.03
    ],
    [
     1766448000,
-    496.38
+    495.03
    ],
    [
     1767052800,
-    492.04
+    490.7
    ],
    [
     1767657600,
-    534.26
+    532.81
    ],
    [
     1768262400,
-    498.54
+    497.18
    ],
    [
     1768867200,
-    478.38
+    477.08
    ],
    [
     1769472000,
-    469.57
+    468.29
    ],
    [
     1770076800,
-    469.57
+    468.29
    ],
    [
     1770681600,
-    469.57
+    468.29
    ],
    [
     1771286400,
-    469.57
+    468.29
    ],
    [
     1771891200,
-    469.57
+    468.29
    ],
    [
     1772496000,
-    469.57
+    468.29
    ],
    [
     1773100800,
-    458.24
+    456.99
    ],
    [
     1773705600,
-    466.89
+    465.62
    ],
    [
     1774310400,
-    447.17
+    445.95
    ],
    [
     1774915200,
-    434.42
+    433.24
    ],
    [
     1775520000,
-    427.9
+    426.73
    ],
    [
     1776124800,
-    428.71
+    427.55
    ],
    [
     1776729600,
-    406.17
+    405.07
    ],
    [
     1777334400,
-    381.2
+    380.17
    ],
    [
     1777939200,
-    371.4
+    370.39
    ],
    [
     1778544000,
-    372.67
+    370.95
    ],
    [
     1779148800,
-    347.04
+    345.42
    ],
    [
     1779753600,
-    358.22
+    356.55
    ],
    [
     1780358400,
-    347.59
+    345.96
    ],
    [
     1780963200,
-    347.59
+    345.96
    ],
    [
     1781568000,
-    347.59
+    345.96
    ],
    [
     1782172800,
-    347.59
+    345.96
    ],
    [
     1782777600,
-    347.59
+    345.96
    ],
    [
     1783382400,
-    347.38
+    345.76
    ],
    [
     1783987200,
-    334.99
+    333.42
    ],
    [
     1784592000,
-    319.98
+    318.48
    ],
    [
     1785196800,
-    310.19
+    308.75
    ],
    [
     1785801600,
-    302.29
+    300.88
    ],
    [
     1786406400,
-    288.41
+    287.06
    ],
    [
     1787011200,
-    287.86
+    286.51
    ],
    [
     1787616000,
-    363.81
+    362.12
    ],
    [
     1788220800,
-    352.86
+    351.21
    ],
    [
     1788825600,
-    343.68
+    342.08
    ],
    [
     1789430400,
-    325.62
+    324.1
    ],
    [
     1790035200,
-    380.06
+    378.29
    ],
    [
     1790640000,
-    359.03
+    357.35
    ],
    [
     1791244800,
-    356.85
+    355.19
    ],
    [
     1791849600,
-    332.68
+    331.13
    ],
    [
     1792454400,
-    331.15
+    329.61
    ],
    [
     1793059200,
-    327.35
+    325.82
+   ],
+   [
+    1793664000,
+    319.34
    ]
   ]
  },
@@ -1159,10 +1165,10 @@
   "win_rate_pct": 23.3,
   "expectancy_r": 0.078,
   "total_r": 14.1,
-  "profit_factor": 1.09,
-  "return_pct": 7.9,
+  "profit_factor": 1.16,
+  "return_pct": 14.0,
   "max_drawdown_pct": 30.3,
-  "fees": 259.08,
+  "fees": 260.54,
   "halts": 1,
   "best_market": "XRP/EUR",
   "best_market_r": 15.574,
@@ -1543,45 +1549,49 @@
    ],
    [
     1787616000,
-    1052.64
+    1078.52
    ],
    [
     1788220800,
-    1019.5
+    1049.22
    ],
    [
     1788825600,
-    1032.14
+    1101.7
    ],
    [
     1789430400,
-    1001.57
+    1059.15
    ],
    [
     1790035200,
-    1129.18
+    1193.89
    ],
    [
     1790640000,
-    1128.13
+    1192.73
    ],
    [
     1791244800,
-    1158.05
+    1224.31
    ],
    [
     1791849600,
-    1107.68
+    1171.12
    ],
    [
     1792454400,
-    1107.68
+    1171.12
    ],
    [
     1793059200,
-    1088.57
+    1150.91
+   ],
+   [
+    1793664000,
+    1140.34
    ]
   ]
  },
- "btc_return_pct": -4.9
+ "btc_return_pct": -7.6
 }
