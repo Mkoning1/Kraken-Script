@@ -1,5 +1,5 @@
 {
-  "generated_ts": 1793622608,
+  "generated_ts": 1794229021,
   "timeframe_minutes": 15,
   "source": "CCXT spot proxy markets; not necessarily Kraken EUR",
   "no_live_promotion": true,
@@ -7,88 +7,88 @@
   "strategies": {
     "momentum": {
       "train": {
-        "trades": 101,
-        "signals": 194,
-        "events": 202,
+        "trades": 102,
+        "signals": 216,
+        "events": 203,
         "open_positions_end": 0,
-        "win_rate_pct": 6.93,
+        "win_rate_pct": 6.86,
         "expectancy_r": -0.54,
-        "return_pct": -35.42,
-        "max_drawdown_pct": 35.91,
-        "fees_paid": 267.4,
-        "btc_hold_pct": -19.19
+        "return_pct": -35.7,
+        "max_drawdown_pct": 36.19,
+        "fees_paid": 269.4,
+        "btc_hold_pct": -4.24
       },
       "oos": {
-        "trades": 106,
-        "signals": 152,
-        "events": 201,
+        "trades": 89,
+        "signals": 139,
+        "events": 169,
         "open_positions_end": 0,
-        "win_rate_pct": 15.09,
-        "expectancy_r": -0.415,
-        "return_pct": -29.7,
-        "max_drawdown_pct": 32.1,
-        "fees_paid": 290.54,
-        "btc_hold_pct": 23.73
+        "win_rate_pct": 11.24,
+        "expectancy_r": -0.511,
+        "return_pct": -30.96,
+        "max_drawdown_pct": 32.77,
+        "fees_paid": 232.93,
+        "btc_hold_pct": -0.46
       }
     },
     "squeeze": {
       "train": {
-        "trades": 76,
-        "signals": 185,
-        "events": 144,
-        "open_positions_end": 0,
-        "win_rate_pct": 9.21,
-        "expectancy_r": -0.487,
-        "return_pct": -27.3,
-        "max_drawdown_pct": 27.3,
-        "fees_paid": 221.99,
-        "btc_hold_pct": -19.19
+        "trades": 81,
+        "signals": 195,
+        "events": 155,
+        "open_positions_end": 2,
+        "win_rate_pct": 9.88,
+        "expectancy_r": -0.394,
+        "return_pct": -22.9,
+        "max_drawdown_pct": 29.21,
+        "fees_paid": 237.56,
+        "btc_hold_pct": -4.24
       },
       "oos": {
-        "trades": 58,
-        "signals": 129,
-        "events": 104,
+        "trades": 55,
+        "signals": 126,
+        "events": 99,
         "open_positions_end": 0,
-        "win_rate_pct": 10.34,
-        "expectancy_r": -0.487,
-        "return_pct": -21.87,
-        "max_drawdown_pct": 29.45,
-        "fees_paid": 189.91,
-        "btc_hold_pct": 23.73
+        "win_rate_pct": 7.27,
+        "expectancy_r": -0.694,
+        "return_pct": -28.45,
+        "max_drawdown_pct": 30.37,
+        "fees_paid": 165.48,
+        "btc_hold_pct": -0.46
       }
     },
     "fast_breakout": {
       "train": {
-        "trades": 114,
-        "signals": 255,
-        "events": 214,
-        "open_positions_end": 0,
-        "win_rate_pct": 9.65,
-        "expectancy_r": -0.56,
-        "return_pct": -41.33,
-        "max_drawdown_pct": 41.51,
-        "fees_paid": 286.77,
-        "btc_hold_pct": -19.19
+        "trades": 125,
+        "signals": 301,
+        "events": 234,
+        "open_positions_end": 2,
+        "win_rate_pct": 11.2,
+        "expectancy_r": -0.444,
+        "return_pct": -34.99,
+        "max_drawdown_pct": 43.83,
+        "fees_paid": 309.89,
+        "btc_hold_pct": -4.24
       },
       "oos": {
-        "trades": 98,
-        "signals": 317,
-        "events": 162,
+        "trades": 90,
+        "signals": 280,
+        "events": 150,
         "open_positions_end": 0,
-        "win_rate_pct": 18.37,
-        "expectancy_r": -0.263,
-        "return_pct": -20.03,
-        "max_drawdown_pct": 30.69,
-        "fees_paid": 309.47,
-        "btc_hold_pct": 23.73
+        "win_rate_pct": 16.67,
+        "expectancy_r": -0.422,
+        "return_pct": -28.62,
+        "max_drawdown_pct": 30.76,
+        "fees_paid": 252.49,
+        "btc_hold_pct": -0.46
       }
     }
   },
   "approved_for_live": false,
   "window": {
     "start": 1776852000,
-    "split": 1786914000,
-    "end": 1793622600
+    "split": 1787277600,
+    "end": 1794228300
   },
   "validation": "research_only"
 }
