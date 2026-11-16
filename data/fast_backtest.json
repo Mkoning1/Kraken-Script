@@ -1,5 +1,5 @@
 {
-  "generated_ts": 1794229021,
+  "generated_ts": 1794833366,
   "timeframe_minutes": 15,
   "source": "CCXT spot proxy markets; not necessarily Kraken EUR",
   "no_live_promotion": true,
@@ -7,88 +7,88 @@
   "strategies": {
     "momentum": {
       "train": {
-        "trades": 102,
-        "signals": 216,
-        "events": 203,
+        "trades": 104,
+        "signals": 227,
+        "events": 207,
         "open_positions_end": 0,
-        "win_rate_pct": 6.86,
-        "expectancy_r": -0.54,
-        "return_pct": -35.7,
-        "max_drawdown_pct": 36.19,
-        "fees_paid": 269.4,
-        "btc_hold_pct": -4.24
+        "win_rate_pct": 6.73,
+        "expectancy_r": -0.537,
+        "return_pct": -36.12,
+        "max_drawdown_pct": 36.65,
+        "fees_paid": 273.9,
+        "btc_hold_pct": 3.49
       },
       "oos": {
-        "trades": 89,
-        "signals": 139,
-        "events": 169,
+        "trades": 78,
+        "signals": 128,
+        "events": 151,
         "open_positions_end": 0,
-        "win_rate_pct": 11.24,
-        "expectancy_r": -0.511,
-        "return_pct": -30.96,
-        "max_drawdown_pct": 32.77,
-        "fees_paid": 232.93,
-        "btc_hold_pct": -0.46
+        "win_rate_pct": 10.26,
+        "expectancy_r": -0.515,
+        "return_pct": -28.15,
+        "max_drawdown_pct": 29.23,
+        "fees_paid": 208.64,
+        "btc_hold_pct": -20.63
       }
     },
     "squeeze": {
       "train": {
-        "trades": 81,
-        "signals": 195,
-        "events": 155,
+        "trades": 90,
+        "signals": 210,
+        "events": 167,
         "open_positions_end": 2,
-        "win_rate_pct": 9.88,
-        "expectancy_r": -0.394,
-        "return_pct": -22.9,
+        "win_rate_pct": 12.22,
+        "expectancy_r": -0.374,
+        "return_pct": -24.94,
         "max_drawdown_pct": 29.21,
-        "fees_paid": 237.56,
-        "btc_hold_pct": -4.24
+        "fees_paid": 262.45,
+        "btc_hold_pct": 3.49
       },
       "oos": {
-        "trades": 55,
-        "signals": 126,
-        "events": 99,
+        "trades": 40,
+        "signals": 113,
+        "events": 77,
         "open_positions_end": 0,
-        "win_rate_pct": 7.27,
-        "expectancy_r": -0.694,
-        "return_pct": -28.45,
-        "max_drawdown_pct": 30.37,
-        "fees_paid": 165.48,
-        "btc_hold_pct": -0.46
+        "win_rate_pct": 5.0,
+        "expectancy_r": -0.764,
+        "return_pct": -23.37,
+        "max_drawdown_pct": 24.06,
+        "fees_paid": 122.22,
+        "btc_hold_pct": -20.63
       }
     },
     "fast_breakout": {
       "train": {
-        "trades": 125,
-        "signals": 301,
-        "events": 234,
+        "trades": 142,
+        "signals": 337,
+        "events": 257,
         "open_positions_end": 2,
-        "win_rate_pct": 11.2,
-        "expectancy_r": -0.444,
-        "return_pct": -34.99,
+        "win_rate_pct": 13.38,
+        "expectancy_r": -0.413,
+        "return_pct": -38.23,
         "max_drawdown_pct": 43.83,
-        "fees_paid": 309.89,
-        "btc_hold_pct": -4.24
+        "fees_paid": 345.69,
+        "btc_hold_pct": 3.49
       },
       "oos": {
-        "trades": 90,
-        "signals": 280,
-        "events": 150,
+        "trades": 75,
+        "signals": 259,
+        "events": 131,
         "open_positions_end": 0,
-        "win_rate_pct": 16.67,
-        "expectancy_r": -0.422,
-        "return_pct": -28.62,
-        "max_drawdown_pct": 30.76,
-        "fees_paid": 252.49,
-        "btc_hold_pct": -0.46
+        "win_rate_pct": 8.0,
+        "expectancy_r": -0.62,
+        "return_pct": -31.84,
+        "max_drawdown_pct": 34.13,
+        "fees_paid": 209.69,
+        "btc_hold_pct": -20.63
       }
     }
   },
   "approved_for_live": false,
   "window": {
     "start": 1776852000,
-    "split": 1787277600,
-    "end": 1794228300
+    "split": 1787640300,
+    "end": 1794833100
   },
   "validation": "research_only"
 }
