@@ -286,5 +286,9 @@
  "XTZ": {
   "exchange": "kucoin",
   "symbol": "XTZ/USDT"
+ },
+ "VIRTUAL": {
+  "exchange": "kucoin",
+  "symbol": "VIRTUAL/USDT"
  }
 }
