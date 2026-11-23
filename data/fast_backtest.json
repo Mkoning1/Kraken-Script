@@ -1,5 +1,5 @@
 {
-  "generated_ts": 1794833366,
+  "generated_ts": 1795445064,
   "timeframe_minutes": 15,
   "source": "CCXT spot proxy markets; not necessarily Kraken EUR",
   "no_live_promotion": true,
@@ -7,88 +7,88 @@
   "strategies": {
     "momentum": {
       "train": {
-        "trades": 104,
-        "signals": 227,
-        "events": 207,
+        "trades": 111,
+        "signals": 235,
+        "events": 218,
         "open_positions_end": 0,
-        "win_rate_pct": 6.73,
-        "expectancy_r": -0.537,
-        "return_pct": -36.12,
-        "max_drawdown_pct": 36.65,
-        "fees_paid": 273.9,
-        "btc_hold_pct": 3.49
+        "win_rate_pct": 7.21,
+        "expectancy_r": -0.545,
+        "return_pct": -38.69,
+        "max_drawdown_pct": 39.15,
+        "fees_paid": 289.25,
+        "btc_hold_pct": -0.57
       },
       "oos": {
-        "trades": 78,
+        "trades": 74,
         "signals": 128,
-        "events": 151,
-        "open_positions_end": 0,
-        "win_rate_pct": 10.26,
-        "expectancy_r": -0.515,
-        "return_pct": -28.15,
-        "max_drawdown_pct": 29.23,
-        "fees_paid": 208.64,
-        "btc_hold_pct": -20.63
+        "events": 148,
+        "open_positions_end": 2,
+        "win_rate_pct": 12.16,
+        "expectancy_r": -0.454,
+        "return_pct": -24.22,
+        "max_drawdown_pct": 25.33,
+        "fees_paid": 208.21,
+        "btc_hold_pct": -18.15
       }
     },
     "squeeze": {
       "train": {
-        "trades": 90,
-        "signals": 210,
-        "events": 167,
-        "open_positions_end": 2,
-        "win_rate_pct": 12.22,
-        "expectancy_r": -0.374,
-        "return_pct": -24.94,
+        "trades": 95,
+        "signals": 213,
+        "events": 174,
+        "open_positions_end": 0,
+        "win_rate_pct": 11.58,
+        "expectancy_r": -0.397,
+        "return_pct": -27.92,
         "max_drawdown_pct": 29.21,
-        "fees_paid": 262.45,
-        "btc_hold_pct": 3.49
+        "fees_paid": 273.04,
+        "btc_hold_pct": -0.57
       },
       "oos": {
-        "trades": 40,
-        "signals": 113,
-        "events": 77,
-        "open_positions_end": 0,
-        "win_rate_pct": 5.0,
-        "expectancy_r": -0.764,
-        "return_pct": -23.37,
-        "max_drawdown_pct": 24.06,
-        "fees_paid": 122.22,
-        "btc_hold_pct": -20.63
+        "trades": 45,
+        "signals": 118,
+        "events": 88,
+        "open_positions_end": 3,
+        "win_rate_pct": 4.44,
+        "expectancy_r": -0.713,
+        "return_pct": -23.94,
+        "max_drawdown_pct": 25.01,
+        "fees_paid": 139.75,
+        "btc_hold_pct": -18.15
       }
     },
     "fast_breakout": {
       "train": {
-        "trades": 142,
-        "signals": 337,
-        "events": 257,
-        "open_positions_end": 2,
-        "win_rate_pct": 13.38,
-        "expectancy_r": -0.413,
-        "return_pct": -38.23,
+        "trades": 150,
+        "signals": 351,
+        "events": 268,
+        "open_positions_end": 0,
+        "win_rate_pct": 14.0,
+        "expectancy_r": -0.407,
+        "return_pct": -40.21,
         "max_drawdown_pct": 43.83,
-        "fees_paid": 345.69,
-        "btc_hold_pct": 3.49
+        "fees_paid": 361.08,
+        "btc_hold_pct": -0.57
       },
       "oos": {
-        "trades": 75,
-        "signals": 259,
-        "events": 131,
-        "open_positions_end": 0,
-        "win_rate_pct": 8.0,
-        "expectancy_r": -0.62,
-        "return_pct": -31.84,
-        "max_drawdown_pct": 34.13,
-        "fees_paid": 209.69,
-        "btc_hold_pct": -20.63
+        "trades": 86,
+        "signals": 223,
+        "events": 156,
+        "open_positions_end": 2,
+        "win_rate_pct": 11.63,
+        "expectancy_r": -0.541,
+        "return_pct": -31.57,
+        "max_drawdown_pct": 32.48,
+        "fees_paid": 237.64,
+        "btc_hold_pct": -18.15
       }
     }
   },
   "approved_for_live": false,
   "window": {
     "start": 1776852000,
-    "split": 1787640300,
-    "end": 1794833100
+    "split": 1788006600,
+    "end": 1795444200
   },
   "validation": "research_only"
 }
